@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<node name="/">
+  <interface name="org.gnome.NautilusApplication">
+  
+    <method name="get_window_list">
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="nautilus_application_dbus_get_window_list"/>
+      <arg type="as" direction="out"/> 
+    </method>
+
+    <method name="create_navigation_window">
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="nautilus_application_dbus_create_navigation_window"/>
+      <arg type="o" direction="out"/> 
+    </method>
+
+  </interface>
+</node>

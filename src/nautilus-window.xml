@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<node name="/">
+  <interface name="org.gnome.NautilusWindow">
+
+    <method name="go_to">
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="nautilus_window_dbus_go_to"/>
+      <arg type="s"/>
+    </method>
+
+    <method name="go_up">
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="nautilus_window_dbus_go_up"/>
+    </method>
+
+    <method name="get_location_uri">
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="nautilus_window_dbus_get_location_uri"/>
+      <arg type="s" direction="out"/>
+    </method>
+
+    <method name="go_to_with_selection">
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="nautilus_window_dbus_go_to_with_selection"/>
+      <arg type="s"/>
+      <arg type="as"/>
+    </method>
+
+    <method name="close">
+      <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="nautilus_window_dbus_close"/>
+    </method>
+
+  </interface>
+</node>
