@@ -162,4 +162,18 @@ void             nautilus_window_allow_burn_cd        (NautilusWindow    *window
 GtkUIManager *   nautilus_window_get_ui_manager       (NautilusWindow    *window);
 gboolean         nautilus_window_has_menubar_and_statusbar (NautilusWindow *window);
 
+gboolean         nautilus_window_dbus_go_to           (NautilusWindow    *window,
+						       const char             *location,
+						       GError **error);
+gboolean         nautilus_window_dbus_go_up           (NautilusWindow    *window,
+						       GError **error);
+gboolean         nautilus_window_dbus_get_location_uri  (NautilusWindow    *window,
+						       char             **location,
+						       GError **error);
+gboolean         nautilus_window_dbus_go_to_with_selection (NautilusWindow    *window,
+						       const char             *location_uri,
+						       const char** selection_uris,
+						       GError **error);
+gboolean         nautilus_window_dbus_close           (NautilusWindow    *window,
+						       GError **error);
 #endif

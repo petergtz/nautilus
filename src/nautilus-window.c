@@ -74,6 +74,8 @@
  */
 #include "nautilus-desktop-window.h"
 
+#include "nautilus-window-dbus-binding.h"
+
 #define MAX_HISTORY_ITEMS 50
 
 #define EXTRA_VIEW_WIDGETS_BACKGROUND "#a7c6e1"
@@ -146,6 +148,10 @@ nautilus_window_init (NautilusWindow *window)
 	GtkWidget *menu;
 	GtkWidget *statusbar;
 
+	gchar *dbus_window_as_string;
+	DBusGConnection *bus;
+	GError *error = NULL;
+
 	window->details = G_TYPE_INSTANCE_GET_PRIVATE (window, NAUTILUS_TYPE_WINDOW, NautilusWindowDetails);
 
 	window->details->show_hidden_files_mode = NAUTILUS_WINDOW_SHOW_HIDDEN_FILES_DEFAULT;
@@ -190,6 +196,11 @@ nautilus_window_init (NautilusWindow *window)
 
 	/* Keep the main event loop alive as long as the window exists */
 	nautilus_main_event_loop_register (GTK_OBJECT (window));
+
+	bus = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+	dbus_g_object_type_install_info(NAUTILUS_TYPE_WINDOW, &dbus_glib_nautilus_window_object_info);
+	dbus_window_as_string = g_strdup_printf("/NautilusWindow/%p", window);
+	dbus_g_connection_register_g_object (bus, dbus_window_as_string, G_OBJECT (window));
 }
 
 /* Unconditionally synchronize the GtkUIManager of WINDOW. */
@@ -1903,4 +1914,42 @@ gboolean
 nautilus_window_has_menubar_and_statusbar (NautilusWindow *window)
 {
 	return (nautilus_window_get_window_type (window) != NAUTILUS_WINDOW_DESKTOP);
+}
+
+gboolean
+nautilus_window_dbus_go_to (NautilusWindow *window, const char *location, GError **error)
+{
+	GFile *file_location;
+	file_location = g_file_new_for_uri(location);
+	nautilus_window_go_to(window, file_location);
+	return TRUE;
+}
+
+gboolean nautilus_window_dbus_go_up (NautilusWindow    *window,
+						       GError **error)
+{
+	nautilus_window_go_up(window, FALSE, FALSE);
+	return TRUE;
+}
+gboolean nautilus_window_dbus_get_location_uri (NautilusWindow    *window,
+						       char             **location,
+						       GError **error)
+{
+	*location = g_strdup(nautilus_window_slot_get_location_uri(window->details->active_slot));
+	return TRUE;
+}
+
+gboolean nautilus_window_dbus_go_to_with_selection (NautilusWindow    *window,
+						       const char             *location_uri,
+						       const char** selection_uris,
+						       GError **error)
+{
+//	nautilus_window_slot_go_to_with_selection(window->details->active_slot, location, selection);
+	return TRUE;
+}
+
+gboolean nautilus_window_dbus_close (NautilusWindow *window, GError **error)
+{
+	nautilus_window_close(window);
+	return TRUE;
 }

@@ -77,6 +77,9 @@
 #include <libnautilus-extension/nautilus-menu-provider.h>
 #include <libnautilus-private/nautilus-autorun.h>
 
+#include <dbus/dbus-glib.h>
+#include "nautilus-application-dbus-binding.h"
+
 enum
 {
   COMMAND_0, /* unused: 0 is an invalid command */
@@ -853,6 +856,34 @@ queue_accel_map_save_callback (GtkAccelMap *object, gchar *accel_path,
 	}
 }
 
+static void
+add_application_object_to_dbus(NautilusApplication *application)
+{
+	DBusGConnection *bus;
+	GError *error;
+	DBusGProxy *bus_proxy;
+	guint request_name_result;
+
+	error = NULL;
+
+	dbus_g_object_type_install_info(NAUTILUS_TYPE_APPLICATION, &dbus_glib_nautilus_application_object_info);
+	bus = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+
+	bus_proxy = dbus_g_proxy_new_for_name(bus, DBUS_SERVICE_DBUS, DBUS_PATH_DBUS, DBUS_INTERFACE_DBUS);
+
+	if (!dbus_g_proxy_call (bus_proxy, "RequestName", &error,
+			  G_TYPE_STRING, "org.gnome.Nautilus",
+			  G_TYPE_UINT, DBUS_NAME_FLAG_DO_NOT_QUEUE,
+			  G_TYPE_INVALID,
+			  G_TYPE_UINT, &request_name_result,
+			  G_TYPE_INVALID))
+	{
+		g_printerr ("Failed to acquire org.gnome.Nautilus: %s", error->message);
+	}
+
+	dbus_g_connection_register_g_object (bus, "/NautilusApplication", G_OBJECT (application));
+}
+
 void
 nautilus_application_startup (NautilusApplication *application,
 			      gboolean kill_shell,
@@ -900,6 +931,8 @@ nautilus_application_startup (NautilusApplication *application,
 		}
 
 		if (!unique_app_is_running (application->unique_app)) {
+			add_application_object_to_dbus(application);
+
 			finish_startup (application, no_desktop);
 			g_signal_connect (application->unique_app, "message-received", G_CALLBACK (message_received_cb), application);			
 		}
@@ -2197,3 +2230,37 @@ nautilus_application_class_init (NautilusApplicationClass *class)
         object_class = G_OBJECT_CLASS (class);
         object_class->finalize = nautilus_application_finalize;
 }
+
+gboolean
+nautilus_application_dbus_get_window_list (NautilusApplication *application, char ***ret, GError **error)
+{
+	  GList *cursor;
+	  int i;
+	  int n_windows;
+	  n_windows = g_list_length(nautilus_application_get_window_list());
+	  *ret = g_new(char*, n_windows+1);
+
+	  cursor = nautilus_application_get_window_list();
+	  i = 0;
+	  while((cursor != NULL) && (i<n_windows))
+	  {
+		  (*ret)[i] = g_strdup_printf("/NautilusWindow/%p", cursor->data);
+		  cursor = cursor->next;
+		  i++;
+	  }
+	  (*ret)[i] = NULL;
+	  return TRUE;
+}
+
+gboolean nautilus_application_dbus_create_navigation_window (NautilusApplication *application, char **ret, GError **error)
+{
+
+	NautilusWindow *window;
+	GFile *location;
+	window = nautilus_application_create_navigation_window (application, NULL, gdk_screen_get_default ());
+	location = g_file_new_for_uri("file:///");
+	nautilus_window_go_to(window, location);
+	*ret = g_strdup_printf("/NautilusWindow/%p", window);
+	return TRUE;
+}
+

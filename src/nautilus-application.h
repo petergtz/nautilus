@@ -111,5 +111,7 @@ void                 nautilus_application_open_desktop      (NautilusApplication
 void                 nautilus_application_close_desktop     (void);
 gboolean             nautilus_application_save_accel_map    (gpointer data);
 
+gboolean	     nautilus_application_dbus_get_window_list (NautilusApplication *application, char ***ret, GError **error);
+gboolean	     nautilus_application_dbus_create_navigation_window (NautilusApplication *application, char **ret, GError **error);
 
 #endif /* NAUTILUS_APPLICATION_H */
