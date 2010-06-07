@@ -60,6 +60,8 @@ typedef struct NautilusWindow NautilusWindow;
 typedef struct NautilusWindowSlot NautilusWindowSlot;
 #endif
 
+typedef struct _NautilusWindowPane      NautilusWindowPane;
+
 typedef struct NautilusWindowSlotClass NautilusWindowSlotClass;
 typedef enum NautilusWindowOpenSlotFlags NautilusWindowOpenSlotFlags;
 
@@ -92,24 +94,20 @@ typedef struct {
         NautilusIconInfo * (* get_icon) (NautilusWindow *window,
 					 NautilusWindowSlot *slot);
 
-        void   (* load_view_as_menu) (NautilusWindow *window);
-
         void   (* sync_allow_stop) (NautilusWindow *window,
 				    NautilusWindowSlot *slot);
 	void   (* set_allow_up) (NautilusWindow *window, gboolean allow);
 	void   (* reload)              (NautilusWindow *window);
         void   (* prompt_for_location) (NautilusWindow *window, const char *initial);
-        void   (* sync_search_widgets) (NautilusWindow *window);
-        void   (* sync_zoom_widgets) (NautilusWindow *window);
+        void   (* get_min_size) (NautilusWindow *window, guint *default_width, guint *default_height);
         void   (* get_default_size) (NautilusWindow *window, guint *default_width, guint *default_height);
-        void   (* show_window)  (NautilusWindow *window);
         void   (* close) (NautilusWindow *window);
 
-        NautilusWindowSlot * (* open_slot) (NautilusWindow *window,
+        NautilusWindowSlot * (* open_slot) (NautilusWindowPane *pane,
 					    NautilusWindowOpenSlotFlags flags);
-        void                 (* close_slot) (NautilusWindow *window,
+        void                 (* close_slot) (NautilusWindowPane *pane,
 					     NautilusWindowSlot *slot);
-        void                 (* set_active_slot) (NautilusWindow *window,
+        void                 (* set_active_slot) (NautilusWindowPane *pane,
 						  NautilusWindowSlot *slot);
 
         /* Signals used only for keybindings */
@@ -145,7 +143,6 @@ void             nautilus_window_go_up                (NautilusWindow    *window
 						       gboolean           new_tab);
 void             nautilus_window_prompt_for_location  (NautilusWindow    *window,
                                                        const char        *initial);
-void		 nautilus_window_sync_search_widgets  (NautilusWindow    *window);
 void             nautilus_window_launch_cd_burner     (NautilusWindow    *window);
 void             nautilus_window_display_error        (NautilusWindow    *window,
                                                        const char        *error_msg);

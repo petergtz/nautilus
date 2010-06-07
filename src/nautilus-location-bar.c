@@ -36,6 +36,7 @@
 #include "nautilus-location-entry.h"
 #include "nautilus-window-private.h"
 #include "nautilus-window.h"
+#include "nautilus-navigation-window-pane.h"
 #include <eel/eel-accessibility.h>
 #include <eel/eel-glib-extensions.h>
 #include <eel/eel-gtk-macros.h>
@@ -266,7 +267,7 @@ label_button_pressed_callback (GtkWidget             *widget,
 	}
 
 	window = nautilus_location_bar_get_window (widget->parent);
-	slot = NAUTILUS_WINDOW (window)->details->active_slot;
+	slot = NAUTILUS_WINDOW (window)->details->active_pane->active_slot;
 	view = slot->content_view;
 	label = GTK_BIN (widget)->child;
 	/* only pop-up if the URI in the entry matches the displayed location */
@@ -318,9 +319,8 @@ editable_activate_callback (GtkEntry *entry,
 }
 
 static void
-editable_event_after_callback (GtkEntry *entry,
-			       GdkEvent *event,
-			       gpointer user_data)
+editable_changed_callback (GtkEntry *entry,
+			   gpointer user_data)
 {
 	nautilus_location_bar_update_label (NAUTILUS_LOCATION_BAR (user_data));
 }
@@ -429,8 +429,8 @@ nautilus_location_bar_init (NautilusLocationBar *bar)
 	
 	g_signal_connect_object (entry, "activate",
 				 G_CALLBACK (editable_activate_callback), bar, 0);
-	g_signal_connect_object (entry, "event_after",
-				 G_CALLBACK (editable_event_after_callback), bar, G_CONNECT_AFTER);
+	g_signal_connect_object (entry, "changed",
+				 G_CALLBACK (editable_changed_callback), bar, 0);
 
 	gtk_box_pack_start (GTK_BOX (hbox), entry, TRUE, TRUE, 0);
 
@@ -466,7 +466,7 @@ nautilus_location_bar_init (NautilusLocationBar *bar)
 }
 
 GtkWidget *
-nautilus_location_bar_new (NautilusNavigationWindow *window)
+nautilus_location_bar_new (NautilusNavigationWindowPane *pane)
 {
 	GtkWidget *bar;
 	NautilusLocationBar *location_bar;
@@ -477,7 +477,7 @@ nautilus_location_bar_new (NautilusNavigationWindow *window)
 	/* Clipboard */
 	nautilus_clipboard_set_up_editable
 		(GTK_EDITABLE (location_bar->details->entry),
-		 nautilus_window_get_ui_manager (NAUTILUS_WINDOW (window)),
+		 nautilus_window_get_ui_manager (NAUTILUS_WINDOW (NAUTILUS_WINDOW_PANE(pane)->window)),
 		 TRUE);
 
 	return bar;
@@ -563,16 +563,50 @@ nautilus_location_bar_update_label (NautilusLocationBar *bar)
 	GFile *location;
 	GFile *last_location;
 	
+	if (bar->details->last_location == NULL){
+		gtk_label_set_text (GTK_LABEL (bar->details->label), GO_TO_LABEL);
+		nautilus_location_entry_set_secondary_action (NAUTILUS_LOCATION_ENTRY (bar->details->entry), 
+							      NAUTILUS_LOCATION_ENTRY_ACTION_GOTO);
+		return;
+	}
+
 	current_text = gtk_entry_get_text (GTK_ENTRY (bar->details->entry));
 	location = g_file_parse_name (current_text);
 	last_location = g_file_parse_name (bar->details->last_location);
 	
 	if (g_file_equal (last_location, location)) {
 		gtk_label_set_text (GTK_LABEL (bar->details->label), LOCATION_LABEL);
+		nautilus_location_entry_set_secondary_action (NAUTILUS_LOCATION_ENTRY (bar->details->entry), 
+							      NAUTILUS_LOCATION_ENTRY_ACTION_CLEAR);
 	} else {		 
 		gtk_label_set_text (GTK_LABEL (bar->details->label), GO_TO_LABEL);
+		nautilus_location_entry_set_secondary_action (NAUTILUS_LOCATION_ENTRY (bar->details->entry), 
+							      NAUTILUS_LOCATION_ENTRY_ACTION_GOTO);
 	}
 
 	g_object_unref (location);
 	g_object_unref (last_location);
+}
+
+/* change background color based on activity state */
+void
+nautilus_location_bar_set_active(NautilusLocationBar *location_bar, gboolean is_active)
+{
+	if(is_active) {
+		/* reset style to default */
+		gtk_widget_modify_base (GTK_WIDGET (location_bar->details->entry), GTK_STATE_NORMAL, NULL);
+	}
+	else {
+		GtkStyle *style;
+		GdkColor color;
+		style = gtk_widget_get_style (GTK_WIDGET (location_bar->details->entry));
+		color = style->base[GTK_STATE_INSENSITIVE];
+		gtk_widget_modify_base(GTK_WIDGET (location_bar->details->entry), GTK_STATE_NORMAL, &color);
+	}
+}
+
+NautilusEntry *
+nautilus_location_bar_get_entry (NautilusLocationBar *location_bar)
+{
+	return location_bar->details->entry;
 }

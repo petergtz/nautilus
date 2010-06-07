@@ -336,6 +336,9 @@ struct FMDirectoryViewClass {
 
 	void	(* emblems_changed)                (FMDirectoryView *view);
 
+	void    (* set_is_active)                  (FMDirectoryView *view,
+						    gboolean         is_active);
+
         /* Signals used only for keybindings */
         gboolean (* trash)                         (FMDirectoryView *view);
         gboolean (* delete)                        (FMDirectoryView *view);
@@ -465,6 +468,14 @@ void                fm_directory_view_handle_text_drop                 (FMDirect
 									GdkDragAction     action,
 									int               x,
 									int               y);
+void                fm_directory_view_handle_raw_drop                 (FMDirectoryView  *view,
+									const char       *raw_data,
+									int               length,
+									const char       *target_uri,
+									const char       *direct_save_uri,
+									GdkDragAction     action,
+									int               x,
+									int               y);
 void                fm_directory_view_freeze_updates                   (FMDirectoryView  *view);
 void                fm_directory_view_unfreeze_updates                 (FMDirectoryView  *view);
 void                fm_directory_view_add_subdirectory                (FMDirectoryView  *view,
@@ -473,5 +484,10 @@ void                fm_directory_view_remove_subdirectory             (FMDirecto
 									NautilusDirectory*directory);
 
 gboolean            fm_directory_view_is_editable                     (FMDirectoryView *view);
+void		    fm_directory_view_set_initiated_unmount	      (FMDirectoryView *view,
+									gboolean inititated_unmount);
+
+/* operations affecting two directory views */
+void                fm_directory_view_move_copy_items_between_views   (FMDirectoryView *source, FMDirectoryView *target, gboolean copy);
 
 #endif /* FM_DIRECTORY_VIEW_H */

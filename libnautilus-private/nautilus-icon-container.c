@@ -270,6 +270,7 @@ enum {
 	HANDLE_NETSCAPE_URL,
 	HANDLE_URI_LIST,
 	HANDLE_TEXT,
+	HANDLE_RAW,
 	PREVIEW,
 	SELECTION_CHANGED,
 	ICON_ADDED,
@@ -4130,7 +4131,6 @@ size_allocate (GtkWidget *widget,
 static void
 realize (GtkWidget *widget)
 {
-	GtkWindow *window;
 	GdkBitmap *stipple;
 	GtkAdjustment *vadj, *hadj;
 	NautilusIconContainer *container;
@@ -4149,11 +4149,6 @@ realize (GtkWidget *widget)
 	nautilus_icon_dnd_init (container, NULL);
 
 	setup_label_gcs (container);
-
- 	/* make us the focused widget */
- 	g_assert (GTK_IS_WINDOW (gtk_widget_get_toplevel (widget)));
-	window = GTK_WINDOW (gtk_widget_get_toplevel (widget));
-	gtk_window_set_focus (window, widget);
 
 	stipple = eel_stipple_bitmap_for_screen (
 			gdk_drawable_get_screen (GDK_DRAWABLE (widget->window)));
@@ -4174,14 +4169,9 @@ static void
 unrealize (GtkWidget *widget)
 {
 	int i;
-	GtkWindow *window;
 	NautilusIconContainer *container;
 
 	container = NAUTILUS_ICON_CONTAINER (widget);
-
-        g_assert (GTK_IS_WINDOW (gtk_widget_get_toplevel (widget)));
-        window = GTK_WINDOW (gtk_widget_get_toplevel (widget));
-	gtk_window_set_focus (window, NULL);
 
 	for (i = 0; i < LAST_LABEL_COLOR; i++) {
 		if (container->details->label_gcs [i]) {
@@ -4217,7 +4207,7 @@ style_set (GtkWidget *widget,
 
 	nautilus_icon_container_theme_changed (NAUTILUS_ICON_CONTAINER (widget));	
 
-	if (GTK_WIDGET_REALIZED (widget)) {
+	if (gtk_widget_get_realized (widget)) {
 		invalidate_label_sizes (container);
 		nautilus_icon_container_request_update_all (container);
 	}
@@ -4253,7 +4243,7 @@ button_press_event (GtkWidget *widget,
 	/* Move focus to icon container, unless we're still renaming (to avoid exiting
 	 * renaming mode)
 	 */
-  	if (!GTK_WIDGET_HAS_FOCUS (widget) && !(is_renaming (container) || is_renaming_pending (container))) {
+  	if (!gtk_widget_has_focus (widget) && !(is_renaming (container) || is_renaming_pending (container))) {
     		gtk_widget_grab_focus (widget);
     	}
 
@@ -4484,7 +4474,7 @@ start_stretching (NautilusIconContainer *container)
 
 	/* Ensure the window itself is focused.. */
 	toplevel = gtk_widget_get_toplevel (GTK_WIDGET (container));
-	if (toplevel != NULL && GTK_WIDGET_REALIZED (toplevel)) {
+	if (toplevel != NULL && gtk_widget_get_realized (toplevel)) {
 		eel_gdk_window_focus (toplevel->window, GDK_CURRENT_TIME);
 	}
 
@@ -5286,11 +5276,11 @@ nautilus_icon_container_real_start_interactive_search (NautilusIconContainer *co
 	GtkWidgetClass *entry_parent_class;
 
 	if (container->details->search_window != NULL &&
-	    GTK_WIDGET_VISIBLE (container->details->search_window)) {
+	    gtk_widget_get_visible (container->details->search_window)) {
 		return TRUE;
 	}
 
-	if (!GTK_WIDGET_HAS_FOCUS (container)) {
+	if (!gtk_widget_has_focus (GTK_WIDGET (container))) {
 		return FALSE;
 	}
 
@@ -5850,6 +5840,22 @@ nautilus_icon_container_class_init (NautilusIconContainerClass *class)
 		                NULL, NULL,
 		                nautilus_marshal_VOID__STRING_STRING_ENUM_INT_INT,
 		                G_TYPE_NONE, 5,
+				G_TYPE_STRING,
+				G_TYPE_STRING,
+				GDK_TYPE_DRAG_ACTION,
+				G_TYPE_INT,
+				G_TYPE_INT);
+	signals[HANDLE_RAW]
+		= g_signal_new ("handle_raw",
+		                G_TYPE_FROM_CLASS (class),
+		                G_SIGNAL_RUN_LAST,
+		                G_STRUCT_OFFSET (NautilusIconContainerClass,
+						 handle_raw),
+		                NULL, NULL,
+		                nautilus_marshal_VOID__POINTER_INT_STRING_STRING_ENUM_INT_INT,
+		                G_TYPE_NONE, 7,
+				G_TYPE_POINTER,
+				G_TYPE_INT,
 				G_TYPE_STRING,
 				G_TYPE_STRING,
 				GDK_TYPE_DRAG_ACTION,
@@ -7543,6 +7549,8 @@ nautilus_icon_container_invert_selection (NautilusIconContainer *container)
 		icon = p->data;
 		icon_toggle_selected (container, icon);
 	}
+
+	g_signal_emit (container, signals[SELECTION_CHANGED], 0);
 }
 
 
@@ -8285,9 +8293,12 @@ nautilus_icon_container_start_renaming_selected_item (NautilusIconContainer *con
 	int x, y, width;
 	int start_offset, end_offset;
 
-	/* Check if it already in renaming mode. */
+	/* Check if it already in renaming mode, if so - select all */
 	details = container->details;
 	if (details->renaming) {
+		eel_editable_label_select_region (EEL_EDITABLE_LABEL (details->rename_widget),
+						  0,
+						  -1);
 		return;
 	}
 
@@ -8520,7 +8531,7 @@ nautilus_icon_container_get_label_color_and_gc (NautilusIconContainer *container
 	
 	if (is_name) {
 		if (is_highlight) {
-			if (GTK_WIDGET_HAS_FOCUS (GTK_WIDGET (container))) {
+			if (gtk_widget_has_focus (GTK_WIDGET (container))) {
 				idx = LABEL_COLOR_HIGHLIGHT;
 			} else {
 				idx = LABEL_COLOR_ACTIVE;
@@ -8534,7 +8545,7 @@ nautilus_icon_container_get_label_color_and_gc (NautilusIconContainer *container
 		}
 	} else {
 		if (is_highlight) {
-			if (GTK_WIDGET_HAS_FOCUS (GTK_WIDGET (container))) {
+			if (gtk_widget_has_focus (GTK_WIDGET (container))) {
 				idx = LABEL_INFO_COLOR_HIGHLIGHT;
 			} else {
 				idx = LABEL_INFO_COLOR_ACTIVE;
@@ -8579,7 +8590,7 @@ setup_label_gcs (NautilusIconContainer *container)
 	guint light_info_value, dark_info_value;
 	gboolean frame_text;
 	
-	if (!GTK_WIDGET_REALIZED (container))
+	if (!gtk_widget_get_realized (GTK_WIDGET (container)))
 		return;
 
 	widget = GTK_WIDGET (container);

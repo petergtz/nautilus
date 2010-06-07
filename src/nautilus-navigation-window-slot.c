@@ -26,6 +26,7 @@
 #include "nautilus-navigation-window-slot.h"
 #include "nautilus-window-private.h"
 #include "nautilus-search-bar.h"
+#include "nautilus-navigation-window-pane.h"
 #include <libnautilus-private/nautilus-window-slot-info.h>
 #include <libnautilus-private/nautilus-file.h>
 #include <eel/eel-gtk-macros.h>
@@ -45,6 +46,10 @@ nautilus_navigation_window_slot_should_close_with_mount (NautilusNavigationWindo
 	GList *l;
 	gboolean close_with_mount;
 
+	if (slot->parent.pane->window->details->initiated_unmount) {
+		return FALSE;
+	}
+
 	mount_location = g_mount_get_root (mount);
 
 	close_with_mount = TRUE;
@@ -53,7 +58,8 @@ nautilus_navigation_window_slot_should_close_with_mount (NautilusNavigationWindo
 		bookmark = NAUTILUS_BOOKMARK (l->data);
 
 		bookmark_location = nautilus_bookmark_get_location (bookmark);
-		close_with_mount &= g_file_has_prefix (bookmark_location, mount_location);
+		close_with_mount &= g_file_has_prefix (bookmark_location, mount_location) ||
+				    g_file_equal (bookmark_location, mount_location);
 		g_object_unref (bookmark_location);
 
 		if (!close_with_mount) {
@@ -61,7 +67,8 @@ nautilus_navigation_window_slot_should_close_with_mount (NautilusNavigationWindo
 		}
 	}
 
-	close_with_mount &= g_file_has_prefix (NAUTILUS_WINDOW_SLOT (slot)->location, mount_location);
+	close_with_mount &= g_file_has_prefix (NAUTILUS_WINDOW_SLOT (slot)->location, mount_location) ||
+			    g_file_equal (NAUTILUS_WINDOW_SLOT (slot)->location, mount_location);
 
 	/* we could also consider the forward list here, but since the “go home” request
 	 * in nautilus-window-manager-views.c:mount_removed_callback() would discard those
@@ -123,8 +130,8 @@ nautilus_navigation_window_slot_update_query_editor (NautilusWindowSlot *slot)
 	NautilusNavigationWindow *navigation_window;
 	GtkWidget *query_editor;
 
-	g_assert (slot->window != NULL);
-	navigation_window = NAUTILUS_NAVIGATION_WINDOW (slot->window);
+	g_assert (slot->pane->window != NULL);
+	navigation_window = NAUTILUS_NAVIGATION_WINDOW (slot->pane->window);
 
 	query_editor = NULL;
 
@@ -138,8 +145,8 @@ nautilus_navigation_window_slot_update_query_editor (NautilusWindowSlot *slot)
 		} else {
 			query_editor = nautilus_query_editor_new_with_bar (FALSE,
 									   nautilus_search_directory_is_indexed (search_directory),
-									   slot->window->details->active_slot == slot,
-									   NAUTILUS_SEARCH_BAR (navigation_window->search_bar),
+									   slot->pane->window->details->active_pane->active_slot == slot,
+									   NAUTILUS_SEARCH_BAR (NAUTILUS_NAVIGATION_WINDOW_PANE (slot->pane)->search_bar),
 									   slot);
 		}
 	}
@@ -172,16 +179,18 @@ nautilus_navigation_window_slot_active (NautilusWindowSlot *slot)
 {
 	NautilusNavigationWindow *window;
 	NautilusNavigationWindowSlot *navigation_slot;
+	NautilusNavigationWindowPane *pane;
 	int page_num;
 
 	navigation_slot = NAUTILUS_NAVIGATION_WINDOW_SLOT (slot);
-	window = NAUTILUS_NAVIGATION_WINDOW (slot->window);
+	pane = NAUTILUS_NAVIGATION_WINDOW_PANE (slot->pane);
+	window = NAUTILUS_NAVIGATION_WINDOW (slot->pane->window);
 
-	page_num = gtk_notebook_page_num (GTK_NOTEBOOK (window->notebook),
+	page_num = gtk_notebook_page_num (GTK_NOTEBOOK (pane->notebook),
 					  slot->content_box);
 	g_assert (page_num >= 0);
 
-	gtk_notebook_set_current_page (GTK_NOTEBOOK (window->notebook), page_num);
+	gtk_notebook_set_current_page (GTK_NOTEBOOK (pane->notebook), page_num);
 
 	EEL_CALL_PARENT (NAUTILUS_WINDOW_SLOT_CLASS, active, (slot));
 

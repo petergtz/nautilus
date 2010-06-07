@@ -137,8 +137,14 @@ struct _NautilusWindowInfoIface
 				       NautilusWindowShowHiddenFilesMode mode);
 
 	NautilusWindowSlotInfo * (* get_active_slot) (NautilusWindowInfo *window);
+	NautilusWindowSlotInfo * (* get_extra_slot)  (NautilusWindowInfo *window);
 
-	void   (* show_window)        (NautilusWindowInfo *window);
+	gboolean (* get_initiated_unmount) (NautilusWindowInfo *window);
+	void   (* set_initiated_unmount) (NautilusWindowInfo *window,
+					  gboolean initiated_unmount);
+
+	void   (* view_visible)        (NautilusWindowInfo *window,
+					NautilusView *view);
 	void   (* close_window)       (NautilusWindowInfo *window);
 	GtkUIManager *     (* get_ui_manager)   (NautilusWindowInfo *window);
 };
@@ -152,7 +158,9 @@ void                              nautilus_window_info_report_view_failed       
 										 NautilusView                      *view);
 void                              nautilus_window_info_report_selection_changed (NautilusWindowInfo                *window);
 NautilusWindowSlotInfo *          nautilus_window_info_get_active_slot          (NautilusWindowInfo                *window);
-void                              nautilus_window_info_show_window              (NautilusWindowInfo                *window);
+NautilusWindowSlotInfo *          nautilus_window_info_get_extra_slot           (NautilusWindowInfo                *window);
+void                              nautilus_window_info_view_visible             (NautilusWindowInfo                *window,
+										 NautilusView                      *view);
 void                              nautilus_window_info_close                    (NautilusWindowInfo                *window);
 void                              nautilus_window_info_push_status              (NautilusWindowInfo                *window,
 										 const char                        *status);
@@ -166,8 +174,10 @@ GList *                           nautilus_window_info_get_selection            
 NautilusWindowShowHiddenFilesMode nautilus_window_info_get_hidden_files_mode    (NautilusWindowInfo                *window);
 void                              nautilus_window_info_set_hidden_files_mode    (NautilusWindowInfo                *window,
 										 NautilusWindowShowHiddenFilesMode  mode);
+gboolean                          nautilus_window_info_get_initiated_unmount    (NautilusWindowInfo                *window);
+void                              nautilus_window_info_set_initiated_unmount    (NautilusWindowInfo                *window,
+										 gboolean initiated_unmount);
 GtkUIManager *                    nautilus_window_info_get_ui_manager           (NautilusWindowInfo                *window);
-
 
 G_END_DECLS
 

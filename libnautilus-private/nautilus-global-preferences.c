@@ -339,16 +339,11 @@ static const PreferenceDefault preference_defaults[] = {
 	  NULL, NULL,
 	  NULL
 	},
-	/* FIXME bugzilla.gnome.org 41245: Saved in pixels instead of in %? */
 	{ NAUTILUS_PREFERENCES_SIDEBAR_WIDTH,
 	  PREFERENCE_INTEGER,
 	  GINT_TO_POINTER (148)
 	},
 	{ NAUTILUS_PREFERENCES_ALWAYS_USE_BROWSER,
-	  PREFERENCE_BOOLEAN,
-	  GINT_TO_POINTER (FALSE)
-	},
-	{ NAUTILUS_PREFERENCES_ENABLE_TABS,
 	  PREFERENCE_BOOLEAN,
 	  GINT_TO_POINTER (TRUE)
 	},

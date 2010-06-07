@@ -1322,7 +1322,7 @@ draw_label_text (NautilusIconCanvasItem *item,
 	if (needs_highlight && !details->is_renaming) {
 		draw_frame (item,
 			    drawable,
-			    GTK_WIDGET_HAS_FOCUS (GTK_WIDGET (container)) ? container->details->highlight_color_rgba : container->details->active_color_rgba,
+			    gtk_widget_has_focus (GTK_WIDGET (container)) ? container->details->highlight_color_rgba : container->details->active_color_rgba,
 			    create_mask,
 			    is_rtl_label_beside ? text_rect.x0 + item->details->text_dx : text_rect.x0,
 			    text_rect.y0,
@@ -1883,7 +1883,7 @@ real_map_pixbuf (NautilusIconCanvasItem *icon_item)
 
 		old_pixbuf = temp_pixbuf;
 
-		color =  GTK_WIDGET_HAS_FOCUS (GTK_WIDGET (canvas)) ? NAUTILUS_ICON_CONTAINER (canvas)->details->highlight_color_rgba : NAUTILUS_ICON_CONTAINER (canvas)->details->active_color_rgba;
+		color =  gtk_widget_has_focus (GTK_WIDGET (canvas)) ? NAUTILUS_ICON_CONTAINER (canvas)->details->highlight_color_rgba : NAUTILUS_ICON_CONTAINER (canvas)->details->active_color_rgba;
 
 		temp_pixbuf = eel_create_colorized_pixbuf (temp_pixbuf,
 							   EEL_RGBA_COLOR_GET_R (color),
@@ -1928,7 +1928,7 @@ map_pixbuf (NautilusIconCanvasItem *icon_item)
 	      && icon_item->details->rendered_is_prelit == icon_item->details->is_prelit
 	      && icon_item->details->rendered_is_highlighted_for_selection == icon_item->details->is_highlighted_for_selection
 	      && icon_item->details->rendered_is_highlighted_for_drop == icon_item->details->is_highlighted_for_drop
-	      && (icon_item->details->is_highlighted_for_selection && icon_item->details->rendered_is_focused == GTK_WIDGET_HAS_FOCUS (EEL_CANVAS_ITEM (icon_item)->canvas)))) {
+	      && (icon_item->details->is_highlighted_for_selection && icon_item->details->rendered_is_focused == gtk_widget_has_focus (GTK_WIDGET (EEL_CANVAS_ITEM (icon_item)->canvas))))) {
 		if (icon_item->details->rendered_pixbuf != NULL) {
 			g_object_unref (icon_item->details->rendered_pixbuf);
 		}
@@ -1937,7 +1937,7 @@ map_pixbuf (NautilusIconCanvasItem *icon_item)
 		icon_item->details->rendered_is_prelit = icon_item->details->is_prelit;
 		icon_item->details->rendered_is_highlighted_for_selection = icon_item->details->is_highlighted_for_selection;
 		icon_item->details->rendered_is_highlighted_for_drop = icon_item->details->is_highlighted_for_drop;
-		icon_item->details->rendered_is_focused = GTK_WIDGET_HAS_FOCUS (EEL_CANVAS_ITEM (icon_item)->canvas);
+		icon_item->details->rendered_is_focused = gtk_widget_has_focus (GTK_WIDGET (EEL_CANVAS_ITEM (icon_item)->canvas));
 	}
 
 	g_object_ref (icon_item->details->rendered_pixbuf);
@@ -2488,7 +2488,7 @@ static void
 nautilus_icon_canvas_item_ensure_bounds_up_to_date (NautilusIconCanvasItem *icon_item)
 {
 	NautilusIconCanvasItemDetails *details;
-	EelIRect icon_rect, emblem_rect;
+	EelIRect icon_rect, emblem_rect, icon_rect_raw;
 	EelIRect text_rect, text_rect_for_layout, text_rect_for_entire_text;
 	EelIRect total_rect, total_rect_for_layout, total_rect_for_entire_text;
 	EelCanvasItem *item;
@@ -2505,15 +2505,21 @@ nautilus_icon_canvas_item_ensure_bounds_up_to_date (NautilusIconCanvasItem *icon
 
 		pixels_per_unit = EEL_CANVAS_ITEM (item)->canvas->pixels_per_unit;
 
-		/* Compute icon rectangle. */
+		/* Compute raw and scaled icon rectangle. */
 		icon_rect.x0 = 0;
 		icon_rect.y0 = 0;
+		icon_rect_raw.x0 = 0;
+		icon_rect_raw.y0 = 0;
 		if (details->pixbuf == NULL) {
 			icon_rect.x1 = icon_rect.x0;
 			icon_rect.y1 = icon_rect.y0;
+			icon_rect_raw.x1 = icon_rect_raw.x0;
+			icon_rect_raw.y1 = icon_rect_raw.y0;
 		} else {
-			icon_rect.x1 = icon_rect.x0 + gdk_pixbuf_get_width (details->pixbuf) / pixels_per_unit;
-			icon_rect.y1 = icon_rect.y0 + gdk_pixbuf_get_height (details->pixbuf) / pixels_per_unit;
+			icon_rect_raw.x1 = icon_rect_raw.x0 + gdk_pixbuf_get_width (details->pixbuf);
+			icon_rect_raw.y1 = icon_rect_raw.y0 + gdk_pixbuf_get_height (details->pixbuf);
+			icon_rect.x1 = icon_rect_raw.x1 / pixels_per_unit;
+			icon_rect.y1 = icon_rect_raw.y1 / pixels_per_unit;
 		}
 		
 		/* Compute text rectangle. */
@@ -2527,7 +2533,7 @@ nautilus_icon_canvas_item_ensure_bounds_up_to_date (NautilusIconCanvasItem *icon
 		eel_irect_union (&total_rect, &icon_rect, &text_rect);
 		eel_irect_union (&total_rect_for_layout, &icon_rect, &text_rect_for_layout);
 		eel_irect_union (&total_rect_for_entire_text, &icon_rect, &text_rect_for_entire_text);
-		emblem_layout_reset (&emblem_layout, icon_item, icon_rect, is_rtl);
+		emblem_layout_reset (&emblem_layout, icon_item, icon_rect_raw, is_rtl);
 		while (emblem_layout_next (&emblem_layout, &emblem_pixbuf, &emblem_rect, is_rtl)) {
 			emblem_rect.x0 = floor (emblem_rect.x0 / pixels_per_unit);
 			emblem_rect.y0 = floor (emblem_rect.y0 / pixels_per_unit);

@@ -1842,7 +1842,7 @@ icon_container_activate_alternate_callback (NautilusIconContainer *container,
 	}
 
 	flags = NAUTILUS_WINDOW_OPEN_FLAG_CLOSE_BEHIND;
-	if (open_in_tab && eel_preferences_get_boolean (NAUTILUS_PREFERENCES_ENABLE_TABS)) {
+	if (open_in_tab) {
 		flags |= NAUTILUS_WINDOW_OPEN_FLAG_NEW_TAB;
 	} else {
 		flags |= NAUTILUS_WINDOW_OPEN_FLAG_NEW_WINDOW;
@@ -2661,6 +2661,19 @@ store_layout_timestamp (NautilusIconContainer *container,
 	return TRUE;
 }
 
+static gboolean
+focus_in_event_callback (GtkWidget *widget, GdkEventFocus *event, gpointer user_data)
+{
+	NautilusWindowSlotInfo *slot_info;
+	FMIconView *icon_view = FM_ICON_VIEW (user_data);
+	
+	/* make the corresponding slot (and the pane that contains it) active */
+	slot_info = fm_directory_view_get_nautilus_window_slot (FM_DIRECTORY_VIEW (icon_view));
+	nautilus_window_slot_info_make_hosting_pane_active (slot_info);
+
+	return FALSE; 
+}
+
 static NautilusIconContainer *
 create_icon_container (FMIconView *icon_view)
 {
@@ -2670,6 +2683,8 @@ create_icon_container (FMIconView *icon_view)
 
 	GTK_WIDGET_SET_FLAGS (icon_container, GTK_CAN_FOCUS);
 	
+	g_signal_connect_object (icon_container, "focus_in_event",
+			 G_CALLBACK (focus_in_event_callback), icon_view, 0);
 	g_signal_connect_object (icon_container, "activate",	
 			 G_CALLBACK (icon_container_activate_callback), icon_view, 0);
 	g_signal_connect_object (icon_container, "activate_alternate",	
@@ -2755,6 +2770,15 @@ icon_view_handle_text (NautilusIconContainer *container, const char *text,
 {
 	fm_directory_view_handle_text_drop (FM_DIRECTORY_VIEW (view),
 					    text, target_uri, action, x, y);
+}
+
+static void
+icon_view_handle_raw (NautilusIconContainer *container, const char *raw_data,
+		       int length, const char *target_uri, const char *direct_save_uri,
+		       GdkDragAction action, int x, int y, FMIconView *view)
+{
+	fm_directory_view_handle_raw_drop (FM_DIRECTORY_VIEW (view),
+					    raw_data, length, target_uri, direct_save_uri, action, x, y);
 }
 
 static char *
@@ -2989,6 +3013,8 @@ fm_icon_view_init (FMIconView *icon_view)
 				 G_CALLBACK (icon_view_handle_uri_list), icon_view, 0);
 	g_signal_connect_object (get_icon_container (icon_view), "handle_text",
 				 G_CALLBACK (icon_view_handle_text), icon_view, 0);
+	g_signal_connect_object (get_icon_container (icon_view), "handle_raw",
+				 G_CALLBACK (icon_view_handle_raw), icon_view, 0);
 }
 
 static NautilusView *

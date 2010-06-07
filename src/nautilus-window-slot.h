@@ -25,7 +25,7 @@
 #ifndef NAUTILUS_WINDOW_SLOT_H
 #define NAUTILUS_WINDOW_SLOT_H
 
-#include "nautilus-window.h"
+#include "nautilus-window-pane.h"
 #include "nautilus-query-editor.h"
 #include <glib/gi18n.h>
 
@@ -65,7 +65,7 @@ struct NautilusWindowSlotClass {
 struct NautilusWindowSlot {
 	GObject parent;
 
-	NautilusWindow *window;
+	NautilusWindowPane *pane;
 
 	/* content_box contains
  	 *  1) an event box containing extra_location_widgets
@@ -108,6 +108,8 @@ struct NautilusWindowSlot {
 	gboolean tried_mount;
 
 	GCancellable *find_mount_cancellable;
+
+	gboolean visible;
 };
 
 GType   nautilus_window_slot_get_type (void);
@@ -175,5 +177,7 @@ void    nautilus_window_slot_add_extra_location_widget     (NautilusWindowSlot *
 void    nautilus_window_slot_remove_extra_location_widgets (NautilusWindowSlot *slot);
 
 void    nautilus_window_slot_add_current_location_to_history_list (NautilusWindowSlot *slot);
+
+void    nautilus_window_slot_is_in_active_pane (NautilusWindowSlot *slot, gboolean is_active);
 
 #endif /* NAUTILUS_WINDOW_SLOT_H */

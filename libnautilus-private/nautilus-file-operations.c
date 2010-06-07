@@ -117,6 +117,7 @@ typedef struct {
 	gboolean make_dir;
 	GFile *src;
 	char *src_data;
+	int length;
 	GdkPoint position;
 	gboolean has_position;
 	GFile *created_file;
@@ -190,6 +191,7 @@ typedef struct {
 #define REPLACE_ALL _("Replace _All")
 #define MERGE _("_Merge")
 #define MERGE_ALL _("Merge _All")
+#define COPY_FORCE _("Copy _Anyway")
 
 static void
 mark_desktop_file_trusted (CommonJob *common,
@@ -1396,7 +1398,7 @@ report_delete_progress (CommonJob *job,
 
 	now = g_thread_gettime ();
 	if (transfer_info->last_report_time != 0 &&
-	    ABS (transfer_info->last_report_time - now) < 100 * NSEC_PER_MSEC) {
+	    ABS ((gint64)(transfer_info->last_report_time - now)) < 100 * NSEC_PER_MSEC) {
 		return;
 	}
 	transfer_info->last_report_time = now;
@@ -1994,12 +1996,14 @@ typedef struct {
 	gboolean eject;
 	GMount *mount;
 	GtkWindow *parent_window;
+	NautilusUnmountCallback callback;
+	gpointer callback_data;
 } UnmountData;
 
 static void
 unmount_mount_callback (GObject *source_object,
-			 GAsyncResult *res,
-			 gpointer user_data)
+			GAsyncResult *res,
+			gpointer user_data)
 {
 	UnmountData *data = user_data;
 	GError *error;
@@ -2027,6 +2031,13 @@ unmount_mount_callback (GObject *source_object,
 					       data->parent_window);
 			g_free (primary);
 		}
+	}
+
+	if (data->callback) {
+		data->callback (data->callback_data);
+	}
+
+	if (error != NULL) {
 		g_error_free (error);
 	}
 	
@@ -2202,15 +2213,19 @@ prompt_empty_trash (GtkWindow *parent_window)
 }
 
 void
-nautilus_file_operations_unmount_mount (GtkWindow                      *parent_window,
-					GMount                         *mount,
-					gboolean                        eject,
-					gboolean                        check_trash)
+nautilus_file_operations_unmount_mount_full (GtkWindow                      *parent_window,
+					     GMount                         *mount,
+					     gboolean                        eject,
+					     gboolean                        check_trash,
+					     NautilusUnmountCallback         callback,
+					     gpointer                        callback_data)
 {
 	UnmountData *data;
 	int response;
 
 	data = g_new0 (UnmountData, 1);
+	data->callback = callback;
+	data->callback_data = callback_data;
 	if (parent_window) {
 		data->parent_window = parent_window;
 		eel_add_weak_pointer (&data->parent_window);
@@ -2237,6 +2252,9 @@ nautilus_file_operations_unmount_mount (GtkWindow                      *parent_w
 					   NULL);
 			return;
 		} else if (response == GTK_RESPONSE_CANCEL) {
+			if (callback) {
+				callback (callback_data);
+			}
 			eel_remove_weak_pointer (&data->parent_window);
 			g_object_unref (data->mount);
 			g_free (data);
@@ -2245,6 +2263,16 @@ nautilus_file_operations_unmount_mount (GtkWindow                      *parent_w
 	}
 	
 	do_unmount (data);
+}
+
+void
+nautilus_file_operations_unmount_mount (GtkWindow                      *parent_window,
+					GMount                         *mount,
+					gboolean                        eject,
+					gboolean                        check_trash)
+{
+	nautilus_file_operations_unmount_mount_full (parent_window, mount, eject,
+						     check_trash, NULL, NULL);
 }
 
 static void
@@ -2765,13 +2793,17 @@ verify_destination (CommonJob *job,
 						secondary,
 						details,
 						FALSE,
-						GTK_STOCK_CANCEL, RETRY,
+						GTK_STOCK_CANCEL,
+						COPY_FORCE,
+						RETRY,
 						NULL);
 			
 			if (response == 0 || response == GTK_RESPONSE_DELETE_EVENT) {
 				abort_job (job);
-			} else if (response == 1) {
+			} else if (response == 2) {
 				goto retry;
+			} else if (response == 1) {
+				/* We are forced to copy - just fall through ... */
 			} else {
 				g_assert_not_reached ();
 			}
@@ -2820,7 +2852,7 @@ report_copy_progress (CopyMoveJob *copy_job,
 	now = g_thread_gettime ();
 	
 	if (transfer_info->last_report_time != 0 &&
-	    ABS (transfer_info->last_report_time - now) < 100 * NSEC_PER_MSEC) {
+	    ABS ((gint64)(transfer_info->last_report_time - now)) < 100 * NSEC_PER_MSEC) {
 		return;
 	}
 	transfer_info->last_report_time = now;
@@ -3852,7 +3884,6 @@ copy_move_file (CopyMoveJob *copy_job,
 	 * detect and report it at this level) */
 	if (test_dir_is_parent (dest_dir, src)) {
 		if (job->skip_all_error) {
-			g_error_free (error);
 			goto out;
 		}
 		
@@ -3886,7 +3917,6 @@ copy_move_file (CopyMoveJob *copy_job,
 	 */
 	if (test_dir_is_parent (src, dest)) {
 		if (job->skip_all_error) {
-			g_error_free (error);
 			goto out;
 		}
 		
@@ -4526,7 +4556,6 @@ move_file_prepare (CopyMoveJob *move_job,
 	 * detect and report it at this level) */
 	if (test_dir_is_parent (dest_dir, src)) {
 		if (job->skip_all_error) {
-			g_error_free (error);
 			goto out;
 		}
 		
@@ -5633,6 +5662,7 @@ create_job (GIOSchedulerJob *io_job,
 	char *primary, *secondary, *details;
 	int response;
 	char *data;
+	int length;
 	GFileOutputStream *out;
 	gboolean handled_invalid_filename;
 	int max_length;
@@ -5706,8 +5736,10 @@ create_job (GIOSchedulerJob *io_job,
 					   &error);
 		} else {
 			data = "";
+			length = 0;
 			if (job->src_data) {
 				data = job->src_data;
+				length = job->length;
 			}
 
 			out = g_file_create (dest,
@@ -5716,7 +5748,7 @@ create_job (GIOSchedulerJob *io_job,
 					     &error);
 			if (out) {
 				res = g_output_stream_write_all (G_OUTPUT_STREAM (out),
-								 data, strlen (data),
+								 data, length,
 								 NULL,
 								 common->cancellable,
 								 &error);
@@ -5939,6 +5971,7 @@ nautilus_file_operations_new_file (GtkWidget *parent_view,
 				   const char *parent_dir,
 				   const char *target_filename,
 				   const char *initial_contents,
+				   int length,
 				   NautilusCreateCallback done_callback,
 				   gpointer done_callback_data)
 {
@@ -5958,7 +5991,8 @@ nautilus_file_operations_new_file (GtkWidget *parent_view,
 		job->position = *target_point;
 		job->has_position = TRUE;
 	}
-	job->src_data = g_strdup (initial_contents);
+	job->src_data = g_memdup (initial_contents, length);
+	job->length = length;
 	job->filename = g_strdup (target_filename);
 
 	g_io_scheduler_push_job (create_job,

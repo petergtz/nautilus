@@ -59,6 +59,7 @@
 #include <gio/gio.h>
 #include <glib.h>
 #include <libnautilus-extension/nautilus-file-info.h>
+#include <libnautilus-extension/nautilus-extension-private.h>
 #include <libxml/parser.h>
 #include <pwd.h>
 #include <stdlib.h>
@@ -1216,6 +1217,25 @@ nautilus_file_mount (NautilusFile                   *file,
 	}
 }
 
+typedef struct {
+	NautilusFile *file;
+	NautilusFileOperationCallback callback;
+	gpointer callback_data;
+} UnmountData;
+
+static void
+unmount_done (void *callback_data)
+{
+	UnmountData *data;
+
+	data = (UnmountData *)callback_data;
+	if (data->callback) {
+		data->callback (data->file, NULL, NULL, data->callback_data);
+	}
+	nautilus_file_unref (data->file);
+	g_free (data);
+}
+
 void
 nautilus_file_unmount (NautilusFile                   *file,
 		       GMountOperation                *mount_op,
@@ -1224,6 +1244,7 @@ nautilus_file_unmount (NautilusFile                   *file,
 		       gpointer                        callback_data)
 {
 	GError *error;
+	UnmountData *data;
 
 	if (file->details->can_unmount) {
 		if (NAUTILUS_FILE_GET_CLASS (file)->unmount != NULL) {
@@ -1239,7 +1260,13 @@ nautilus_file_unmount (NautilusFile                   *file,
 		}
 	} else if (file->details->mount != NULL &&
 		   g_mount_can_unmount (file->details->mount)) {
-		nautilus_file_operations_unmount_mount (NULL, file->details->mount, FALSE, TRUE);
+		data = g_new0 (UnmountData, 1);
+		data->file = nautilus_file_ref (file);
+		data->callback = callback;
+		data->callback_data = callback_data;
+		nautilus_file_operations_unmount_mount_full (NULL, file->details->mount, FALSE, TRUE, unmount_done, data);
+	} else if (callback) {
+		callback (file, NULL, NULL, callback_data);
 	}
 }
 
@@ -1251,6 +1278,7 @@ nautilus_file_eject (NautilusFile                   *file,
 		     gpointer                        callback_data)
 {
 	GError *error;
+	UnmountData *data;
 
 	if (file->details->can_eject) {
 		if (NAUTILUS_FILE_GET_CLASS (file)->eject != NULL) {
@@ -1266,7 +1294,13 @@ nautilus_file_eject (NautilusFile                   *file,
 		}
 	} else if (file->details->mount != NULL &&
 		   g_mount_can_eject (file->details->mount)) {
-		nautilus_file_operations_unmount_mount (NULL, file->details->mount, TRUE, TRUE);
+		data = g_new0 (UnmountData, 1);
+		data->file = nautilus_file_ref (file);
+		data->callback = callback;
+		data->callback_data = callback_data;
+		nautilus_file_operations_unmount_mount_full (NULL, file->details->mount, TRUE, TRUE, unmount_done, data);
+	} else if (callback) {
+		callback (file, NULL, NULL, callback_data);
 	}
 }
 
@@ -6634,6 +6668,8 @@ nautilus_file_get_volume_free_space (NautilusFile *file)
 						    get_fs_free_cb,
 						    directory); /* Inherits ref */
 		g_object_unref (location);
+	} else {
+		nautilus_directory_unref (directory);
 	}
 
 
@@ -7828,7 +7864,9 @@ static void
 nautilus_file_class_init (NautilusFileClass *class)
 {
 	GtkIconTheme *icon_theme;
-	
+
+	nautilus_file_info_getter = nautilus_file_get_internal;
+
 	attribute_name_q = g_quark_from_static_string ("name");
 	attribute_size_q = g_quark_from_static_string ("size");
 	attribute_type_q = g_quark_from_static_string ("type");

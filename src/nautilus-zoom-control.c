@@ -159,7 +159,7 @@ menu_position_under_widget (GtkMenu   *menu,
 	gdk_screen_get_monitor_geometry (screen, monitor_num, &monitor);
 
 	gdk_window_get_origin (widget->window, x, y);
-	if (GTK_WIDGET_NO_WINDOW (widget)) {
+	if (!gtk_widget_get_has_window (widget)) {
 		*x += widget->allocation.x;
 		*y += widget->allocation.y;
 	}
@@ -944,4 +944,12 @@ nautilus_zoom_control_accessible_get_type (void)
 	}
 
 	return type;
+}
+
+void
+nautilus_zoom_control_set_active_appearance (NautilusZoomControl *zoom_control, gboolean is_active)
+{
+	gtk_widget_set_sensitive (gtk_bin_get_child (GTK_BIN (zoom_control->details->zoom_in)), is_active);
+	gtk_widget_set_sensitive (gtk_bin_get_child (GTK_BIN (zoom_control->details->zoom_out)), is_active);
+	gtk_widget_set_sensitive (zoom_control->details->zoom_label, is_active);
 }

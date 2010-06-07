@@ -117,6 +117,7 @@ enum {
 	PLACES_SIDEBAR_COLUMN_NO_EJECT,
 	PLACES_SIDEBAR_COLUMN_BOOKMARK,
 	PLACES_SIDEBAR_COLUMN_NO_BOOKMARK,
+	PLACES_SIDEBAR_COLUMN_TOOLTIP,
 	
 	PLACES_SIDEBAR_COLUMN_COUNT
 };
@@ -209,7 +210,8 @@ add_place (NautilusPlacesSidebar *sidebar,
 	   GDrive *drive,
 	   GVolume *volume,
 	   GMount *mount,
-	   const int index)
+	   const int index,
+	   const char *tooltip)
 {
 	GdkPixbuf            *pixbuf;
 	GtkTreeIter           iter, child_iter;
@@ -250,6 +252,7 @@ add_place (NautilusPlacesSidebar *sidebar,
 			    PLACES_SIDEBAR_COLUMN_NO_EJECT, !show_eject_button,
 			    PLACES_SIDEBAR_COLUMN_BOOKMARK, place_type != PLACES_BOOKMARK,
 			    PLACES_SIDEBAR_COLUMN_NO_BOOKMARK, place_type == PLACES_BOOKMARK,
+			    PLACES_SIDEBAR_COLUMN_TOOLTIP, tooltip,
 			    -1);
 
 	if (pixbuf != NULL) {
@@ -280,6 +283,7 @@ update_places (NautilusPlacesSidebar *sidebar)
 	GIcon *icon;
 	GFile *root;
 	NautilusWindowSlotInfo *slot;
+	char *tooltip;
 
 	selection = gtk_tree_view_get_selection (sidebar->tree_view);
 	gtk_list_store_clear (sidebar->store);
@@ -298,7 +302,8 @@ update_places (NautilusPlacesSidebar *sidebar)
 		icon = g_themed_icon_new (NAUTILUS_ICON_HOME);
 		last_iter = add_place (sidebar, PLACES_BUILT_IN,
 				       display_name, icon,
-				       mount_uri, NULL, NULL, NULL, 0);
+				       mount_uri, NULL, NULL, NULL, 0,
+				       _("Open your personal folder"));
 		g_object_unref (icon);
 		g_free (display_name);
 		if (eel_strcmp (location, mount_uri) == 0) {
@@ -311,7 +316,8 @@ update_places (NautilusPlacesSidebar *sidebar)
 	icon = g_themed_icon_new (NAUTILUS_ICON_DESKTOP);
 	last_iter = add_place (sidebar, PLACES_BUILT_IN,
 			       _("Desktop"), icon,
-			       mount_uri, NULL, NULL, NULL, 0);
+			       mount_uri, NULL, NULL, NULL, 0,
+			       _("Open the contents of your desktop in a folder"));
 	g_object_unref (icon);
 	if (eel_strcmp (location, mount_uri) == 0) {
 		gtk_tree_selection_select_iter (selection, &last_iter);
@@ -323,7 +329,8 @@ update_places (NautilusPlacesSidebar *sidebar)
 	icon = g_themed_icon_new (NAUTILUS_ICON_FILESYSTEM);
 	last_iter = add_place (sidebar, PLACES_BUILT_IN,
 			       _("File System"), icon,
-			       mount_uri, NULL, NULL, NULL, 0);
+			       mount_uri, NULL, NULL, NULL, 0,
+			       _("Open the contents of the File System"));
 	g_object_unref (icon);
 	if (eel_strcmp (location, mount_uri) == 0) {
 		gtk_tree_selection_select_iter (selection, &last_iter);
@@ -333,7 +340,8 @@ update_places (NautilusPlacesSidebar *sidebar)
 	icon = g_themed_icon_new (NAUTILUS_ICON_NETWORK);
 	last_iter = add_place (sidebar, PLACES_BUILT_IN,
 			       _("Network"), icon,
-			       mount_uri, NULL, NULL, NULL, 0);
+			       mount_uri, NULL, NULL, NULL, 0,
+			       _("Browse the contents of the network"));
 	g_object_unref (icon);
 	if (strcmp (location, mount_uri) == 0) {
 		gtk_tree_selection_select_iter (selection, &last_iter);
@@ -354,18 +362,20 @@ update_places (NautilusPlacesSidebar *sidebar)
 				if (mount != NULL) {
 					/* Show mounted volume in the sidebar */
 					icon = g_mount_get_icon (mount);
-					root = g_mount_get_root (mount);
+					root = g_mount_get_default_location (mount);
 					mount_uri = g_file_get_uri (root);
-					g_object_unref (root);
 					name = g_mount_get_name (mount);
+					tooltip = g_file_get_parse_name (root);
 					last_iter = add_place (sidebar, PLACES_MOUNTED_VOLUME,
 							       name, icon, mount_uri,
-							       drive, volume, mount, 0);
+							       drive, volume, mount, 0, tooltip);
 					if (eel_strcmp (location, mount_uri) == 0) {
 						gtk_tree_selection_select_iter (selection, &last_iter);
 					}
+					g_object_unref (root);
 					g_object_unref (mount);
 					g_object_unref (icon);
+					g_free (tooltip);
 					g_free (name);
 					g_free (mount_uri);
 				} else {
@@ -379,11 +389,13 @@ update_places (NautilusPlacesSidebar *sidebar)
 					 */
 					icon = g_volume_get_icon (volume);
 					name = g_volume_get_name (volume);
+					tooltip = g_strdup_printf (_("Mount and open %s"), name);
 					last_iter = add_place (sidebar, PLACES_MOUNTED_VOLUME,
 							       name, icon, NULL,
-							       drive, volume, NULL, 0);
+							       drive, volume, NULL, 0, tooltip);
 					g_object_unref (icon);
 					g_free (name);
+					g_free (tooltip);
 				}
 				g_object_unref (volume);
 			}
@@ -400,10 +412,12 @@ update_places (NautilusPlacesSidebar *sidebar)
 				 */
 				icon = g_drive_get_icon (drive);
 				name = g_drive_get_name (drive);
+				tooltip = g_strdup_printf (_("Mount and open %s"), name);
 				last_iter = add_place (sidebar, PLACES_BUILT_IN,
 						       name, icon, NULL,
-						       drive, NULL, NULL, 0);
+						       drive, NULL, NULL, 0, tooltip);
 				g_object_unref (icon);
+				g_free (tooltip);
 				g_free (name);
 			}
 		}
@@ -424,19 +438,21 @@ update_places (NautilusPlacesSidebar *sidebar)
 		mount = g_volume_get_mount (volume);
 		if (mount != NULL) {
 			icon = g_mount_get_icon (mount);
-			root = g_mount_get_root (mount);
+			root = g_mount_get_default_location (mount);
 			mount_uri = g_file_get_uri (root);
+			tooltip = g_file_get_parse_name (root);
 			g_object_unref (root);
 			name = g_mount_get_name (mount);
 			last_iter = add_place (sidebar, PLACES_MOUNTED_VOLUME,
 					       name, icon, mount_uri,
-					       NULL, volume, mount, 0);
+					       NULL, volume, mount, 0, tooltip);
 			if (eel_strcmp (location, mount_uri) == 0) {
 				gtk_tree_selection_select_iter (selection, &last_iter);
 			}
 			g_object_unref (mount);
 			g_object_unref (icon);
 			g_free (name);
+			g_free (tooltip);
 			g_free (mount_uri);
 		} else {
 			/* see comment above in why we add an icon for an unmounted mountable volume */
@@ -444,7 +460,7 @@ update_places (NautilusPlacesSidebar *sidebar)
 			name = g_volume_get_name (volume);
 			last_iter = add_place (sidebar, PLACES_MOUNTED_VOLUME,
 					       name, icon, NULL,
-					       NULL, volume, NULL, 0);
+					       NULL, volume, NULL, 0, name);
 			g_object_unref (icon);
 			g_free (name);
 		}
@@ -467,20 +483,22 @@ update_places (NautilusPlacesSidebar *sidebar)
 			continue;
 		}
 		icon = g_mount_get_icon (mount);
-		root = g_mount_get_root (mount);
+		root = g_mount_get_default_location (mount);
 		mount_uri = g_file_get_uri (root);
-		g_object_unref (root);
 		name = g_mount_get_name (mount);
+		tooltip = g_file_get_parse_name (root);
 		last_iter = add_place (sidebar, PLACES_MOUNTED_VOLUME,
 				       name, icon, mount_uri,
-				       NULL, NULL, mount, 0);
+				       NULL, NULL, mount, 0, tooltip);
 		if (eel_strcmp (location, mount_uri) == 0) {
 			gtk_tree_selection_select_iter (selection, &last_iter);
 		}
+		g_object_unref (root);
 		g_object_unref (mount);
 		g_object_unref (icon);
 		g_free (name);
 		g_free (mount_uri);
+		g_free (tooltip);
 	}
 	g_list_free (mounts);
 
@@ -488,7 +506,8 @@ update_places (NautilusPlacesSidebar *sidebar)
 	icon = nautilus_trash_monitor_get_icon ();
 	last_iter = add_place (sidebar, PLACES_BUILT_IN,
 			       _("Trash"), icon, mount_uri,
-			       NULL, NULL, NULL, 0);
+			       NULL, NULL, NULL, 0,
+			       _("Open the trash"));
 	if (eel_strcmp (location, mount_uri) == 0) {
 		gtk_tree_selection_select_iter (selection, &last_iter);
 	}
@@ -514,15 +533,20 @@ update_places (NautilusPlacesSidebar *sidebar)
 		name = nautilus_bookmark_get_name (bookmark);
 		icon = nautilus_bookmark_get_icon (bookmark);
 		mount_uri = nautilus_bookmark_get_uri (bookmark);
+		root = nautilus_bookmark_get_location (bookmark);
+		tooltip = g_file_get_parse_name (root);
 		last_iter = add_place (sidebar, PLACES_BOOKMARK,
 				       name, icon, mount_uri,
-				       NULL, NULL, NULL, index);
+				       NULL, NULL, NULL, index, 
+				       tooltip);
 		if (eel_strcmp (location, mount_uri) == 0) {
 			gtk_tree_selection_select_iter (selection, &last_iter);
 		}
 		g_free (name);
+		g_object_unref (root);
 		g_object_unref (icon);
 		g_free (mount_uri);
+		g_free (tooltip);
 	}
 	g_free (location);
 }
@@ -691,16 +715,6 @@ desktop_location_changed_callback (gpointer user_data)
 	sidebar = NAUTILUS_PLACES_SIDEBAR (user_data);
 
 	update_places (sidebar);
-}
-
-static void
-enable_tabs_changed_callback (gpointer user_data)
-{
-	NautilusPlacesSidebar *sidebar;
-
-	sidebar = NAUTILUS_PLACES_SIDEBAR (user_data);
-
-	bookmarks_check_popup_sensitivity (sidebar);
 }
 
 static void
@@ -1384,11 +1398,7 @@ bookmarks_check_popup_sensitivity (NautilusPlacesSidebar *sidebar)
 				    -1);
 	}
 
-	if (eel_preferences_get_boolean (NAUTILUS_PREFERENCES_ENABLE_TABS)) {
-		gtk_widget_show (sidebar->popup_menu_open_in_new_tab_item);
-	} else {
-		gtk_widget_hide (sidebar->popup_menu_open_in_new_tab_item);
-	}
+	gtk_widget_show (sidebar->popup_menu_open_in_new_tab_item);
 
 	gtk_widget_set_sensitive (sidebar->popup_menu_remove_item, (type == PLACES_BOOKMARK));
 	gtk_widget_set_sensitive (sidebar->popup_menu_rename_item, (type == PLACES_BOOKMARK));
@@ -1472,7 +1482,7 @@ volume_mounted_cb (GVolume *volume,
 
 	mount = g_volume_get_mount (volume);
 	if (mount != NULL) {
-		location = g_mount_get_root (mount);
+		location = g_mount_get_default_location (mount);
 
 		if (sidebar->go_to_after_mount_slot != NULL) {
 			if ((sidebar->go_to_after_mount_flags & NAUTILUS_WINDOW_OPEN_FLAG_NEW_WINDOW) == 0) {
@@ -1539,12 +1549,6 @@ open_selected_bookmark (NautilusPlacesSidebar *sidebar,
 
 	if (!gtk_tree_model_get_iter (model, &iter, path)) {
 		return;
-	}
-
-	if (flags & NAUTILUS_WINDOW_OPEN_FLAG_NEW_TAB &&
-	    !eel_preferences_get_boolean (NAUTILUS_PREFERENCES_ENABLE_TABS)) {
-		flags &= ~NAUTILUS_WINDOW_OPEN_FLAG_NEW_TAB;
-		flags |= NAUTILUS_WINDOW_OPEN_FLAG_NEW_WINDOW;
 	}
 
 	gtk_tree_model_get (model, &iter, PLACES_SIDEBAR_COLUMN_URI, &uri, -1);
@@ -1734,11 +1738,24 @@ mount_shortcut_cb (GtkMenuItem           *item,
 }
 
 static void
+unmount_done (gpointer data)
+{
+	NautilusWindow *window;
+
+	window = data;
+	nautilus_window_info_set_initiated_unmount (window, FALSE);
+	g_object_unref (window);
+}
+
+static void
 do_unmount (GMount *mount,
 	    NautilusPlacesSidebar *sidebar)
 {
 	if (mount != NULL) {
-		nautilus_file_operations_unmount_mount (NULL, mount, FALSE, TRUE);
+		nautilus_window_info_set_initiated_unmount (sidebar->window, TRUE);
+		nautilus_file_operations_unmount_mount_full (NULL, mount, FALSE, TRUE,
+							     unmount_done,
+							     g_object_ref (sidebar->window));
 	}
 }
 
@@ -1774,9 +1791,15 @@ drive_eject_cb (GObject *source_object,
 		GAsyncResult *res,
 		gpointer user_data)
 {
+	NautilusWindow *window;
 	GError *error;
 	char *primary;
 	char *name;
+
+	window = user_data;
+	nautilus_window_info_set_initiated_unmount (window, FALSE);
+	g_object_unref (window);
+
 	error = NULL;
 	if (!g_drive_eject_with_operation_finish (G_DRIVE (source_object), res, &error)) {
 		if (error->code != G_IO_ERROR_FAILED_HANDLED) {
@@ -1797,9 +1820,15 @@ volume_eject_cb (GObject *source_object,
 		GAsyncResult *res,
 		gpointer user_data)
 {
+	NautilusWindow *window;
 	GError *error;
 	char *primary;
 	char *name;
+
+	window = user_data;
+	nautilus_window_info_set_initiated_unmount (window, FALSE);
+	g_object_unref (window);
+
 	error = NULL;
 	if (!g_volume_eject_with_operation_finish (G_VOLUME (source_object), res, &error)) {
 		if (error->code != G_IO_ERROR_FAILED_HANDLED) {
@@ -1820,9 +1849,15 @@ mount_eject_cb (GObject *source_object,
 		GAsyncResult *res,
 		gpointer user_data)
 {
+	NautilusWindow *window;
 	GError *error;
 	char *primary;
 	char *name;
+
+	window = user_data;
+	nautilus_window_info_set_initiated_unmount (window, FALSE);
+	g_object_unref (window);
+
 	error = NULL;
 	if (!g_mount_eject_with_operation_finish (G_MOUNT (source_object), res, &error)) {
 		if (error->code != G_IO_ERROR_FAILED_HANDLED) {
@@ -1848,11 +1883,17 @@ do_eject (GMount *mount,
 
 	mount_op = gtk_mount_operation_new (GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (sidebar))));
 	if (mount != NULL) {
-		g_mount_eject_with_operation (mount, 0, mount_op, NULL, mount_eject_cb, NULL);
+		nautilus_window_info_set_initiated_unmount (sidebar->window, TRUE);
+		g_mount_eject_with_operation (mount, 0, mount_op, NULL, mount_eject_cb,
+					      g_object_ref (sidebar->window));
 	} else if (volume != NULL) {
-		g_volume_eject_with_operation (volume, 0, mount_op, NULL, volume_eject_cb, NULL);
+		nautilus_window_info_set_initiated_unmount (sidebar->window, TRUE);
+		g_volume_eject_with_operation (volume, 0, mount_op, NULL, volume_eject_cb,
+					      g_object_ref (sidebar->window));
 	} else if (drive != NULL) {
-		g_drive_eject_with_operation (drive, 0, mount_op, NULL, drive_eject_cb, NULL);
+		nautilus_window_info_set_initiated_unmount (sidebar->window, TRUE);
+		g_drive_eject_with_operation (drive, 0, mount_op, NULL, drive_eject_cb,
+					      g_object_ref (sidebar->window));
 	}
 	g_object_unref (mount_op);
 }
@@ -2059,9 +2100,14 @@ drive_stop_cb (GObject *source_object,
 	       GAsyncResult *res,
 	       gpointer user_data)
 {
+	NautilusWindow *window;
 	GError *error;
 	char *primary;
 	char *name;
+
+	window = user_data;
+	nautilus_window_info_set_initiated_unmount (window, FALSE);
+	g_object_unref (window);
 
 	error = NULL;
 	if (!g_drive_poll_for_media_finish (G_DRIVE (source_object), res, &error)) {
@@ -2097,7 +2143,9 @@ stop_shortcut_cb (GtkMenuItem           *item,
 		GMountOperation *mount_op;
 
 		mount_op = gtk_mount_operation_new (GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (sidebar))));
-		g_drive_stop (drive, G_MOUNT_UNMOUNT_NONE, mount_op, NULL, drive_stop_cb, NULL);
+		nautilus_window_info_set_initiated_unmount (sidebar->window, TRUE);
+		g_drive_stop (drive, G_MOUNT_UNMOUNT_NONE, mount_op, NULL, drive_stop_cb,
+			      g_object_ref (sidebar->window));
 		g_object_unref (mount_op);
 	}
 	g_object_unref (drive);
@@ -2405,6 +2453,7 @@ nautilus_places_sidebar_init (NautilusPlacesSidebar *sidebar)
 					GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_hadjustment (GTK_SCROLLED_WINDOW (sidebar), NULL);
 	gtk_scrolled_window_set_vadjustment (GTK_SCROLLED_WINDOW (sidebar), NULL);
+	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (sidebar), GTK_SHADOW_IN);
 	
   	/* tree view */
 	tree_view = GTK_TREE_VIEW (gtk_tree_view_new ());
@@ -2484,8 +2533,12 @@ nautilus_places_sidebar_init (NautilusPlacesSidebar *sidebar)
 					     G_TYPE_BOOLEAN,
 					     G_TYPE_BOOLEAN,
 					     G_TYPE_BOOLEAN,
-					     G_TYPE_BOOLEAN
+					     G_TYPE_BOOLEAN,
+					     G_TYPE_STRING
 					     );
+
+	gtk_tree_view_set_tooltip_column (tree_view, PLACES_SIDEBAR_COLUMN_TOOLTIP);
+
 	sidebar->filter_model = nautilus_shortcuts_model_filter_new (sidebar,
 								     GTK_TREE_MODEL (sidebar->store),
 								     NULL);
@@ -2541,11 +2594,6 @@ nautilus_places_sidebar_init (NautilusPlacesSidebar *sidebar)
 
 	eel_preferences_add_callback_while_alive (NAUTILUS_PREFERENCES_DESKTOP_IS_HOME_DIR,
 						  desktop_location_changed_callback,
-						  sidebar,
-						  G_OBJECT (sidebar));
-
-	eel_preferences_add_callback_while_alive (NAUTILUS_PREFERENCES_ENABLE_TABS,
-						  enable_tabs_changed_callback,
 						  sidebar,
 						  G_OBJECT (sidebar));
 

@@ -31,7 +31,7 @@
 #include "nautilus-window-manage-views.h"
 #include "nautilus-window-private.h"
 #include "nautilus-window-slot.h"
-#include "ephy-spinner.h"
+#include "nautilus-navigation-window-pane.h"
 #include <libnautilus-private/nautilus-dnd.h>
 
 #include <glib/gi18n.h>
@@ -128,7 +128,7 @@ find_notebook_at_pointer (gint abs_x, gint abs_y)
 	/* toplevel should be an NautilusWindow */
 	if (toplevel != NULL && NAUTILUS_IS_NAVIGATION_WINDOW (toplevel))
 	{
-		return NAUTILUS_NOTEBOOK (NAUTILUS_NAVIGATION_WINDOW (toplevel)->notebook);
+		return NAUTILUS_NOTEBOOK (NAUTILUS_NAVIGATION_WINDOW_PANE (NAUTILUS_WINDOW (toplevel)->details->active_pane)->notebook);
 	}
 
 	return NULL;
@@ -176,7 +176,7 @@ find_tab_num_at_pos (NautilusNotebook *notebook, gint abs_x, gint abs_y)
 		tab = gtk_notebook_get_tab_label (nb, page);
 		g_return_val_if_fail (tab != NULL, -1);
 
-		if (!GTK_WIDGET_MAPPED (GTK_WIDGET (tab)))
+		if (!gtk_widget_get_mapped (GTK_WIDGET (tab)))
 		{
 			page_num++;
 			continue;
@@ -263,6 +263,7 @@ nautilus_notebook_sync_loading (NautilusNotebook *notebook,
 				NautilusWindowSlot *slot)
 {
 	GtkWidget *tab_label, *spinner, *icon;
+	gboolean active;
 
 	g_return_if_fail (NAUTILUS_IS_NOTEBOOK (notebook));
 	g_return_if_fail (NAUTILUS_IS_WINDOW_SLOT (slot));
@@ -274,19 +275,18 @@ nautilus_notebook_sync_loading (NautilusNotebook *notebook,
 	icon = GTK_WIDGET (g_object_get_data (G_OBJECT (tab_label), "icon"));
 	g_return_if_fail (spinner != NULL && icon != NULL);
 
-	if (ephy_spinner_get_spinning (EPHY_SPINNER (spinner)) == slot->allow_stop) {
+	active = FALSE;
+	g_object_get (spinner, "active", &active, NULL);
+	if (active == slot->allow_stop)	{
 		return;
 	}
 
-	if (slot->allow_stop)
-	{
+	if (slot->allow_stop) {
 		gtk_widget_hide (icon);
 		gtk_widget_show (spinner);
-		ephy_spinner_start (EPHY_SPINNER (spinner));
-	}
-	else
-	{
-		ephy_spinner_stop (EPHY_SPINNER (spinner));
+		gtk_spinner_start (GTK_SPINNER (spinner));
+	} else {
+		gtk_spinner_stop (GTK_SPINNER (spinner));
 		gtk_widget_hide (spinner);
 		gtk_widget_show (icon);
 	}
@@ -335,34 +335,6 @@ close_button_clicked_cb (GtkWidget *widget,
 	}
 }
 
-static void
-tab_label_style_set_cb (GtkWidget *hbox,
-			GtkStyle *previous_style,
-			gpointer user_data)
-{
-	PangoFontMetrics *metrics;
-	PangoContext *context;
-	GtkWidget *button;
-	int char_width, h, w;
-
-	context = gtk_widget_get_pango_context (hbox);
-	metrics = pango_context_get_metrics (context,
-					     hbox->style->font_desc,
-					     pango_context_get_language (context));
-
-	char_width = pango_font_metrics_get_approximate_digit_width (metrics);
-	pango_font_metrics_unref (metrics);
-
-	gtk_icon_size_lookup_for_settings (gtk_widget_get_settings (hbox),
-					   GTK_ICON_SIZE_MENU, &w, &h);
-
-	gtk_widget_set_size_request
-		(hbox, TAB_WIDTH_N_CHARS * PANGO_PIXELS(char_width) + 2 * w, -1);
-
-	button = g_object_get_data (G_OBJECT (hbox), "close-button");
-	gtk_widget_set_size_request (button, w + 2, h + 2);
-}
-
 static GtkWidget *
 build_tab_label (NautilusNotebook *nb, NautilusWindowSlot *slot)
 {
@@ -375,8 +347,7 @@ build_tab_label (NautilusNotebook *nb, NautilusWindowSlot *slot)
 	gtk_widget_show (hbox);
 
 	/* setup load feedback */
-	spinner = ephy_spinner_new ();
-	ephy_spinner_set_size (EPHY_SPINNER (spinner), GTK_ICON_SIZE_MENU);
+	spinner = gtk_spinner_new ();
 	gtk_box_pack_start (GTK_BOX (hbox), spinner, FALSE, FALSE, 0);
 
 	/* setup site icon, empty by default */
@@ -412,10 +383,6 @@ build_tab_label (NautilusNotebook *nb, NautilusWindowSlot *slot)
 
 	gtk_box_pack_start (GTK_BOX (hbox), close_button, FALSE, FALSE, 0);
 	gtk_widget_show (close_button);
-
-	/* Set minimal size */
-	g_signal_connect (hbox, "style-set",
-			  G_CALLBACK (tab_label_style_set_cb), NULL);
 
 	drag_info = g_new0 (NautilusDragSlotProxyInfo, 1);
 	drag_info->target_slot = slot;
@@ -472,6 +439,11 @@ nautilus_notebook_add_tab (NautilusNotebook *notebook,
 					     slot->content_box,
 					     tab_label,
 					     position);
+
+	gtk_container_child_set (GTK_CONTAINER (notebook),
+				 slot->content_box,
+				 "tab-expand", TRUE,
+				 NULL);
 
 	nautilus_notebook_sync_tab_label (notebook, slot);
 	nautilus_notebook_sync_loading (notebook, slot);

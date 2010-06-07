@@ -139,7 +139,7 @@ fill_menu (NautilusNavigationWindow *window,
 
 	g_assert (NAUTILUS_IS_NAVIGATION_WINDOW (window));
 
-	slot = NAUTILUS_NAVIGATION_WINDOW_SLOT (NAUTILUS_WINDOW (window)->details->active_slot);
+	slot = NAUTILUS_NAVIGATION_WINDOW_SLOT (NAUTILUS_WINDOW (window)->details->active_pane->active_slot);
 	
 	list = back ? slot->back_list : slot->forward_list;
 	index = 0;
@@ -199,7 +199,7 @@ proxy_button_press_event_cb (GtkButton *button,
 			     gpointer user_data)
 {
 	if (event->button == 2) {
-		gtk_button_pressed (button);
+                g_signal_emit_by_name (button, "pressed", 0);
 	}
 
 	return FALSE;
@@ -211,7 +211,7 @@ proxy_button_release_event_cb (GtkButton *button,
 			       gpointer user_data)
 {
 	if (event->button == 2) {
-		gtk_button_released (button);
+                g_signal_emit_by_name (button, "released", 0);
 	}
 
 	return FALSE;

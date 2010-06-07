@@ -1,4 +1,10 @@
 <ui>
+<accelerator action="ShowSearch"/>
+<accelerator action="SplitViewNextPane"/>
+<accelerator action="TabsPrevious"/>
+<accelerator action="TabsNext"/>
+<accelerator action="TabsMoveLeft"/>
+<accelerator action="TabsMoveRight"/>
 <menubar name="MenuBar">
 	<menu action="File">
 		<placeholder name="New Items Placeholder">
@@ -18,6 +24,7 @@
 			<menuitem name="Show Hide Sidebar" action="Show Hide Sidebar"/>
 			<menuitem name="Show Hide Location Bar" action="Show Hide Location Bar"/>
 			<menuitem name="Show Hide Statusbar" action="Show Hide Statusbar"/>
+			<menuitem name="Show Hide Extra Pane" action="Show Hide Extra Pane"/>
 		</placeholder>
 	</menu>
         <placeholder name="Other Menus">
@@ -26,6 +33,7 @@
 			<menuitem name="Up" action="Up"/>
 			<menuitem name="Back" action="Back"/>
 			<menuitem name="Forward"  action="Forward"/>
+			<menuitem name="SplitViewSameLocationMenu" action="SplitViewSameLocation"/>
 	                </placeholder>
 	                <separator/>
 			<menuitem name="Home" action="Home"/>
@@ -46,18 +54,6 @@
 			<separator/>
 			<placeholder name="Bookmarks Placeholder"/>
 		</menu>
-		<menu action="Tabs">
-			<menuitem name="TabsPreviousMenu" action="TabsPrevious"/>
-			<menuitem name="TabsNextMenu" action="TabsNext"/>
-			<separator name="TabsSep1"/>
-			<placeholder name="TabsMoveGroup">
-				<menuitem name="TabsMoveLeftMenu" action="TabsMoveLeft"/>
-				<menuitem name="TabsMoveRightMenu" action="TabsMoveRight"/>
-			</placeholder>
-			<placeholder name="TabsOpen">
-				<separator name="TabsSep2"/>
-			</placeholder>
-		</menu>
         </placeholder>
 </menubar>
 <toolbar name="Toolbar">
@@ -71,6 +67,8 @@
 	<toolitem name="Home" action="Home"/>
 	<toolitem name="Computer" action="Go to Computer"/>
 	<separator/>
+	<toolitem name="Zoom" action="Zoom"/>
+	<toolitem name="ViewAs" action="ViewAs"/>
 	<toolitem name="Search" action="Search"/>
 	<placeholder name="Extra Buttons Placeholder">
 	          <placeholder name="Extension Actions"/>

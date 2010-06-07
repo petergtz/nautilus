@@ -89,10 +89,6 @@ enum
   COMMAND_OPEN_BROWSER,
 };
 
-/* Needed for the is_kdesktop_present check */
-#include <gdk/gdkx.h>
-#include <X11/Xlib.h>
-
 /* Keep window from shrinking down ridiculously small; numbers are somewhat arbitrary */
 #define APPLICATION_WINDOW_MIN_WIDTH	300
 #define APPLICATION_WINDOW_MIN_HEIGHT	100
@@ -129,7 +125,6 @@ static void     drive_connected_callback           (GVolumeMonitor           *mo
 						    NautilusApplication      *application);
 static void     drive_listen_for_eject_button      (GDrive *drive, 
 						    NautilusApplication *application);
-static gboolean is_kdesktop_present               (void);
 static void     nautilus_application_load_session     (NautilusApplication *application); 
 static char *   nautilus_application_get_session_data (void);
 static void     ck_session_active_changed_cb (DBusGProxy *proxy,
@@ -744,7 +739,7 @@ open_window (NautilusApplication *application,
 		g_object_unref (location);
 	}
 	
-	if (geometry != NULL && !GTK_WIDGET_VISIBLE (window)) {
+	if (geometry != NULL && !gtk_widget_get_visible (GTK_WIDGET (window))) {
 		/* never maximize windows opened from shell if a
 		 * custom geometry has been requested.
 		 */
@@ -911,11 +906,6 @@ nautilus_application_startup (NautilusApplication *application,
 	} else {
 		char *accel_map_filename;
 
-		/* If KDE desktop is running, then force no_desktop */
-		if (is_kdesktop_present ()) {
-			no_desktop = TRUE;
-		}
-		
 		if (!no_desktop &&
 		    !eel_preferences_get_boolean (NAUTILUS_PREFERENCES_SHOW_DESKTOP)) {
 			no_desktop = TRUE;
@@ -1148,7 +1138,7 @@ nautilus_application_get_existing_spatial_window (GFile *location)
 	     l != NULL; l = l->next) {
 		GFile *window_location;
 
-		slot = NAUTILUS_WINDOW (l->data)->details->active_slot;
+		slot = NAUTILUS_WINDOW (l->data)->details->active_pane->active_slot;
 		window_location = slot->location;
 		if (window_location != NULL) {
 			if (g_file_equal (location, window_location)) {
@@ -1167,7 +1157,7 @@ find_parent_spatial_window (NautilusSpatialWindow *window)
 	NautilusWindowSlot *slot;
 	GFile *location;
 
-	slot = NAUTILUS_WINDOW (window)->details->active_slot;
+	slot = NAUTILUS_WINDOW (window)->details->active_pane->active_slot;
 
 	location = slot->location;
 	if (location == NULL) {
@@ -1346,7 +1336,7 @@ nautilus_application_present_spatial_window_with_selection (NautilusApplication 
 		GFile *existing_location;
 
 		existing_window = NAUTILUS_WINDOW (l->data);
-		slot = existing_window->details->active_slot;
+		slot = existing_window->details->active_pane->active_slot;
 		existing_location = slot->pending_location;
 		
 		if (existing_location == NULL) {
@@ -1456,8 +1446,8 @@ nautilus_application_create_navigation_window (NautilusApplication *application,
 		eel_gtk_window_set_initial_geometry_from_string 
 			(GTK_WINDOW (window), 
 			 geometry_string,
-			 NAUTILUS_WINDOW_MIN_WIDTH, 
-			 NAUTILUS_WINDOW_MIN_HEIGHT,
+			 NAUTILUS_NAVIGATION_WINDOW_MIN_WIDTH,
+			 NAUTILUS_NAVIGATION_WINDOW_MIN_HEIGHT,
 			 another_navigation_window_already_showing (window));
 	}
 	g_free (geometry_string);
@@ -1621,26 +1611,6 @@ mount_added_callback (GVolumeMonitor *monitor,
 	nautilus_autorun (mount, autorun_show_window, application);
 }
 
-static inline int
-count_slots_of_windows (GList *window_list)
-{
-	NautilusWindow *window;
-	GList *slots, *l;
-	int count;
-
-	count = 0;
-
-	for (l = window_list; l != NULL; l = l->next) {
-		window = NAUTILUS_WINDOW (l->data);
-
-		slots = nautilus_window_get_slots (window);
-		count += g_list_length (slots);
-		g_list_free (slots);
-	}
-
-	return count;
-}
-
 static NautilusWindowSlot *
 get_first_navigation_slot (GList *slot_list)
 {
@@ -1653,6 +1623,19 @@ get_first_navigation_slot (GList *slot_list)
 	}
 
 	return NULL;
+}
+
+/* We redirect some slots and close others */
+static gboolean
+should_close_slot_with_mount (NautilusWindow *window,
+			      NautilusWindowSlot *slot,
+			      GMount *mount)
+{
+	if (NAUTILUS_IS_SPATIAL_WINDOW (window)) {
+		return TRUE;
+	}
+	return nautilus_navigation_window_slot_should_close_with_mount (NAUTILUS_NAVIGATION_WINDOW_SLOT (slot),
+									mount);
 }
 
 /* Called whenever a mount is unmounted. Check and see if there are
@@ -1671,11 +1654,13 @@ mount_removed_callback (GVolumeMonitor *monitor,
 	NautilusWindow *window;
 	NautilusWindowSlot *slot;
 	NautilusWindowSlot *force_no_close_slot;
-	GFile *root;
+	GFile *root, *computer;
+	gboolean unclosed_slot;
 
 	close_list = NULL;
 	force_no_close_slot = NULL;
-	
+	unclosed_slot = FALSE;
+
 	/* Check and see if any of the open windows are displaying contents from the unmounted mount */
 	window_list = nautilus_application_get_window_list ();
 
@@ -1683,23 +1668,35 @@ mount_removed_callback (GVolumeMonitor *monitor,
 	/* Construct a list of windows to be closed. Do not add the non-closable windows to the list. */
 	for (node = window_list; node != NULL; node = node->next) {
 		window = NAUTILUS_WINDOW (node->data);
-  		if (window != NULL && window_can_be_closed (window)) {
+		if (window != NULL && window_can_be_closed (window)) {
 			GList *l;
-  			GFile *location;
-  
-			for (l = window->details->slots; l != NULL; l = l->next) {
-				slot = l->data;
-				location = slot->location;
-				if (g_file_has_prefix (location, root)) {
-					close_list = g_list_prepend (close_list, slot);
-				} 
-			}
+			GList *lp;
+			GFile *location;
+
+			for (lp = window->details->panes; lp != NULL; lp = lp->next) {
+				NautilusWindowPane *pane;
+				pane = (NautilusWindowPane*) lp->data;
+				for (l = pane->slots; l != NULL; l = l->next) {
+					slot = l->data;
+					location = slot->location;
+					if (g_file_has_prefix (location, root) ||
+					    g_file_equal (location, root)) {
+						close_list = g_list_prepend (close_list, slot);
+
+						if (!should_close_slot_with_mount (window, slot, mount)) {
+							/* We'll be redirecting this, not closing */
+							unclosed_slot = TRUE;
+						}
+					} else {
+						unclosed_slot = TRUE;
+					}
+				} /* for all slots */
+			} /* for all panes */
 		}
 	}
 
 	if (nautilus_application_desktop_windows == NULL &&
-	    g_list_length (close_list) != 0 &&
-	    g_list_length (close_list) == count_slots_of_windows (window_list)) {
+	    !unclosed_slot) {
 		/* We are trying to close all open slots. Keep one navigation slot open. */
 		force_no_close_slot = get_first_navigation_slot (close_list);
 	}
@@ -1707,14 +1704,15 @@ mount_removed_callback (GVolumeMonitor *monitor,
 	/* Handle the windows in the close list. */
 	for (node = close_list; node != NULL; node = node->next) {
 		slot = node->data;
-		window = slot->window;
+		window = slot->pane->window;
 
-		if (NAUTILUS_IS_SPATIAL_WINDOW (window) ||
-		    (nautilus_navigation_window_slot_should_close_with_mount (NAUTILUS_NAVIGATION_WINDOW_SLOT (slot), mount) &&
-		     slot != force_no_close_slot)) {
+		if (should_close_slot_with_mount (window, slot, mount) &&
+		    slot != force_no_close_slot) {
 			nautilus_window_slot_close (slot);
 		} else {
-			nautilus_window_slot_go_home (slot, FALSE);
+			computer = g_file_new_for_uri ("computer:///");
+			nautilus_window_slot_go_to (slot, computer, FALSE);
+			g_object_unref(computer);
 		}
 	}
 
@@ -2006,8 +2004,8 @@ nautilus_application_load_session (NautilusApplication *application)
 						eel_gtk_window_set_initial_geometry_from_string 
 							(GTK_WINDOW (window), 
 							 geometry,
-							 NAUTILUS_WINDOW_MIN_WIDTH, 
-							 NAUTILUS_WINDOW_MIN_HEIGHT,
+							 NAUTILUS_NAVIGATION_WINDOW_MIN_WIDTH,
+							 NAUTILUS_NAVIGATION_WINDOW_MIN_HEIGHT,
 							 FALSE);
 					}
 					xmlFree (geometry);
@@ -2037,16 +2035,16 @@ nautilus_application_load_session (NautilusApplication *application)
 								NautilusWindowSlot *slot;
 								
 								if (i == 0) {
-									slot = window->details->active_slot;
+									slot = window->details->active_pane->active_slot;
 								} else {
-									slot = nautilus_window_open_slot (window, NAUTILUS_WINDOW_OPEN_SLOT_APPEND);
+									slot = nautilus_window_open_slot (window->details->active_pane, NAUTILUS_WINDOW_OPEN_SLOT_APPEND);
 								}
 								
 								location = g_file_new_for_uri (slot_uri);
 								nautilus_window_slot_open_location (slot, location, FALSE);
 								
 								if (xmlHasProp (slot_node, "active")) {
-									nautilus_window_set_active_slot (window, slot);
+									nautilus_window_set_active_slot (slot->pane->window, slot);
 								}
 								
 								i++;
@@ -2058,7 +2056,7 @@ nautilus_application_load_session (NautilusApplication *application)
 					if (i == 0) {
 						/* This may be an old session file */
 						location = g_file_new_for_uri (location_uri);
-						nautilus_window_slot_open_location (window->details->active_slot, location, FALSE);
+						nautilus_window_slot_open_location (window->details->active_pane->active_slot, location, FALSE);
 						g_object_unref (location);
 					}
 				} else if (!strcmp (type, "spatial")) {
@@ -2089,137 +2087,6 @@ nautilus_application_load_session (NautilusApplication *application)
 	if (bail) {
 		g_message ("failed to load session");
 	} 
-}
-
-#ifdef UGLY_HACK_TO_DETECT_KDE
-
-static gboolean
-get_self_typed_prop (Window      xwindow,
-                     Atom        atom,
-                     gulong     *val)
-{  
-	Atom type;
-	int format;
-	gulong nitems;
-	gulong bytes_after;
-	gulong *num;
-	int err;
-  
-	gdk_error_trap_push ();
-	type = None;
-	XGetWindowProperty (gdk_display,
-			    xwindow,
-			    atom,
-			    0, G_MAXLONG,
-			    False, atom, &type, &format, &nitems,
-			    &bytes_after, (guchar **)&num);  
-
-	err = gdk_error_trap_pop ();
-	if (err != Success) {
-		return FALSE;
-	}
-  
-	if (type != atom) {
-		return FALSE;
-	}
-
-	if (val)
-		*val = *num;
-  
-	XFree (num);
-
-	return TRUE;
-}
-
-static gboolean
-has_wm_state (Window xwindow)
-{
-	return get_self_typed_prop (xwindow,
-				    XInternAtom (gdk_display, "WM_STATE", False),
-				    NULL);
-}
-
-static gboolean
-look_for_kdesktop_recursive (Window xwindow)
-{
-  
-	Window ignored1, ignored2;
-	Window *children;
-	unsigned int n_children;
-	unsigned int i;
-	gboolean retval;
-  
-	/* If WM_STATE is set, this is a managed client, so look
-	 * for the class hint and end recursion. Otherwise,
-	 * this is probably just a WM frame, so keep recursing.
-	 */
-	if (has_wm_state (xwindow)) {      
-		XClassHint ch;
-      
-		gdk_error_trap_push ();
-		ch.res_name = NULL;
-		ch.res_class = NULL;
-      
-		XGetClassHint (gdk_display, xwindow, &ch);
-      
-		gdk_error_trap_pop ();
-      
-		if (ch.res_name)
-			XFree (ch.res_name);
-      
-		if (ch.res_class) {
-			if (strcmp (ch.res_class, "kdesktop") == 0) {
-				XFree (ch.res_class);
-				return TRUE;
-			}
-			else
-				XFree (ch.res_class);
-		}
-
-		return FALSE;
-	}
-  
-	retval = FALSE;
-  
-	gdk_error_trap_push ();
-  
-	XQueryTree (gdk_display,
-		    xwindow,
-		    &ignored1, &ignored2, &children, &n_children);
-
-	if (gdk_error_trap_pop ()) {
-		return FALSE;
-	}
-
-	i = 0;
-	while (i < n_children) {
-		if (look_for_kdesktop_recursive (children[i])) {
-			retval = TRUE;
-			break;
-		}
-      
-		++i;
-	}
-  
-	if (children)
-		XFree (children);
-
-	return retval;
-}
-#endif /* UGLY_HACK_TO_DETECT_KDE */
-
-static gboolean
-is_kdesktop_present (void)
-{
-#ifdef UGLY_HACK_TO_DETECT_KDE
-	/* FIXME this is a pretty lame hack, should be replaced
-	 * eventually with e.g. a requirement that desktop managers
-	 * support a manager selection, ICCCM sec 2.8
-	 */
-	return look_for_kdesktop_recursive (GDK_ROOT_WINDOW ());
-#else
-	return FALSE;
-#endif
 }
 
 static void

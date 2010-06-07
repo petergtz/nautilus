@@ -28,10 +28,11 @@
 #define NAUTILUS_WINDOW_MANAGE_VIEWS_H
 
 #include "nautilus-window.h"
+#include "nautilus-window-pane.h"
 #include "nautilus-navigation-window.h"
 
-void                    nautilus_window_manage_views_close_slot       (NautilusWindow           *window,
-								       NautilusWindowSlot       *slot);
+void nautilus_window_manage_views_close_slot (NautilusWindowPane *pane,
+                                              NautilusWindowSlot *slot);
 
 
 /* NautilusWindowInfo implementation: */
@@ -43,5 +44,6 @@ void nautilus_window_report_view_failed       (NautilusWindow     *window,
 void nautilus_window_report_load_complete     (NautilusWindow     *window,
                                                NautilusView       *view);
 void nautilus_window_report_location_change   (NautilusWindow     *window);
+void nautilus_window_update_up_button         (NautilusWindow     *window);
 
 #endif /* NAUTILUS_WINDOW_MANAGE_VIEWS_H */

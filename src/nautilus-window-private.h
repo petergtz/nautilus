@@ -30,10 +30,13 @@
 
 #include "nautilus-window.h"
 #include "nautilus-window-slot.h"
+#include "nautilus-window-pane.h"
 #include "nautilus-spatial-window.h"
 #include "nautilus-navigation-window.h"
 
 #include <libnautilus-private/nautilus-directory.h>
+
+struct _NautilusNavigationWindowPane;
 
 /* FIXME bugzilla.gnome.org 42575: Migrate more fields into here. */
 struct NautilusWindowDetails
@@ -54,13 +57,6 @@ struct NautilusWindowDetails
         guint refresh_bookmarks_menu_idle_id;
         guint bookmarks_merge_id;
 
-	/* available slots, and active slot.
- 	 * Both of them may never be NULL.
- 	 */
-	GList *slots;
-	GList *active_slots;
-	NautilusWindowSlot *active_slot;
-
 	NautilusWindowShowHiddenFilesMode show_hidden_files_mode;
 
 	/* View As menu */
@@ -79,23 +75,26 @@ struct NautilusWindowDetails
 	 * is cancelled
 	 */
 	gboolean temporarily_ignore_view_signals;
+
+        /* available panes, and active pane.
+         * Both of them may never be NULL.
+         */
+        GList *panes;
+        NautilusWindowPane *active_pane;
+
+	/* So we can tell which window initiated
+	 * an unmount operation.
+	 */
+	gboolean initiated_unmount;
 };
 
 struct _NautilusNavigationWindowDetails {
         GtkWidget *content_paned;
         GtkWidget *content_box;
         GtkActionGroup *navigation_action_group; /* owned by ui_manager */
+
+        GtkSizeGroup *header_size_group;
         
-        /* Location bar */
-        gboolean temporary_navigation_bar;
-        gboolean temporary_location_bar;
-        gboolean temporary_search_bar;
-
-        GtkWidget *location_button;
-	/* focus widget before the location bar
-	 * has been shown temporarily */
-	GtkWidget *last_focus_widget;
-
         /* Side Pane */
         int side_pane_width;
         NautilusSidebar *current_side_panel;
@@ -105,19 +104,21 @@ struct _NautilusNavigationWindowDetails {
 	guint refresh_go_menu_idle_id;
         guint go_menu_merge_id;
         
-	GtkActionGroup *tabs_menu_action_group;
-	guint tabs_menu_merge_id;
-
         /* Toolbar */
         GtkWidget *toolbar;
-        GtkWidget *location_bar;
 
         guint extensions_toolbar_merge_id;
         GtkActionGroup *extensions_toolbar_action_group;
 
-	/* Throbber */
-        gboolean    throbber_active;
-        GtkWidget  *throbber;
+        /* spinner */
+        gboolean    spinner_active;
+        GtkWidget  *spinner;
+
+        /* focus widget before the location bar has been shown temporarily */
+        GtkWidget *last_focus_widget;
+        	
+        /* split view */
+        GtkWidget *split_view_hpane;
 };
 
 #define NAUTILUS_MENU_PATH_BACK_ITEM			"/menu/Go/Back"
@@ -141,20 +142,20 @@ struct _NautilusNavigationWindowDetails {
 #define NAUTILUS_COMMAND_ZOOM_NORMAL			"/commands/Zoom Normal"
 
 /* window geometry */
-/* These are very small, and a Nautilus window at this tiny size is *almost*
+/* Min values are very small, and a Nautilus window at this tiny size is *almost*
  * completely unusable. However, if all the extra bits (sidebar, location bar, etc)
  * are turned off, you can see an icon or two at this size. See bug 5946.
  */
-#define NAUTILUS_WINDOW_MIN_WIDTH			200
-#define NAUTILUS_WINDOW_MIN_HEIGHT			200
 
 #define NAUTILUS_SPATIAL_WINDOW_MIN_WIDTH			100
 #define NAUTILUS_SPATIAL_WINDOW_MIN_HEIGHT			100
 #define NAUTILUS_SPATIAL_WINDOW_DEFAULT_WIDTH			500
 #define NAUTILUS_SPATIAL_WINDOW_DEFAULT_HEIGHT			300
 
-#define NAUTILUS_NAVIGATION_WINDOW_DEFAULT_WIDTH        800
-#define NAUTILUS_NAVIGATION_WINDOW_DEFAULT_HEIGHT       550
+#define NAUTILUS_NAVIGATION_WINDOW_MIN_WIDTH			200
+#define NAUTILUS_NAVIGATION_WINDOW_MIN_HEIGHT			200
+#define NAUTILUS_NAVIGATION_WINDOW_DEFAULT_WIDTH		800
+#define NAUTILUS_NAVIGATION_WINDOW_DEFAULT_HEIGHT		550
 
 typedef void (*NautilusBookmarkFailedCallback) (NautilusWindow *window,
                                                 NautilusBookmark *bookmark);
@@ -166,6 +167,7 @@ void               nautilus_window_load_view_as_menus                    (Nautil
 void               nautilus_window_load_extension_menus                  (NautilusWindow    *window);
 void               nautilus_window_initialize_menus                      (NautilusWindow    *window);
 void               nautilus_window_remove_trash_monitor_callback         (NautilusWindow    *window);
+NautilusWindowPane *nautilus_window_get_next_pane                        (NautilusWindow *window);
 void               nautilus_menus_append_bookmark_to_menu                (NautilusWindow    *window, 
                                                                           NautilusBookmark  *bookmark, 
                                                                           const char        *parent_path,
@@ -185,20 +187,21 @@ void               nautilus_window_zoom_to_level                         (Nautil
                                                                           NautilusZoomLevel  level);
 void               nautilus_window_zoom_to_default                       (NautilusWindow    *window);
 
-NautilusWindowSlot *nautilus_window_open_slot                            (NautilusWindow     *window,
+NautilusWindowSlot *nautilus_window_open_slot                            (NautilusWindowPane *pane,
 									  NautilusWindowOpenSlotFlags flags);
-void                nautilus_window_close_slot                           (NautilusWindow     *window,
-									  NautilusWindowSlot *slot);
+void                nautilus_window_close_slot                           (NautilusWindowSlot *slot);
 
 NautilusWindowSlot *nautilus_window_get_slot_for_view                    (NautilusWindow *window,
 									  NautilusView   *view);
-NautilusWindowSlot *nautilus_window_get_slot_for_content_box             (NautilusWindow *window,
-									  GtkWidget *content_box);
 
 GList *              nautilus_window_get_slots                           (NautilusWindow    *window);
 NautilusWindowSlot * nautilus_window_get_active_slot                     (NautilusWindow    *window);
-void                 nautilus_window_set_active_slot                     (NautilusWindow     *window,
+NautilusWindowSlot * nautilus_window_get_extra_slot                      (NautilusWindow    *window);
+void                 nautilus_window_set_active_slot                     (NautilusWindow    *window,
 									  NautilusWindowSlot *slot);
+void                 nautilus_window_set_active_pane                     (NautilusWindow *window,
+                                                                          NautilusWindowPane *new_pane);
+NautilusWindowPane * nautilus_window_get_active_pane                     (NautilusWindow *window);
 
 void               nautilus_send_history_list_changed                    (void);
 void               nautilus_remove_from_history_list_no_notify           (GFile             *location);
@@ -220,7 +223,6 @@ void nautilus_window_sync_allow_stop       (NautilusWindow *window,
 					    NautilusWindowSlot *slot);
 void nautilus_window_sync_title            (NautilusWindow *window,
 					    NautilusWindowSlot *slot);
-void nautilus_window_sync_location_widgets (NautilusWindow *window);
 void nautilus_window_sync_zoom_widgets     (NautilusWindow *window);
 
 /* Navigation window menus */
@@ -231,20 +233,18 @@ void               nautilus_navigation_window_remove_bookmarks_menu_callback    
 void               nautilus_navigation_window_remove_bookmarks_menu_items           (NautilusNavigationWindow    *window);
 void               nautilus_navigation_window_update_show_hide_menu_items           (NautilusNavigationWindow     *window);
 void               nautilus_navigation_window_update_spatial_menu_item              (NautilusNavigationWindow     *window);
-void               nautilus_navigation_window_update_tab_menu_item_visibility       (NautilusNavigationWindow     *window);
-void               nautilus_navigation_window_sync_tab_menu_title                   (NautilusNavigationWindow     *window,
-										     NautilusWindowSlot           *slot);
 void               nautilus_navigation_window_remove_go_menu_callback    (NautilusNavigationWindow    *window);
 void               nautilus_navigation_window_remove_go_menu_items       (NautilusNavigationWindow    *window);
 
 /* Navigation window toolbar */
-void               nautilus_navigation_window_activate_throbber                     (NautilusNavigationWindow    *window);
+void               nautilus_navigation_window_activate_spinner                     (NautilusNavigationWindow    *window);
 void               nautilus_navigation_window_initialize_toolbars                   (NautilusNavigationWindow    *window);
 void               nautilus_navigation_window_load_extension_toolbar_items          (NautilusNavigationWindow    *window);
-void               nautilus_navigation_window_set_throbber_active                   (NautilusNavigationWindow    *window, 
+void               nautilus_navigation_window_set_spinner_active                   (NautilusNavigationWindow    *window, 
                                                                                      gboolean                     active);
 void               nautilus_navigation_window_go_back                               (NautilusNavigationWindow    *window);
 void               nautilus_navigation_window_go_forward                            (NautilusNavigationWindow    *window);
-
+void               nautilus_window_close_pane                                       (NautilusWindowPane *pane);
+void               nautilus_navigation_window_update_split_view_actions_sensitivity (NautilusNavigationWindow    *window);
 
 #endif /* NAUTILUS_WINDOW_PRIVATE_H */

@@ -41,7 +41,7 @@ typedef struct {
 struct _NautilusSidePaneDetails {
 	GtkWidget *notebook;
 	GtkWidget *menu;
-	
+
 	GtkWidget *title_frame;
 	GtkWidget *title_hbox;
 	GtkWidget *title_label;
@@ -210,7 +210,7 @@ menu_position_under (GtkMenu *menu,
 	GtkWidget *widget;
 	
 	g_return_if_fail (GTK_IS_BUTTON (user_data));
-	g_return_if_fail (GTK_WIDGET_NO_WINDOW (user_data));
+	g_return_if_fail (!gtk_widget_get_has_window (GTK_WIDGET (user_data)));
 
 	widget = GTK_WIDGET (user_data);
 	
@@ -316,11 +316,15 @@ nautilus_side_pane_init (GObject *object)
 
 	side_pane->details = G_TYPE_INSTANCE_GET_PRIVATE (object, NAUTILUS_TYPE_SIDE_PANE, NautilusSidePaneDetails);
 
-	frame = gtk_frame_new (NULL);
+	/* The frame (really a vbox) has the border */
+	frame = gtk_vbox_new (FALSE, 0);
+	gtk_container_set_border_width (GTK_CONTAINER (frame), 4);
 	side_pane->details->title_frame = frame;
 	gtk_widget_show (frame);
 	gtk_box_pack_start (GTK_BOX (side_pane), frame, FALSE, FALSE, 0);
 
+	/* And the title_hbox is what gets the same size as the other
+	   headers */
 	hbox = gtk_hbox_new (FALSE, 0);
 	side_pane->details->title_hbox = hbox;
 	gtk_widget_show (hbox);
@@ -632,4 +636,10 @@ nautilus_side_pane_get_current_panel (NautilusSidePane *side_pane)
 	
 	index = gtk_notebook_get_current_page (GTK_NOTEBOOK (side_pane->details->notebook));
 	return gtk_notebook_get_nth_page (GTK_NOTEBOOK (side_pane->details->notebook), index);
+}
+
+GtkWidget *
+nautilus_side_pane_get_title (NautilusSidePane *side_pane)
+{
+	return side_pane->details->title_hbox;
 }

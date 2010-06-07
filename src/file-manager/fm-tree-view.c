@@ -226,7 +226,7 @@ show_selection_idle_callback (gpointer callback_data)
 		(view->details->sort_model, path);
 	gtk_tree_path_free (path);
 	gtk_tree_view_set_cursor (view->details->tree_widget, sort_path, NULL, FALSE);
-	if (GTK_WIDGET_REALIZED (view->details->tree_widget)) {
+	if (gtk_widget_get_realized (GTK_WIDGET (view->details->tree_widget))) {
 		gtk_tree_view_scroll_to_cell (view->details->tree_widget, sort_path, NULL, FALSE, 0, 0);
 	}
 	gtk_tree_path_free (sort_path);
@@ -798,13 +798,6 @@ fm_tree_view_activate_file (FMTreeView *view,
 	NautilusFileAttributes attributes;
 
 	cancel_activation (view);
-
-	if (view->details->activation_flags & NAUTILUS_WINDOW_OPEN_FLAG_NEW_TAB &&
-	    !eel_preferences_get_boolean (NAUTILUS_PREFERENCES_ENABLE_TABS)) {
-		view->details->activation_flags &= ~NAUTILUS_WINDOW_OPEN_FLAG_NEW_TAB;
-		view->details->activation_flags |= NAUTILUS_WINDOW_OPEN_FLAG_NEW_WINDOW;
-	}
-
 
 	view->details->activation_file = nautilus_file_ref (file);
 	view->details->activation_flags = flags;
@@ -1529,6 +1522,7 @@ fm_tree_view_init (FMTreeView *view)
 					GTK_POLICY_AUTOMATIC);
 	gtk_scrolled_window_set_hadjustment (GTK_SCROLLED_WINDOW (view), NULL);
 	gtk_scrolled_window_set_vadjustment (GTK_SCROLLED_WINDOW (view), NULL);
+	gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (view), GTK_SHADOW_IN);
 	
 	gtk_widget_show (GTK_WIDGET (view));
 

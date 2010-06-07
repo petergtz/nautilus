@@ -1,15 +1,18 @@
-# translation of nautilus.gnome-2-28.is.po to Icelandic
-# Samúel Jón Gunnarsson <sammi@techattack.nu>, 2003.
-# Sveinn í Felli <sveinki@nett.is>, 2009.
-# Copyright (C) 2009 Free Software Foundation, Inc.
+# Icelandic Translation of Nautilus.
 # This file is distributed under the same license as the GNOME package.
+# The translations are Copyright (C) of the contributing translators.  
+# Copyright (C) 2009 Free Software Foundation, Inc.
+# Samúel Jón Gunnarsson <sammi@techattack.nu>, 2003.
+# Anna Jonna Ármannsdóttir <annajonna@gmail.com> 2009. 
+# Sveinn í Felli <sveinki@nett.is>, 2009.
+# íslenskun nautilus.gnome
 msgid ""
 msgstr ""
 "Project-Id-Version: nautilus.gnome-2-28.is\n"
 "Report-Msgid-Bugs-To: http://bugzilla.gnome.org/enter_bug.cgi?"
 "product=nautilus&component=Internationalization (i18n)\n"
-"POT-Creation-Date: 2009-09-29 14:42+0000\n"
-"PO-Revision-Date: 2009-10-02 14:59+0000\n"
+"POT-Creation-Date: 2009-10-10 13:57+0000\n"
+"PO-Revision-Date: 2009-10-16 00:01+0000\n"
 "Last-Translator: Sveinn í Felli <sveinki@nett.is>\n"
 "Language-Team: Icelandic <rglug@rglug.is>\n"
 "MIME-Version: 1.0\n"
@@ -21,7 +24,7 @@ msgstr ""
 #: ../cut-n-paste-code/libegg/eggdesktopfile.c:165
 #, c-format
 msgid "File is not a valid .desktop file"
-msgstr "Skrá er ekki gild .desktop skrá"
+msgstr "Skráin er ekki gild .desktop skrá"
 
 #: ../cut-n-paste-code/libegg/eggdesktopfile.c:188
 #, c-format
@@ -470,7 +473,7 @@ msgstr "Allar frekari villur verða sýndar í skel."
 
 #: ../eel/eel-stock-dialogs.c:203
 msgid "You can stop this operation by clicking cancel."
-msgstr "Þú getur stoppað þessa aðgerð með því að ýta á hætta við"
+msgstr "Þú getur stoppað þessa aðgerð með því að ýta á 'Hætta við'."
 
 #: ../eel/eel-vfs-extensions.c:92
 msgid " (invalid Unicode)"
@@ -489,7 +492,7 @@ msgstr ""
 "Listi yfir texta fyrir neðan táknmyndir í táknmyndasýn og skjáborði. Fjöldi "
 "upplýsingareita veltur á aðdráttargildi. Hugsanleg gildi eru: \"stærð\","
 "\"gerð\", \"dags_breytt\", \"dags_opnað\", \"eigandi\", \"hópur\", \"réttindi"
-"\", \"tölu_réttindi\" og \"mime_gerð\""
+"\", \"tölu_réttindi\" og \"mime_gerð\"."
 
 #. TRANSLATORS: don't translate the zoom levels between quotes
 #: ../libnautilus-private/apps_nautilus_preferences.schemas.in.h:6
@@ -1363,7 +1366,7 @@ msgstr ""
 msgid "Whether to ask for confirmation when deleting files, or emptying Trash"
 msgstr ""
 "Hvort spyrja eigi um staðfestingu um það hvort eyða eigi skrám, eða hvort "
-"tæma eigi ruslafötuna."
+"tæma eigi ruslafötuna"
 
 #: ../libnautilus-private/apps_nautilus_preferences.schemas.in.h:146
 msgid "Whether to automatically mount media"
@@ -1522,7 +1525,7 @@ msgstr "_Alltaf gera þetta"
 #: ../src/file-manager/fm-directory-view.c:7091
 #: ../src/file-manager/fm-directory-view.c:7172
 #: ../src/file-manager/fm-tree-view.c:1325
-#: ../src/nautilus-places-sidebar.c:2209
+#: ../src/nautilus-places-sidebar.c:2242
 msgid "_Eject"
 msgstr "_Spýta út"
 
@@ -1534,7 +1537,7 @@ msgstr "_Spýta út"
 #: ../src/file-manager/fm-directory-view.c:7087
 #: ../src/file-manager/fm-directory-view.c:7168
 #: ../src/file-manager/fm-tree-view.c:1316
-#: ../src/nautilus-places-sidebar.c:2202
+#: ../src/nautilus-places-sidebar.c:2235
 msgid "_Unmount"
 msgstr "_Aftengja"
 
@@ -1585,7 +1588,7 @@ msgstr "Nota _sjálfgefið"
 
 #: ../libnautilus-private/nautilus-column-utilities.c:43
 #: ../libnautilus-private/nautilus-mime-application-chooser.c:273
-#: ../src/file-manager/fm-list-view.c:1457
+#: ../src/file-manager/fm-list-view.c:1485
 msgid "Name"
 msgstr "Heiti"
 
@@ -1620,7 +1623,7 @@ msgstr "Dagsetningin þegar skránni var breytt."
 
 #: ../libnautilus-private/nautilus-column-utilities.c:73
 msgid "Date Accessed"
-msgstr "Síðast notað:"
+msgstr "Síðast notað"
 
 #: ../libnautilus-private/nautilus-column-utilities.c:74
 msgid "The date the file was accessed."
@@ -1817,29 +1820,33 @@ msgstr "Sa_meina"
 msgid "Merge _All"
 msgstr "Sameina _allt"
 
-#: ../libnautilus-private/nautilus-file-operations.c:277
+#: ../libnautilus-private/nautilus-file-operations.c:193
+msgid "Copy _Anyway"
+msgstr ""
+
+#: ../libnautilus-private/nautilus-file-operations.c:278
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
 msgstr[0] "%'d sekúnda"
 msgstr[1] "%'d sekúndur"
 
-#: ../libnautilus-private/nautilus-file-operations.c:282
-#: ../libnautilus-private/nautilus-file-operations.c:293
+#: ../libnautilus-private/nautilus-file-operations.c:283
+#: ../libnautilus-private/nautilus-file-operations.c:294
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
 msgstr[0] "%'d mínúta"
 msgstr[1] "%'d mínútur"
 
-#: ../libnautilus-private/nautilus-file-operations.c:292
+#: ../libnautilus-private/nautilus-file-operations.c:293
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
 msgstr[0] "%'d klukkustund"
 msgstr[1] "%'d klukkustundir"
 
-#: ../libnautilus-private/nautilus-file-operations.c:300
+#: ../libnautilus-private/nautilus-file-operations.c:301
 #, c-format
 msgid "approximately %'d hour"
 msgid_plural "approximately %'d hours"
@@ -1851,7 +1858,7 @@ msgstr[1] "nálægt %'d klukkustundum"
 #. * (e.g. "folder", "plain text") to file type for symbolic link
 #. * to that kind of file (e.g. "link to folder").
 #.
-#: ../libnautilus-private/nautilus-file-operations.c:376
+#: ../libnautilus-private/nautilus-file-operations.c:377
 #: ../libnautilus-private/nautilus-file.c:6197
 #: ../src/file-manager/fm-directory-view.c:10142
 #, c-format
@@ -1859,7 +1866,7 @@ msgid "Link to %s"
 msgstr "Tengja við %s"
 
 #. appended to new link file
-#: ../libnautilus-private/nautilus-file-operations.c:380
+#: ../libnautilus-private/nautilus-file-operations.c:381
 #, c-format
 msgid "Another link to %s"
 msgstr "Annar tengill í %s"
@@ -1868,25 +1875,25 @@ msgstr "Annar tengill í %s"
 #. * if there's no way to do that nicely for a
 #. * particular language.
 #.
-#: ../libnautilus-private/nautilus-file-operations.c:396
+#: ../libnautilus-private/nautilus-file-operations.c:397
 #, c-format
 msgid "%'dst link to %s"
 msgstr "%'d. tengill í %s"
 
 #. appended to new link file
-#: ../libnautilus-private/nautilus-file-operations.c:400
+#: ../libnautilus-private/nautilus-file-operations.c:401
 #, c-format
 msgid "%'dnd link to %s"
 msgstr "%'d. tengill í %s"
 
 #. appended to new link file
-#: ../libnautilus-private/nautilus-file-operations.c:404
+#: ../libnautilus-private/nautilus-file-operations.c:405
 #, c-format
 msgid "%'drd link to %s"
 msgstr "%'d. tengill í %s"
 
 #. appended to new link file
-#: ../libnautilus-private/nautilus-file-operations.c:408
+#: ../libnautilus-private/nautilus-file-operations.c:409
 #, c-format
 msgid "%'dth link to %s"
 msgstr "%'d. tengill í %s"
@@ -1896,12 +1903,12 @@ msgstr "%'d. tengill í %s"
 #. * make some or all of them match.
 #.
 #. localizers: tag used to detect the first copy of a file
-#: ../libnautilus-private/nautilus-file-operations.c:447
+#: ../libnautilus-private/nautilus-file-operations.c:448
 msgid " (copy)"
 msgstr "(afrita)"
 
 #. localizers: tag used to detect the second copy of a file
-#: ../libnautilus-private/nautilus-file-operations.c:449
+#: ../libnautilus-private/nautilus-file-operations.c:450
 msgid " (another copy)"
 msgstr " (annað afrit)"
 
@@ -1909,37 +1916,37 @@ msgstr " (annað afrit)"
 #. localizers: tag used to detect the x12th copy of a file
 #. localizers: tag used to detect the x13th copy of a file
 #. localizers: tag used to detect the xxth copy of a file
-#: ../libnautilus-private/nautilus-file-operations.c:452
-#: ../libnautilus-private/nautilus-file-operations.c:454
-#: ../libnautilus-private/nautilus-file-operations.c:456
-#: ../libnautilus-private/nautilus-file-operations.c:466
+#: ../libnautilus-private/nautilus-file-operations.c:453
+#: ../libnautilus-private/nautilus-file-operations.c:455
+#: ../libnautilus-private/nautilus-file-operations.c:457
+#: ../libnautilus-private/nautilus-file-operations.c:467
 msgid "th copy)"
 msgstr "afrit)"
 
 #. localizers: tag used to detect the x1st copy of a file
-#: ../libnautilus-private/nautilus-file-operations.c:459
+#: ../libnautilus-private/nautilus-file-operations.c:460
 msgid "st copy)"
 msgstr "afrit)"
 
 #. localizers: tag used to detect the x2nd copy of a file
-#: ../libnautilus-private/nautilus-file-operations.c:461
+#: ../libnautilus-private/nautilus-file-operations.c:462
 msgid "nd copy)"
 msgstr "afrit)"
 
 #. localizers: tag used to detect the x3rd copy of a file
-#: ../libnautilus-private/nautilus-file-operations.c:463
+#: ../libnautilus-private/nautilus-file-operations.c:464
 msgid "rd copy)"
 msgstr "afrit)"
 
 #  localizers: appended to first file copy
 #. localizers: appended to first file copy
-#: ../libnautilus-private/nautilus-file-operations.c:480
+#: ../libnautilus-private/nautilus-file-operations.c:481
 #, c-format
 msgid "%s (copy)%s"
 msgstr "%s (afrit)%s"
 
 #. localizers: appended to second file copy
-#: ../libnautilus-private/nautilus-file-operations.c:482
+#: ../libnautilus-private/nautilus-file-operations.c:483
 #, c-format
 msgid "%s (another copy)%s"
 msgstr "%s (annað afrit)%s"
@@ -1948,10 +1955,10 @@ msgstr "%s (annað afrit)%s"
 #. localizers: appended to x12th file copy
 #. localizers: appended to x13th file copy
 #. localizers: appended to xxth file copy
-#: ../libnautilus-private/nautilus-file-operations.c:485
-#: ../libnautilus-private/nautilus-file-operations.c:487
-#: ../libnautilus-private/nautilus-file-operations.c:489
-#: ../libnautilus-private/nautilus-file-operations.c:503
+#: ../libnautilus-private/nautilus-file-operations.c:486
+#: ../libnautilus-private/nautilus-file-operations.c:488
+#: ../libnautilus-private/nautilus-file-operations.c:490
+#: ../libnautilus-private/nautilus-file-operations.c:504
 #, c-format
 msgid "%s (%'dth copy)%s"
 msgstr "%s (%d. afrit)%s"
@@ -1961,39 +1968,39 @@ msgstr "%s (%d. afrit)%s"
 #. * strings look like "%s (copy %'d)%s".
 #.
 #. localizers: appended to x1st file copy
-#: ../libnautilus-private/nautilus-file-operations.c:497
+#: ../libnautilus-private/nautilus-file-operations.c:498
 #, c-format
 msgid "%s (%'dst copy)%s"
 msgstr "%s (%d. afrit)%s"
 
 #. localizers: appended to x2nd file copy
-#: ../libnautilus-private/nautilus-file-operations.c:499
+#: ../libnautilus-private/nautilus-file-operations.c:500
 #, c-format
 msgid "%s (%'dnd copy)%s"
 msgstr "%s (%d. afrit)%s"
 
 #. localizers: appended to x3rd file copy
-#: ../libnautilus-private/nautilus-file-operations.c:501
+#: ../libnautilus-private/nautilus-file-operations.c:502
 #, c-format
 msgid "%s (%'drd copy)%s"
 msgstr "%s (%d. afrit)%s"
 
 #. localizers: opening parentheses to match the "th copy)" string
-#: ../libnautilus-private/nautilus-file-operations.c:601
+#: ../libnautilus-private/nautilus-file-operations.c:602
 msgid " ("
 msgstr " ("
 
 #. localizers: opening parentheses of the "th copy)" string
-#: ../libnautilus-private/nautilus-file-operations.c:609
+#: ../libnautilus-private/nautilus-file-operations.c:610
 #, c-format
 msgid " (%'d"
 msgstr " (%'d"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1296
+#: ../libnautilus-private/nautilus-file-operations.c:1297
 msgid "Are you sure you want to permanently delete \"%B\" from the trash?"
 msgstr "Ertu viss um að þú viljir eyða \"%B\" varanlega úr ruslinu?"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1299
+#: ../libnautilus-private/nautilus-file-operations.c:1300
 #, c-format
 msgid ""
 "Are you sure you want to permanently delete the %'d selected item from the "
@@ -2006,16 +2013,16 @@ msgstr[0] ""
 msgstr[1] ""
 "Ertu viss um að þú viljir eyða %'d völdum skrám úr ruslinu til frambúðar?"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1309
-#: ../libnautilus-private/nautilus-file-operations.c:1377
+#: ../libnautilus-private/nautilus-file-operations.c:1310
+#: ../libnautilus-private/nautilus-file-operations.c:1378
 msgid "If you delete an item, it will be permanently lost."
 msgstr "Ef þú eyðir hlut, hverfur hann fyrir fullt og allt."
 
-#: ../libnautilus-private/nautilus-file-operations.c:1329
+#: ../libnautilus-private/nautilus-file-operations.c:1330
 msgid "Empty all of the items from the trash?"
 msgstr "Fjarlægja alla hluti úr ruslinu?"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1333
+#: ../libnautilus-private/nautilus-file-operations.c:1334
 msgid ""
 "If you choose to empty the trash, all items in it will be permanently lost. "
 "Please note that you can also delete them separately."
@@ -2024,17 +2031,17 @@ msgstr ""
 "Athugaðu að þú getur einnig fjarlægt þau eitt og eitt í einu."
 
 #. Empty Trash menu item
-#: ../libnautilus-private/nautilus-file-operations.c:1338
-#: ../libnautilus-private/nautilus-file-operations.c:2181
-#: ../src/nautilus-places-sidebar.c:2246 ../src/nautilus-trash-bar.c:125
+#: ../libnautilus-private/nautilus-file-operations.c:1339
+#: ../libnautilus-private/nautilus-file-operations.c:2182
+#: ../src/nautilus-places-sidebar.c:2279 ../src/nautilus-trash-bar.c:125
 msgid "Empty _Trash"
 msgstr "_Tæma ruslið"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1365
+#: ../libnautilus-private/nautilus-file-operations.c:1366
 msgid "Are you sure you want to permanently delete \"%B\"?"
 msgstr "Ertu viss um að þú viljir eyða „%B“ algjörlega?"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1368
+#: ../libnautilus-private/nautilus-file-operations.c:1369
 #, c-format
 msgid "Are you sure you want to permanently delete the %'d selected item?"
 msgid_plural ""
@@ -2042,35 +2049,35 @@ msgid_plural ""
 msgstr[0] "Ertu viss um að þú viljir algjörlega eyða þessari %'d völdu skrá?"
 msgstr[1] "Ertu viss um að þú viljir algjörlega eyða þessum %'d völdu skrám?"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1411
+#: ../libnautilus-private/nautilus-file-operations.c:1412
 #, c-format
 msgid "%'d file left to delete"
 msgid_plural "%'d files left to delete"
 msgstr[0] "%'d skrá eftir að eyða"
 msgstr[1] "%'d skrár eftir að eyða"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1417
+#: ../libnautilus-private/nautilus-file-operations.c:1418
 msgid "Deleting files"
 msgstr "Eyði skrám"
 
 #. To translators: %T will expand to a time like "2 minutes".
 #. * The singular/plural form will be used depending on the remaining time (i.e. the %T argument).
 #.
-#: ../libnautilus-private/nautilus-file-operations.c:1431
+#: ../libnautilus-private/nautilus-file-operations.c:1432
 msgid "%T left"
 msgid_plural "%T left"
 msgstr[0] "%T eftir"
 msgstr[1] "%T eftir"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1498
-#: ../libnautilus-private/nautilus-file-operations.c:1532
-#: ../libnautilus-private/nautilus-file-operations.c:1571
-#: ../libnautilus-private/nautilus-file-operations.c:1648
-#: ../libnautilus-private/nautilus-file-operations.c:2408
+#: ../libnautilus-private/nautilus-file-operations.c:1499
+#: ../libnautilus-private/nautilus-file-operations.c:1533
+#: ../libnautilus-private/nautilus-file-operations.c:1572
+#: ../libnautilus-private/nautilus-file-operations.c:1649
+#: ../libnautilus-private/nautilus-file-operations.c:2409
 msgid "Error while deleting."
 msgstr "Villa kom upp við útstrokun gagna."
 
-#: ../libnautilus-private/nautilus-file-operations.c:1502
+#: ../libnautilus-private/nautilus-file-operations.c:1503
 msgid ""
 "Files in the folder \"%B\" cannot be deleted because you do not have "
 "permissions to see them."
@@ -2078,20 +2085,20 @@ msgstr ""
 "Ekki var hægt að eyða skránum \"%B\" þar sem þú hefur ekki réttindi til að "
 "lesa þær."
 
-#: ../libnautilus-private/nautilus-file-operations.c:1505
-#: ../libnautilus-private/nautilus-file-operations.c:2467
-#: ../libnautilus-private/nautilus-file-operations.c:3429
+#: ../libnautilus-private/nautilus-file-operations.c:1506
+#: ../libnautilus-private/nautilus-file-operations.c:2468
+#: ../libnautilus-private/nautilus-file-operations.c:3434
 msgid ""
 "There was an error getting information about the files in the folder \"%B\"."
 msgstr ""
 "Villa kom upp þegar þú reyndar að afla þér upplýsinga um möppuna \"%B\"."
 
-#: ../libnautilus-private/nautilus-file-operations.c:1514
-#: ../libnautilus-private/nautilus-file-operations.c:3438
+#: ../libnautilus-private/nautilus-file-operations.c:1515
+#: ../libnautilus-private/nautilus-file-operations.c:3443
 msgid "_Skip files"
 msgstr "_Sleppa skrám"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1535
+#: ../libnautilus-private/nautilus-file-operations.c:1536
 msgid ""
 "The folder \"%B\" cannot be deleted because you do not have permissions to "
 "read it."
@@ -2099,60 +2106,60 @@ msgstr ""
 "Ekki var hægt að eyða möppunni \"%B\" þar sem þú hefur ekki réttindi til að "
 "lesa hana."
 
-#: ../libnautilus-private/nautilus-file-operations.c:1538
-#: ../libnautilus-private/nautilus-file-operations.c:2506
-#: ../libnautilus-private/nautilus-file-operations.c:3474
+#: ../libnautilus-private/nautilus-file-operations.c:1539
+#: ../libnautilus-private/nautilus-file-operations.c:2507
+#: ../libnautilus-private/nautilus-file-operations.c:3479
 msgid "There was an error reading the folder \"%B\"."
 msgstr "Villa kom upp þegar þú reyndir að lesa möppuna \"%B\"."
 
-#: ../libnautilus-private/nautilus-file-operations.c:1572
+#: ../libnautilus-private/nautilus-file-operations.c:1573
 msgid "Could not remove the folder %B."
 msgstr "Gat ekki fjarlægt skrána %B."
 
-#: ../libnautilus-private/nautilus-file-operations.c:1649
+#: ../libnautilus-private/nautilus-file-operations.c:1650
 msgid "There was an error deleting %B."
 msgstr "Villa kom upp við að eyða %B."
 
-#: ../libnautilus-private/nautilus-file-operations.c:1729
+#: ../libnautilus-private/nautilus-file-operations.c:1730
 msgid "Moving files to trash"
 msgstr "Flyt skrár í ruslið"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1731
+#: ../libnautilus-private/nautilus-file-operations.c:1732
 #, c-format
 msgid "%'d file left to trash"
 msgid_plural "%'d files left to trash"
 msgstr[0] "%'d skrá á eftir að flytja í ruslið"
 msgstr[1] "%'d skrár á eftir að flytja í ruslið"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1781
+#: ../libnautilus-private/nautilus-file-operations.c:1782
 msgid "Cannot move file to trash, do you want to delete immediately?"
 msgstr "Það er ekki hægt að flytja skrána í ruslið. Viltu eyða henni strax?"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1782
+#: ../libnautilus-private/nautilus-file-operations.c:1783
 msgid "The file \"%B\" cannot be moved to the trash."
 msgstr "Ekki er hægt að henda \"%B\" í ruslið."
 
-#: ../libnautilus-private/nautilus-file-operations.c:1957
+#: ../libnautilus-private/nautilus-file-operations.c:1958
 msgid "Trashing Files"
 msgstr "Set skrár í ruslið"
 
-#: ../libnautilus-private/nautilus-file-operations.c:1959
+#: ../libnautilus-private/nautilus-file-operations.c:1960
 msgid "Deleting Files"
 msgstr "Eyði skrám"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2021
+#: ../libnautilus-private/nautilus-file-operations.c:2022
 msgid "Unable to eject %V"
 msgstr "Get ekki spýtt út %V"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2023
+#: ../libnautilus-private/nautilus-file-operations.c:2024
 msgid "Unable to unmount %V"
 msgstr "Get ekki aftengt %V"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2171
+#: ../libnautilus-private/nautilus-file-operations.c:2172
 msgid "Do you want to empty the trash before you unmount?"
 msgstr "Viltu tæma ruslið áður en þú aftengir gangahirsluna?"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2173
+#: ../libnautilus-private/nautilus-file-operations.c:2174
 msgid ""
 "In order to regain the free space on this volume the trash must be emptied. "
 "All trashed items on the volume will be permanently lost."
@@ -2160,61 +2167,61 @@ msgstr ""
 "Til að endurheimta pláss á gagnahirslunni verður að tæma ruslið. Öllu því "
 "rusli sem hent var á gagnahirslunni verður eytt, og er ekki afturkræft."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2179
+#: ../libnautilus-private/nautilus-file-operations.c:2180
 msgid "Do _not Empty Trash"
 msgstr "E_kki tæma ruslið"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2278
+#: ../libnautilus-private/nautilus-file-operations.c:2279
 #, c-format
 msgid "Unable to mount %s"
 msgstr "Ófær um að tengjast %s"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2355
+#: ../libnautilus-private/nautilus-file-operations.c:2356
 #, c-format
 msgid "Preparing to copy %'d file (%S)"
 msgid_plural "Preparing to copy %'d files (%S)"
 msgstr[0] "Undirbý það að afrita %'d skrá (%S)"
 msgstr[1] "Undirbý það að afrita %'d skrár (%S)"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2361
+#: ../libnautilus-private/nautilus-file-operations.c:2362
 #, c-format
 msgid "Preparing to move %'d file (%S)"
 msgid_plural "Preparing to move %'d files (%S)"
 msgstr[0] "Undirbý það að færa %'d skrá (%S)"
 msgstr[1] "Undirbý það að færa %'d skrár (%S)"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2367
+#: ../libnautilus-private/nautilus-file-operations.c:2368
 #, c-format
 msgid "Preparing to delete %'d file (%S)"
 msgid_plural "Preparing to delete %'d files (%S)"
 msgstr[0] "Undirbý það að eyða %'d skrá (%S)"
 msgstr[1] "Undirbý það að eyða %'d skrám (%S)"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2373
+#: ../libnautilus-private/nautilus-file-operations.c:2374
 #, c-format
 msgid "Preparing to trash %'d file"
 msgid_plural "Preparing to trash %'d files"
 msgstr[0] "Undirbý það að setja %'d skrá í ruslið"
 msgstr[1] "Undirbý það að setja %'d skrár í ruslið"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2404
-#: ../libnautilus-private/nautilus-file-operations.c:3295
-#: ../libnautilus-private/nautilus-file-operations.c:3421
-#: ../libnautilus-private/nautilus-file-operations.c:3466
+#: ../libnautilus-private/nautilus-file-operations.c:2405
+#: ../libnautilus-private/nautilus-file-operations.c:3300
+#: ../libnautilus-private/nautilus-file-operations.c:3426
+#: ../libnautilus-private/nautilus-file-operations.c:3471
 msgid "Error while copying."
 msgstr "Villa kom upp við afritun."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2406
-#: ../libnautilus-private/nautilus-file-operations.c:3419
-#: ../libnautilus-private/nautilus-file-operations.c:3464
+#: ../libnautilus-private/nautilus-file-operations.c:2407
+#: ../libnautilus-private/nautilus-file-operations.c:3424
+#: ../libnautilus-private/nautilus-file-operations.c:3469
 msgid "Error while moving."
 msgstr "Villa kom upp við flutning."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2410
+#: ../libnautilus-private/nautilus-file-operations.c:2411
 msgid "Error while moving files to trash."
 msgstr "Villa kom upp á meðan reynt var að færa skrár í ruslið."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2464
+#: ../libnautilus-private/nautilus-file-operations.c:2465
 msgid ""
 "Files in the folder \"%B\" cannot be handled because you do not have "
 "permissions to see them."
@@ -2222,7 +2229,7 @@ msgstr ""
 "Ekki er unnt að meðhöndla skrárnar í möppunni \"%B\" vegna þess að þú hefur "
 "ekki heimild til að skoða þær."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2503
+#: ../libnautilus-private/nautilus-file-operations.c:2504
 msgid ""
 "The folder \"%B\" cannot be handled because you do not have permissions to "
 "read it."
@@ -2230,7 +2237,7 @@ msgstr ""
 "Ekki er unnt að meðhöndla möppuna \"%B\" vegna þess að þú hefur ekki heimild "
 "til að skoða hana."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2580
+#: ../libnautilus-private/nautilus-file-operations.c:2581
 msgid ""
 "The file \"%B\" cannot be handled because you do not have permissions to "
 "read it."
@@ -2238,30 +2245,30 @@ msgstr ""
 "Ekki er unnt að meðhöndla skrána \"%B\" vegna þess að þú hefur ekki heimild "
 "til að lesa hana."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2583
+#: ../libnautilus-private/nautilus-file-operations.c:2584
 msgid "There was an error getting information about \"%B\"."
 msgstr "Villa kom upp þegar þú reyndar að nálgast upplýsingar um \"%B\"."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2683
-#: ../libnautilus-private/nautilus-file-operations.c:2725
-#: ../libnautilus-private/nautilus-file-operations.c:2758
-#: ../libnautilus-private/nautilus-file-operations.c:2784
+#: ../libnautilus-private/nautilus-file-operations.c:2684
+#: ../libnautilus-private/nautilus-file-operations.c:2726
+#: ../libnautilus-private/nautilus-file-operations.c:2759
+#: ../libnautilus-private/nautilus-file-operations.c:2789
 msgid "Error while copying to \"%B\"."
 msgstr "Villa kom upp við að afrita yfir í \"%B\"."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2687
+#: ../libnautilus-private/nautilus-file-operations.c:2688
 msgid "You do not have permissions to access the destination folder."
 msgstr "Þú hefur ekki aðgangsheimild að áfangastaðnum."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2689
+#: ../libnautilus-private/nautilus-file-operations.c:2690
 msgid "There was an error getting information about the destination."
 msgstr "Villa kom upp við söfnun upplýsinga um áfangastaðinn."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2726
+#: ../libnautilus-private/nautilus-file-operations.c:2727
 msgid "The destination is not a folder."
 msgstr "Áfangastaðurinn er ekki mappa."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2759
+#: ../libnautilus-private/nautilus-file-operations.c:2760
 msgid ""
 "There is not enough space on the destination. Try to remove files to make "
 "space."
@@ -2269,58 +2276,58 @@ msgstr ""
 "Það er ekki nægjanlegt pláss á áfangastaðnum. Reyndu að eyða skrám til að "
 "búa til pláss."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2761
+#: ../libnautilus-private/nautilus-file-operations.c:2762
 #, c-format
 msgid "There is %S available, but %S is required."
 msgstr "Það eru %S til staðar, en %S eru nauðsynleg."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2785
+#: ../libnautilus-private/nautilus-file-operations.c:2790
 msgid "The destination is read-only."
 msgstr "Áfangastaðurinn er skrifvarinn."
 
-#: ../libnautilus-private/nautilus-file-operations.c:2844
+#: ../libnautilus-private/nautilus-file-operations.c:2849
 msgid "Moving \"%B\" to \"%B\""
 msgstr "Færi \"%B\" yfir í \"%B\""
 
-#: ../libnautilus-private/nautilus-file-operations.c:2845
+#: ../libnautilus-private/nautilus-file-operations.c:2850
 msgid "Copying \"%B\" to \"%B\""
 msgstr "Afrita \"%B\" yfir í \"%B\""
 
-#: ../libnautilus-private/nautilus-file-operations.c:2850
+#: ../libnautilus-private/nautilus-file-operations.c:2855
 msgid "Duplicating \"%B\""
 msgstr "Tvöfalda \"%B\""
 
-#: ../libnautilus-private/nautilus-file-operations.c:2858
+#: ../libnautilus-private/nautilus-file-operations.c:2863
 msgid "Moving %'d file (in \"%B\") to \"%B\""
 msgid_plural "Moving %'d files (in \"%B\") to \"%B\""
 msgstr[0] "Færi %'d skrá (í \"%B\") yfir í \"%B\""
 msgstr[1] "Færi %'d skrár (í \"%B\") yfir í \"%B\""
 
-#: ../libnautilus-private/nautilus-file-operations.c:2862
+#: ../libnautilus-private/nautilus-file-operations.c:2867
 msgid "Copying %'d file (in \"%B\") to \"%B\""
 msgid_plural "Copying %'d files (in \"%B\") to \"%B\""
 msgstr[0] "Afrita %'d skrá (í \"%B\") yfir í \"%B\""
 msgstr[1] "Afrita %'d skrár (í \"%B\") yfir í \"%B\""
 
-#: ../libnautilus-private/nautilus-file-operations.c:2870
+#: ../libnautilus-private/nautilus-file-operations.c:2875
 msgid "Duplicating %'d file (in \"%B\")"
 msgid_plural "Duplicating %'d files (in \"%B\")"
 msgstr[0] "Tvöfalda %'d skrá (í \"%B\")"
 msgstr[1] "Tvöfalda %'d skrár (í \"%B\")"
 
-#: ../libnautilus-private/nautilus-file-operations.c:2880
+#: ../libnautilus-private/nautilus-file-operations.c:2885
 msgid "Moving %'d file to \"%B\""
 msgid_plural "Moving %'d files to \"%B\""
 msgstr[0] "Færi %'d skrá yfir í \"%B\""
 msgstr[1] "Færi %'d skrár yfir í \"%B\""
 
-#: ../libnautilus-private/nautilus-file-operations.c:2884
+#: ../libnautilus-private/nautilus-file-operations.c:2889
 msgid "Copying %'d file to \"%B\""
 msgid_plural "Copying %'d files to \"%B\""
 msgstr[0] "Afrita %'d skrá yfir í \"%B\""
 msgstr[1] "Afrita %'d skrár yfir í \"%B\""
 
-#: ../libnautilus-private/nautilus-file-operations.c:2890
+#: ../libnautilus-private/nautilus-file-operations.c:2895
 #, c-format
 msgid "Duplicating %'d file"
 msgid_plural "Duplicating %'d files"
@@ -2328,7 +2335,7 @@ msgstr[0] "Tvöfalda %'d skrá"
 msgstr[1] "Tvöfalda %'d skrár"
 
 #. To translators: %S will expand to a size like "2 bytes" or "3 MB", so something like "4 kb of 4 MB"
-#: ../libnautilus-private/nautilus-file-operations.c:2910
+#: ../libnautilus-private/nautilus-file-operations.c:2915
 #, c-format
 msgid "%S of %S"
 msgstr "%S af %S"
@@ -2338,13 +2345,13 @@ msgstr "%S af %S"
 #. *
 #. * The singular/plural form will be used depending on the remaining time (i.e. the %T argument).
 #.
-#: ../libnautilus-private/nautilus-file-operations.c:2921
+#: ../libnautilus-private/nautilus-file-operations.c:2926
 msgid "%S of %S — %T left (%S/sec)"
 msgid_plural "%S of %S — %T left (%S/sec)"
 msgstr[0] "%S af %S — %T eftir (%S/sek)"
 msgstr[1] "%S af %S — %T eftir (%S/sek)"
 
-#: ../libnautilus-private/nautilus-file-operations.c:3299
+#: ../libnautilus-private/nautilus-file-operations.c:3304
 msgid ""
 "The folder \"%B\" cannot be copied because you do not have permissions to "
 "create it in the destination."
@@ -2352,307 +2359,246 @@ msgstr ""
 "Ekki var hægt að afrita \"%B\" þar sem þú hefur ekki réttindi til að búa til "
 "afritið á áfangastaðnum."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3302
+#: ../libnautilus-private/nautilus-file-operations.c:3307
 msgid "There was an error creating the folder \"%B\"."
 msgstr "Villa kom upp þegar búa átti til möppuna \"%B\"."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3426
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:3431
 msgid ""
 "Files in the folder \"%B\" cannot be copied because you do not have "
 "permissions to see them."
 msgstr ""
-"Villa kom upp við afritun.\n"
-"\n"
-"Ekki var hægt að afrita \"%s\" þar sem þú hefur ekki réttindi til að lesa "
-"skránna / möppuna."
+"Ekki var hægt að afrita skrárnar í möppunni \"%B\" þar sem þú hefur ekki "
+"réttindi til að lesa þær."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3471
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:3476
 msgid ""
 "The folder \"%B\" cannot be copied because you do not have permissions to "
 "read it."
 msgstr ""
-"Villa kom upp við afritun.\n"
-"\n"
-"Ekki var hægt að afrita \"%s\" þar sem þú hefur ekki réttindi til að lesa "
-"skránna / möppuna."
+"Ekki var hægt að afrita möppuna \"%B\" þar sem þú hefur ekki réttindi til að "
+"lesa hana."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3516
-#: ../libnautilus-private/nautilus-file-operations.c:4128
-#: ../libnautilus-private/nautilus-file-operations.c:4707
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:3521
+#: ../libnautilus-private/nautilus-file-operations.c:4133
+#: ../libnautilus-private/nautilus-file-operations.c:4712
 msgid "Error while moving \"%B\"."
-msgstr "Villa kom upp við flutning."
+msgstr "Villa kom upp við flutning \"%B\"."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3517
-#, fuzzy
-#| msgid "You cannot move this trash folder."
+#: ../libnautilus-private/nautilus-file-operations.c:3522
 msgid "Could not remove the source folder."
-msgstr "Þú getur ekki flutt þessa ruslamöppu."
+msgstr "Gat ekki flutt upprunamöppuna."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3602
-#: ../libnautilus-private/nautilus-file-operations.c:3643
-#: ../libnautilus-private/nautilus-file-operations.c:4130
-#: ../libnautilus-private/nautilus-file-operations.c:4201
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:3607
+#: ../libnautilus-private/nautilus-file-operations.c:3648
+#: ../libnautilus-private/nautilus-file-operations.c:4135
+#: ../libnautilus-private/nautilus-file-operations.c:4206
 msgid "Error while copying \"%B\"."
-msgstr "Villa kom upp við afritun."
+msgstr "Villa kom upp við afritun \"%B\"."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3603
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-file-operations.c:3608
+#, c-format
 msgid "Could not remove files from the already existing folder %F."
-msgstr "Gat ekki eytt skrám frá möppunni %F sem er þegar til."
+msgstr "Gat ekki eytt skrám úr möppunni %F sem er þegar til."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3644
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-file-operations.c:3649
+#, c-format
 msgid "Could not remove the already existing file %F."
-msgstr "Ekki tókst að fjarlægja merkmiða"
+msgstr "Gat ekki eytt skránni %F sem er þegar til."
 
 #. the run_warning() frees all strings passed in automatically
-#: ../libnautilus-private/nautilus-file-operations.c:3860
-#: ../libnautilus-private/nautilus-file-operations.c:4534
+#: ../libnautilus-private/nautilus-file-operations.c:3865
+#: ../libnautilus-private/nautilus-file-operations.c:4539
 msgid "You cannot move a folder into itself."
 msgstr "Þú getur ekki flutt möppuna inn í sjálfa sig."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3861
-#: ../libnautilus-private/nautilus-file-operations.c:4535
+#: ../libnautilus-private/nautilus-file-operations.c:3866
+#: ../libnautilus-private/nautilus-file-operations.c:4540
 msgid "You cannot copy a folder into itself."
 msgstr "Þú getur ekki afritað möppuna inn í sjálfa sig."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3862
-#: ../libnautilus-private/nautilus-file-operations.c:4536
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:3867
+#: ../libnautilus-private/nautilus-file-operations.c:4541
 msgid "The destination folder is inside the source folder."
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Viðtökumappan er inn í upprunalegu möppunni."
 
 #. the run_warning() frees all strings passed in automatically
-#: ../libnautilus-private/nautilus-file-operations.c:3894
-#, fuzzy
-#| msgid "You cannot copy a file over itself."
+#: ../libnautilus-private/nautilus-file-operations.c:3899
 msgid "You cannot move a file over itself."
-msgstr "Þú getur ekki afritað skrá inn í sjálfa sig."
+msgstr "Þú getur ekki fært skrá inn í sjálfa sig."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3895
+#: ../libnautilus-private/nautilus-file-operations.c:3900
 msgid "You cannot copy a file over itself."
 msgstr "Þú getur ekki afritað skrá inn í sjálfa sig."
 
-#: ../libnautilus-private/nautilus-file-operations.c:3896
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:3901
 msgid "The source file would be overwritten by the destination."
-msgstr ""
-"Villa við stofnun möppu.\n"
-"\n"
-"Það er ekkert pláss laust á áfangastað."
+msgstr "Upprunaskráin yrði yfirskrifuð af áfangastaðnum."
 
-#: ../libnautilus-private/nautilus-file-operations.c:4026
-#: ../libnautilus-private/nautilus-file-operations.c:4616
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:4031
+#: ../libnautilus-private/nautilus-file-operations.c:4621
 msgid ""
 "A folder named \"%B\" already exists.  Do you want to merge the source "
 "folder?"
 msgstr ""
-"Skráin \"%s\" finnst nú þegar.\n"
-"\n"
-"Viltu yfirrita hana?"
+"Mappa með heitinu \"%B\" er nú þegar til.  Viltu sameina úttaksmöppuna?"
 
-#: ../libnautilus-private/nautilus-file-operations.c:4028
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:4033
 msgid ""
 "The source folder already exists in \"%B\".  Merging will ask for "
 "confirmation before replacing any files in the folder that conflict with the "
 "files being copied."
 msgstr ""
-"Upprunalega mappan er þegar til í „%B“. Beðið verðum um staðfestingu áður en "
-"skrár sem stangast á verða sameinaðar."
+"Upprunalega mappan er þegar til í \"%B\". Beðið verðum um staðfestingu áður "
+"en skrár í möppunni sem stangast á verða sameinaðar."
 
-#: ../libnautilus-private/nautilus-file-operations.c:4033
-#: ../libnautilus-private/nautilus-file-operations.c:4623
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:4038
+#: ../libnautilus-private/nautilus-file-operations.c:4628
 msgid "A folder named \"%B\" already exists.  Do you want to replace it?"
-msgstr ""
-"Skráin \"%s\" finnst nú þegar.\n"
-"\n"
-"Viltu yfirrita hana?"
+msgstr "Mappa með heitinu \"%B\" er nú þegar til. Viltu skipta henni út?"
 
-#: ../libnautilus-private/nautilus-file-operations.c:4035
-#: ../libnautilus-private/nautilus-file-operations.c:4625
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-file-operations.c:4040
+#: ../libnautilus-private/nautilus-file-operations.c:4630
+#, c-format
 msgid ""
 "The folder already exists in \"%F\".  Replacing it will remove all files in "
 "the folder."
 msgstr ""
-"Mappan er þegar til í „%F“. Ef þú skiptir henni út munu allar skrárnar "
+"Mappan er þegar til í \"%F\". Ef þú skiptir henni út munu allar skrárnar "
 "eyðast."
 
-#: ../libnautilus-private/nautilus-file-operations.c:4040
-#: ../libnautilus-private/nautilus-file-operations.c:4630
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:4045
+#: ../libnautilus-private/nautilus-file-operations.c:4635
 msgid "A file named \"%B\" already exists.  Do you want to replace it?"
-msgstr ""
-"Skráin \"%s\" finnst nú þegar.\n"
-"\n"
-"Viltu yfirrita hana?"
+msgstr "Skrá með heitinu \"%B\" er nú þegar til. Viltu skipta henni út?"
 
-#: ../libnautilus-private/nautilus-file-operations.c:4042
-#: ../libnautilus-private/nautilus-file-operations.c:4632
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-file-operations.c:4047
+#: ../libnautilus-private/nautilus-file-operations.c:4637
+#, c-format
 msgid ""
 "The file already exists in \"%F\".  Replacing it will overwrite its content."
 msgstr ""
-"Skráin er þegar til í „%F“. Ef þú skiptir henni út þá eyðist allt sem í "
+"Skráin er þegar til í \"%F\". Ef þú skiptir henni út þá eyðist allt sem í "
 "henni stendur."
 
-#: ../libnautilus-private/nautilus-file-operations.c:4132
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-file-operations.c:4137
+#, c-format
 msgid "Could not remove the already existing file with the same name in %F."
 msgstr "Gat ekki eytt samnefndri skrá sem er þegar til í %F."
 
-#: ../libnautilus-private/nautilus-file-operations.c:4202
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-file-operations.c:4207
+#, c-format
 msgid "There was an error copying the file into %F."
-msgstr ""
-"Villa átti sér stað við ræsingu á forritinu.\n"
-"\n"
-"Nánar: "
+msgstr "Villa átti sér stað við að afrita skrána inn í %F."
 
-#: ../libnautilus-private/nautilus-file-operations.c:4426
-#, fuzzy
-#| msgid "Copying files"
+#: ../libnautilus-private/nautilus-file-operations.c:4431
 msgid "Copying Files"
-msgstr "Afrita skjöl"
+msgstr "Afrita skrár"
 
-#: ../libnautilus-private/nautilus-file-operations.c:4443
-#, fuzzy
-#| msgid "Preparing to Move to Trash..."
+#: ../libnautilus-private/nautilus-file-operations.c:4448
 msgid "Preparing to Move to \"%B\""
-msgstr "Undirbý flutning í ruslatunnu..."
+msgstr "Býr sig undir að flytja yfir í \"%B\""
 
-#: ../libnautilus-private/nautilus-file-operations.c:4447
-#, fuzzy, c-format
-#| msgid "Preparing to Delete files..."
+#: ../libnautilus-private/nautilus-file-operations.c:4452
+#, c-format
 msgid "Preparing to move %'d file"
 msgid_plural "Preparing to move %'d files"
-msgstr[0] "Undirbý það að eyða skrám..."
-msgstr[1] "Undirbý það að eyða skrám..."
+msgstr[0] "Býr sig undir að flytja %'d skrá"
+msgstr[1] "Býr sig undir að flytja %'d skrár"
 
-#: ../libnautilus-private/nautilus-file-operations.c:4618
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:4623
 msgid ""
 "The source folder already exists in \"%B\".  Merging will ask for "
 "confirmation before replacing any files in the folder that conflict with the "
 "files being moved."
 msgstr ""
-"Upprunalega mappan er þegar til í „%B“. Ef þú ætlar að láta möppurnar renna "
-"saman þá verður þú beðinn um staðfestingu áður en nokkrum skrám sem heita "
-"sama nafni verður eytt."
+"Upprunalega mappan er þegar til í \"%B\". Ef þú ætlar að sameina möppurnar "
+"þá verður þú beðinn um staðfestingu áður en nokkrar skrár sem heita sama "
+"nafni verða fluttar."
 
-#: ../libnautilus-private/nautilus-file-operations.c:4708
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-file-operations.c:4713
+#, c-format
 msgid "There was an error moving the file into %F."
-msgstr ""
-"Villa átti sér stað við ræsingu á forritinu.\n"
-"\n"
-"Nánar: "
+msgstr "Villa átti sér stað við að færa skrána inn í %F."
 
-#: ../libnautilus-private/nautilus-file-operations.c:4968
-#, fuzzy
-#| msgid "Moving files"
+#: ../libnautilus-private/nautilus-file-operations.c:4973
 msgid "Moving Files"
-msgstr "Flyt skrár"
+msgstr "Færi skrár"
 
-#: ../libnautilus-private/nautilus-file-operations.c:4985
-#, fuzzy
-#| msgid "Creating links to files"
+#: ../libnautilus-private/nautilus-file-operations.c:4990
 msgid "Creating links in \"%B\""
-msgstr "Stofna tengla yfir í skrár"
+msgstr "Stofna tengla í skrár \"%B\""
 
-#: ../libnautilus-private/nautilus-file-operations.c:4989
-#, fuzzy, c-format
-#| msgid "Creating links to files"
+#: ../libnautilus-private/nautilus-file-operations.c:4994
+#, c-format
 msgid "Making link to %'d file"
 msgid_plural "Making links to %'d files"
-msgstr[0] "Stofna tengla yfir í skrár"
-msgstr[1] "Stofna tengla yfir í skrár"
-
-#: ../libnautilus-private/nautilus-file-operations.c:5118
-#, fuzzy
-msgid "Error while creating link to %B."
-msgstr "Villa kom upp við tengingu."
-
-#: ../libnautilus-private/nautilus-file-operations.c:5120
-#, fuzzy
-msgid "Symbolic links only supported for local files"
-msgstr "Dregið og sleppt er einungis stutt á staðbundnum skjalakerfum."
+msgstr[0] "Stofna tengla yfir í %'d skrá"
+msgstr[1] "Stofna tengla yfir í %'d skrár"
 
 #: ../libnautilus-private/nautilus-file-operations.c:5123
-#, fuzzy
+msgid "Error while creating link to %B."
+msgstr "Villa kom upp við gerð tengils í %B."
+
+#: ../libnautilus-private/nautilus-file-operations.c:5125
+msgid "Symbolic links only supported for local files"
+msgstr "Tákntengi eru einungis studd fyrir staðbundnar skrár"
+
+#: ../libnautilus-private/nautilus-file-operations.c:5128
 msgid "The target doesn't support symbolic links."
-msgstr "Dregið og sleppt er einungis stutt á staðbundnum skjalakerfum."
+msgstr "Úttakið styður ekki tákntengi."
 
-#: ../libnautilus-private/nautilus-file-operations.c:5126
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-file-operations.c:5131
+#, c-format
 msgid "There was an error creating the symlink in %F."
-msgstr ""
-"Villa átti sér stað við ræsingu á forritinu.\n"
-"\n"
-"Nánar: "
+msgstr "Villa átti sér stað við gerð tákntengisins í %F."
 
-#: ../libnautilus-private/nautilus-file-operations.c:5420
-#, fuzzy
-#| msgid "Error Setting Permissions"
+#: ../libnautilus-private/nautilus-file-operations.c:5425
 msgid "Setting permissions"
-msgstr "Villa við uppsetningu á réttindum"
+msgstr "Set heimildir"
 
 #. localizers: the initial name of a new folder
-#: ../libnautilus-private/nautilus-file-operations.c:5669
+#: ../libnautilus-private/nautilus-file-operations.c:5674
 msgid "untitled folder"
 msgstr "ónefnd mappa"
 
 #. localizers: the initial name of a new empty file
-#: ../libnautilus-private/nautilus-file-operations.c:5677
+#: ../libnautilus-private/nautilus-file-operations.c:5682
 msgid "new file"
-msgstr "Ný skrá"
+msgstr "ný skrá"
 
-#: ../libnautilus-private/nautilus-file-operations.c:5825
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:5830
 msgid "Error while creating directory %B."
-msgstr "Villa kom upp við tengingu."
+msgstr "Villa kom upp við að búa til möppuna %B."
 
-#: ../libnautilus-private/nautilus-file-operations.c:5827
-#, fuzzy
+#: ../libnautilus-private/nautilus-file-operations.c:5832
 msgid "Error while creating file %B."
-msgstr "Villa kom upp við tengingu."
+msgstr "Villa kom upp við að búa til skrána %B."
 
-#: ../libnautilus-private/nautilus-file-operations.c:5829
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-file-operations.c:5834
+#, c-format
 msgid "There was an error creating the directory in %F."
-msgstr ""
-"Villa átti sér stað við ræsingu á forritinu.\n"
-"\n"
-"Nánar: "
+msgstr "Villa kom upp við að búa til möppuna í %F."
 
-#: ../libnautilus-private/nautilus-file-operations.c:6085
+#: ../libnautilus-private/nautilus-file-operations.c:6090
 msgid "Emptying Trash"
 msgstr "Tæmi ruslið"
 
-#: ../libnautilus-private/nautilus-file-operations.c:6132
-#: ../libnautilus-private/nautilus-file-operations.c:6173
-#: ../libnautilus-private/nautilus-file-operations.c:6208
-#: ../libnautilus-private/nautilus-file-operations.c:6243
+#: ../libnautilus-private/nautilus-file-operations.c:6137
+#: ../libnautilus-private/nautilus-file-operations.c:6178
+#: ../libnautilus-private/nautilus-file-operations.c:6213
+#: ../libnautilus-private/nautilus-file-operations.c:6248
 msgid "Unable to mark launcher trusted (executable)"
 msgstr "Tókst ekki að merkja ræsirinn sem treystum (keyranlegan)"
 
 #: ../libnautilus-private/nautilus-file.c:1210
 #: ../libnautilus-private/nautilus-vfs-file.c:381
-#, fuzzy
 msgid "This file cannot be mounted"
 msgstr "Ekki er hægt að tengja þessa skrá"
 
 #: ../libnautilus-private/nautilus-file.c:1235
-#, fuzzy
 msgid "This file cannot be unmounted"
-msgstr "Ekki var hægt að ákvarða skráarréttindi fyrir \"%s\"."
+msgstr "Ekki er hægt að aftengja þessa skrá"
 
 #: ../libnautilus-private/nautilus-file.c:1262
 msgid "This file cannot be ejected"
@@ -2669,32 +2615,29 @@ msgid "This file cannot be stopped"
 msgstr "Ekki hægt að stöðva þessa skrá"
 
 #: ../libnautilus-private/nautilus-file.c:1772
-#, fuzzy, c-format
+#, c-format
 msgid "Slashes are not allowed in filenames"
-msgstr ""
-"Ekki er hægt að búa til skrá með skástrik í nafninu, þar sem skástrik eru "
-"notuð til að aðgreina möppur"
+msgstr "Skástrik eru ekki leyfð í skráaheitum"
 
 #: ../libnautilus-private/nautilus-file.c:1790
-#, fuzzy, c-format
+#, c-format
 msgid "File not found"
 msgstr "Skrá fannst ekki"
 
 #: ../libnautilus-private/nautilus-file.c:1818
-#, fuzzy, c-format
+#, c-format
 msgid "Toplevel files cannot be renamed"
-msgstr "Ekki var hægt að ákvarða skráarréttindi fyrir \"%s\"."
+msgstr "Ekki er hægt að endurnefna rótarskrár"
 
 #: ../libnautilus-private/nautilus-file.c:1841
-#, fuzzy, c-format
-#| msgid "Use the default desktop background"
+#, c-format
 msgid "Unable to rename desktop icon"
-msgstr "Nota sjáfgefin bakgrunn fyrir skjáborð"
+msgstr "Ekki tókst að endurnefna skjáborðstáknmynd"
 
 #: ../libnautilus-private/nautilus-file.c:1878
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to rename desktop file"
-msgstr "Ekki tókst að útskipta skrá."
+msgstr "Ekki tókst að endurnefna skjáborðsskrá"
 
 #  Today, use special word.
 #  * strftime patterns preceeded with the widest
@@ -2849,65 +2792,62 @@ msgid "%m/%d/%y"
 msgstr "%m/%d/%y"
 
 #: ../libnautilus-private/nautilus-file.c:4992
-#, fuzzy, c-format
-#| msgid "octal permissions"
+#, c-format
 msgid "Not allowed to set permissions"
-msgstr "áttundakerfis réttindi"
+msgstr "Þú hefur ekki leyfi til að breyta heimildum"
 
 #: ../libnautilus-private/nautilus-file.c:5277
-#, fuzzy, c-format
+#, c-format
 msgid "Not allowed to set owner"
 msgstr "Þú hefur ekki leyfi til að breyta eiganda"
 
 #: ../libnautilus-private/nautilus-file.c:5295
-#, fuzzy, c-format
+#, c-format
 msgid "Specified owner '%s' doesn't exist"
 msgstr "Eigandinn ‚%s‘ er ekki til"
 
 #: ../libnautilus-private/nautilus-file.c:5544
-#, fuzzy, c-format
+#, c-format
 msgid "Not allowed to set group"
 msgstr "Þú hefur ekki leyfi til að ákveða hópa"
 
 #: ../libnautilus-private/nautilus-file.c:5562
-#, fuzzy, c-format
+#, c-format
 msgid "Specified group '%s' doesn't exist"
 msgstr "Hópurinn ‚%s‘ er ekki til"
 
 #  This means no contents at all were readable
 #: ../libnautilus-private/nautilus-file.c:5706
 #: ../src/file-manager/fm-directory-view.c:2228
-#, fuzzy, c-format
+#, c-format
 msgid "%'u item"
 msgid_plural "%'u items"
-msgstr[0] "? hlutir"
-msgstr[1] "? hlutir"
+msgstr[0] "%'u hlutur"
+msgstr[1] "%'u hlutir"
 
 #: ../libnautilus-private/nautilus-file.c:5707
-#, fuzzy, c-format
+#, c-format
 msgid "%'u folder"
 msgid_plural "%'u folders"
-msgstr[0] "Sto_fna Möppu "
-msgstr[1] "Sto_fna Möppu "
+msgstr[0] "%'u mappa"
+msgstr[1] "%'u möppur"
 
 #: ../libnautilus-private/nautilus-file.c:5708
-#, fuzzy, c-format
+#, c-format
 msgid "%'u file"
 msgid_plural "%'u files"
-msgstr[0] "Ný skrá"
-msgstr[1] "Ný skrá"
+msgstr[0] "%'u skrá"
+msgstr[1] "%'u skrár"
 
 #. Do this in a separate stage so that we don't have to put G_GUINT64_FORMAT in the translated string
 #: ../libnautilus-private/nautilus-file.c:5787
-#, fuzzy
 msgid "%"
 msgstr "%"
 
 #: ../libnautilus-private/nautilus-file.c:5788
-#, fuzzy, c-format
-#| msgid "[Items ]of %s bytes"
+#, c-format
 msgid "%s (%s bytes)"
-msgstr "[Hlutir ] af stærðinni %s bæti"
+msgstr "%s (%s bæti)"
 
 #  This means no contents at all were readable
 #. This means no contents at all were readable
@@ -3043,17 +2983,13 @@ msgstr "1 GB"
 
 #: ../libnautilus-private/nautilus-global-preferences.c:100
 #: ../src/nautilus-file-management-properties.ui.h:10
-#, fuzzy
-#| msgid "1 GB"
 msgid "2 GB"
-msgstr "1 GB"
+msgstr "2 GB"
 
 #: ../libnautilus-private/nautilus-global-preferences.c:101
 #: ../src/nautilus-file-management-properties.ui.h:16
-#, fuzzy
-#| msgid "1 GB"
 msgid "4 GB"
-msgstr "1 GB"
+msgstr "4 GB"
 
 #: ../libnautilus-private/nautilus-global-preferences.c:106
 msgid "Activate items with a _single click"
@@ -3104,8 +3040,8 @@ msgstr "Þjöppuð sýn"
 #. translators: this is used in the view selection dropdown
 #. * of navigation windows and in the preferences dialog
 #: ../libnautilus-private/nautilus-global-preferences.c:144
-#: ../src/file-manager/fm-list-view.c:1511
-#: ../src/file-manager/fm-list-view.c:2923
+#: ../src/file-manager/fm-list-view.c:1539
+#: ../src/file-manager/fm-list-view.c:2954
 #: ../src/nautilus-file-management-properties.ui.h:68
 msgid "List View"
 msgstr "Listasýn"
@@ -3183,28 +3119,26 @@ msgstr "24"
 #. * match the user name string passed by the C code, but not
 #. * put the user name in the final string.
 #.
-#: ../libnautilus-private/nautilus-global-preferences.c:585
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-global-preferences.c:584
+#, c-format
 msgid "%s's Home"
-msgstr "Heimasvæðið þitt"
+msgstr "Heimasvæði %s"
 
-#: ../libnautilus-private/nautilus-global-preferences.c:591
+#: ../libnautilus-private/nautilus-global-preferences.c:590
 #: ../data/nautilus-computer.desktop.in.in.h:2
-#, fuzzy
 msgid "Computer"
-msgstr "CNET Computers.com"
+msgstr "Tölvan"
 
-#: ../libnautilus-private/nautilus-global-preferences.c:597
-#: ../src/nautilus-places-sidebar.c:490 ../src/nautilus-trash-bar.c:121
+#: ../libnautilus-private/nautilus-global-preferences.c:596
+#: ../src/nautilus-places-sidebar.c:508 ../src/nautilus-trash-bar.c:121
 msgid "Trash"
 msgstr "Rusl"
 
-#: ../libnautilus-private/nautilus-global-preferences.c:603
+#: ../libnautilus-private/nautilus-global-preferences.c:602
 msgid "Network Servers"
 msgstr "Netþjónar"
 
 #: ../libnautilus-private/nautilus-icon-container.c:2691
-#, fuzzy
 msgid "The selection rectangle"
 msgstr "Valferhyrningurinn"
 
@@ -3212,35 +3146,29 @@ msgstr "Valferhyrningurinn"
 msgid "Switch to Manual Layout?"
 msgstr "Skipta yfir í handvirkt útlit?"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:697
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-mime-actions.c:698
+#, c-format
 msgid "The Link \"%s\" is Broken."
-msgstr "Tengillinn \"%s\" er bilaður"
+msgstr "Tengillinn \"%s\" virkar ekki."
 
-#: ../libnautilus-private/nautilus-mime-actions.c:699
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-mime-actions.c:700
+#, c-format
 msgid "The Link \"%s\" is Broken. Move it to Trash?"
-msgstr ""
-"Ekki er hægt að nota tengilinn þar sem hann hefur engan áfangastað. Viltu "
-"flytja tengilinn í ruslið?"
+msgstr "Tengillinn \"%s\" virkar ekki. Viltu flytja tengilinn í ruslið?"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:705
-#, fuzzy
+#: ../libnautilus-private/nautilus-mime-actions.c:706
 msgid "This link cannot be used, because it has no target."
-msgstr ""
-"Ekki er hægt að nota tengilinn þar sem hann hefur engan áfangastað. Viltu "
-"flytja tengilinn í ruslið?"
+msgstr "Ekki er hægt að nota tengilinn þar sem hann hefur engan áfangastað."
 
-#: ../libnautilus-private/nautilus-mime-actions.c:707
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-mime-actions.c:708
+#, c-format
 msgid "This link cannot be used, because its target \"%s\" doesn't exist."
 msgstr ""
-"Þessi tengill er ónothæfur þar sem áfangastaðurinn \"%s\" ekki er til "
-"staðar. Viltu flytja tengilinn í ruslið?"
+"Þessi tengill er ónothæfur þar sem áfangastaðurinn \"%s\" ekki er til staðar."
 
 #. name, stock id
 #. label, accelerator
-#: ../libnautilus-private/nautilus-mime-actions.c:717
+#: ../libnautilus-private/nautilus-mime-actions.c:718
 #: ../src/file-manager/fm-directory-view.c:7029
 #: ../src/file-manager/fm-directory-view.c:7152
 #: ../src/file-manager/fm-directory-view.c:8282
@@ -3249,167 +3177,152 @@ msgstr ""
 msgid "Mo_ve to Trash"
 msgstr "Fl_ytja í ruslið"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:777
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-mime-actions.c:778
+#, c-format
 msgid "Do you want to run \"%s\", or display its contents?"
-msgstr ""
-"\"%s\" er keyranleg textaskrá. Viltu keyra hana eða skoða innihald hennar?"
+msgstr "Viltu keyra \"%s\" eða skoða innihald hennar?"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:779
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-mime-actions.c:780
+#, c-format
 msgid "\"%s\" is an executable text file."
 msgstr "\"%s\" er keyranleg textaskrá."
 
-#: ../libnautilus-private/nautilus-mime-actions.c:785
+#: ../libnautilus-private/nautilus-mime-actions.c:786
 msgid "Run in _Terminal"
 msgstr "Keyra í _skel"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:786
+#: ../libnautilus-private/nautilus-mime-actions.c:787
 msgid "_Display"
 msgstr "_Sýna"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:789
+#: ../libnautilus-private/nautilus-mime-actions.c:790
 #: ../src/nautilus-autorun-software.c:229
 msgid "_Run"
 msgstr "_Keyra"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1113
+#: ../libnautilus-private/nautilus-mime-actions.c:1114
 #: ../src/file-manager/fm-directory-view.c:631
-#, fuzzy
 msgid "Are you sure you want to open all files?"
-msgstr "Ertu viss um að þú viljir endanlega eyða \"%s\"?"
+msgstr "Ertu viss um að þú viljir opna allar skrár?"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1115
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-mime-actions.c:1116
+#, c-format
 msgid "This will open %d separate tab."
 msgid_plural "This will open %d separate tabs."
 msgstr[0] "Þetta mun opna %d stakan flipa."
-msgstr[1] "Þetta mun opna %d stakan flipa."
+msgstr[1] "Þetta mun opna %d staka flipa."
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1118
+#: ../libnautilus-private/nautilus-mime-actions.c:1119
 #: ../src/nautilus-location-bar.c:148
-#, fuzzy, c-format
+#, c-format
 msgid "This will open %d separate window."
 msgid_plural "This will open %d separate windows."
-msgstr[0] "Þetta mun opna %d einstakann glugga."
-msgstr[1] "Þetta mun opna %d einstakann glugga."
+msgstr[0] "Þetta mun opna %d einstakan glugga."
+msgstr[1] "Þetta mun opna %d einstaka glugga."
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1182
+#: ../libnautilus-private/nautilus-mime-actions.c:1183
 #: ../src/nautilus-window-manage-views.c:1883
 #: ../src/nautilus-window-manage-views.c:1889
 #: ../src/nautilus-window-manage-views.c:1906
 #: ../src/nautilus-window-manage-views.c:1917
 #: ../src/nautilus-window-manage-views.c:1923
 #: ../src/nautilus-window-manage-views.c:1948
-#, fuzzy, c-format
+#, c-format
 msgid "Could not display \"%s\"."
-msgstr "Nautilus getur ekki sýnt \"%s\"."
+msgstr "Gat ekki sýnt \"%s\"."
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1195
-#, fuzzy
+#: ../libnautilus-private/nautilus-mime-actions.c:1267
 msgid "The file is of an unknown type"
-msgstr "Skráin '%s' virðist ekki vera gild myndaskrá."
+msgstr "Skráin er ekki af þekktri tegund"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1199
-#, fuzzy, c-format
-#| msgid "There is no application associated with \"%s\"."
+#: ../libnautilus-private/nautilus-mime-actions.c:1270
+#, c-format
 msgid "There is no application installed for %s files"
-msgstr "Það er ekkert forrit útdeilt á \"%s\"."
+msgstr "Það er ekkert forrit uppsett fyrir %s skrár"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1225
+#: ../libnautilus-private/nautilus-mime-actions.c:1282
 #, fuzzy
+#| msgid "Select an Application"
+msgid "_Select Application"
+msgstr "Veldu forrit"
+
+#: ../libnautilus-private/nautilus-mime-actions.c:1318
 msgid "There was an internal error trying to search for applications:"
-msgstr ""
-"Villa átti sér stað við ræsingu á forritinu.\n"
-"\n"
-"Nánar: "
+msgstr "Upp kom villa við að leita að forritum:"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1227
-#, fuzzy
-#| msgid "[File type is] application"
+#: ../libnautilus-private/nautilus-mime-actions.c:1320
 msgid "Unable to search for application"
-msgstr "[Skráargerð er] forrit"
+msgstr "Get ekki leitað að forritum"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1301
+#: ../libnautilus-private/nautilus-mime-actions.c:1394
 msgid "Could not use system package installer"
 msgstr "Gat ekki notað pakkauppsetningarforrit kerfisins"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1368
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-mime-actions.c:1461
+#, c-format
 msgid ""
 "There is no application installed for %s files.\n"
 "Do you want to search for an application to open this file?"
 msgstr ""
-"%s\n"
-"\n"
-"Þú getur stillt GNOME af til að útdeila forritum á skráargerðir.  Viltu "
-"útdeila forriti á þessa skráargerð núna?"
+"Ekki er til neitt forrit fyrir %s skrár.\n"
+"Viltu leita að forriti til að opna þessa skrá?"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1541
-#, fuzzy
+#: ../libnautilus-private/nautilus-mime-actions.c:1634
 msgid "Untrusted application launcher"
 msgstr "Forritaræsari sem ekki er treyst"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1544
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-mime-actions.c:1637
+#, c-format
 msgid ""
 "The application launcher \"%s\" has not been marked as trusted. If you do "
 "not know the source of this file, launching it may be unsafe."
 msgstr ""
-"Forritsræsinum „%s“ er ekki endilega treyst. Farðu gætilega ef þú veist ekki "
-"hvaðan þetta kemur."
+"Forritsræsinum \"%s\" er ekki endilega treyst. Farðu gætilega ef þú veist "
+"ekki hvaðan þetta kemur."
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1556
-#, fuzzy
+#: ../libnautilus-private/nautilus-mime-actions.c:1649
 msgid "_Launch Anyway"
 msgstr "_Ræsa samt"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1559
-#, fuzzy
+#: ../libnautilus-private/nautilus-mime-actions.c:1652
 msgid "Mark as _Trusted"
-msgstr "Merkja sem _treyst"
+msgstr "_Treysta"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:1832
-#: ../libnautilus-private/nautilus-mime-actions.c:2105
+#: ../libnautilus-private/nautilus-mime-actions.c:1925
+#: ../libnautilus-private/nautilus-mime-actions.c:2198
 #: ../src/file-manager/fm-directory-view.c:5997
-#, fuzzy
 msgid "Unable to mount location"
-msgstr "Fara í eiginmöppu"
+msgstr "Get ekki tengt staðinn"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:2183
+#: ../libnautilus-private/nautilus-mime-actions.c:2276
 #: ../src/file-manager/fm-directory-view.c:6156
-#, fuzzy
 msgid "Unable to start location"
-msgstr "Fara í eiginmöppu"
+msgstr "Get ekki ræst úr staðsetningunni"
 
-#: ../libnautilus-private/nautilus-mime-actions.c:2271
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-mime-actions.c:2364
+#, c-format
 msgid "Opening \"%s\"."
-msgstr "Opna \"%s\""
+msgstr "Opna \"%s\"."
 
-#: ../libnautilus-private/nautilus-mime-actions.c:2274
-#, fuzzy, c-format
-#| msgid "Opening %s"
+#: ../libnautilus-private/nautilus-mime-actions.c:2367
+#, c-format
 msgid "Opening %d item."
 msgid_plural "Opening %d items."
-msgstr[0] "Opna %s"
-msgstr[1] "Opna %s"
+msgstr[0] "Opna %d hlut."
+msgstr[1] "Opna %d hluti."
 
 #: ../libnautilus-private/nautilus-mime-application-chooser.c:165
-#: ../libnautilus-private/nautilus-open-with-dialog.c:256
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-open-with-dialog.c:260
+#, c-format
 msgid "Could not set application as the default: %s"
-msgstr "Gat ekki gert þetta forrit að helsta forritinu: %s"
+msgstr "Gat ekki gert þetta forrit sjálfgefið: %s"
 
 #: ../libnautilus-private/nautilus-mime-application-chooser.c:166
-#: ../libnautilus-private/nautilus-open-with-dialog.c:257
-#, fuzzy
-#| msgid "Could not complete specified action."
+#: ../libnautilus-private/nautilus-open-with-dialog.c:261
 msgid "Could not set as default application"
-msgstr "Ekki tókst að framkvæma tilgreinda aðgerð."
+msgstr "Gat ekki gert þetta að sjálfgefnu forriti"
 
 #: ../libnautilus-private/nautilus-mime-application-chooser.c:255
-#, fuzzy
 msgid "Default"
 msgstr "Sjálfgefið"
 
@@ -3418,152 +3331,174 @@ msgid "Icon"
 msgstr "Táknmynd"
 
 #: ../libnautilus-private/nautilus-mime-application-chooser.c:326
-#, fuzzy
 msgid "Could not remove application"
-msgstr "Ekki tókst að framkvæma tilgreinda aðgerð."
+msgstr "Gat ekki fjarlægt forrit"
 
 #: ../libnautilus-private/nautilus-mime-application-chooser.c:538
-#, fuzzy
-#| msgid "No Application Associated"
 msgid "No applications selected"
-msgstr "Ekkert forrit útdeilt"
+msgstr "Engin forrit valin"
 
 #: ../libnautilus-private/nautilus-mime-application-chooser.c:566
-#: ../libnautilus-private/nautilus-open-with-dialog.c:945
-#, fuzzy, c-format
+#, c-format
 msgid "%s document"
 msgstr "%s skjal"
 
 #: ../libnautilus-private/nautilus-mime-application-chooser.c:573
-#: ../libnautilus-private/nautilus-open-with-dialog.c:951
-#, fuzzy
+#: ../libnautilus-private/nautilus-open-with-dialog.c:985
 msgid "Unknown"
 msgstr "Óþekkt"
 
 #: ../libnautilus-private/nautilus-mime-application-chooser.c:606
-#, fuzzy, c-format
+#, c-format
 msgid "Select an application to open %s and other files of type \"%s\""
-msgstr "Veldu forrit til að opna %s og aðrar skrár af sömu tegund og „%s“"
+msgstr "Veldu forrit til að opna %s og aðrar skrár af tegundinni \"%s\""
 
 #: ../libnautilus-private/nautilus-mime-application-chooser.c:674
-#: ../libnautilus-private/nautilus-open-with-dialog.c:963
-#, fuzzy, c-format
+#, c-format
 msgid "Open all files of type \"%s\" with:"
-msgstr "Opna allar „%s“ skrár með:"
+msgstr "Opna allar \"%s\" skrár með:"
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:146
-#, fuzzy
+#: ../libnautilus-private/nautilus-open-with-dialog.c:147
 msgid "Could not run application"
 msgstr "Gat ekki keyrt forrit"
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:158
-#, fuzzy, c-format
+#: ../libnautilus-private/nautilus-open-with-dialog.c:159
+#, c-format
 msgid "Could not find '%s'"
 msgstr "Gat ekki fundið '%s'"
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:161
-#, fuzzy
+#: ../libnautilus-private/nautilus-open-with-dialog.c:162
 msgid "Could not find application"
 msgstr "Gat ekki fundið forrit"
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:235
-#, fuzzy, c-format
-msgid "Could not add application to the application database: %s"
-msgstr "Gat ekki bætt forriti við forritsgangasafnið: %s"
-
 #: ../libnautilus-private/nautilus-open-with-dialog.c:236
-#, fuzzy
+#, c-format
+msgid "Could not add application to the application database: %s"
+msgstr "Gat ekki bætt forriti við forritagangagrunninn: %s"
+
+#: ../libnautilus-private/nautilus-open-with-dialog.c:237
 msgid "Could not add application"
 msgstr "Gat ekki bætt forriti við"
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:401
-#, fuzzy
+#: ../libnautilus-private/nautilus-open-with-dialog.c:406
 msgid "Select an Application"
 msgstr "Veldu forrit"
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:762
+#: ../libnautilus-private/nautilus-open-with-dialog.c:767
 #: ../src/file-manager/fm-properties-window.c:5106
-#, fuzzy
 msgid "Open With"
-msgstr ""
-"#-#-#-#-#  is.po (Nautilus)  #-#-#-#-#\n"
-"Opna me_ð\n"
-"#-#-#-#-#  is.po (eel)  #-#-#-#-#\n"
+msgstr "Opna með"
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:799
-#, fuzzy
+#: ../libnautilus-private/nautilus-open-with-dialog.c:804
 msgid "Select an application to view its description."
-msgstr "Veldu forrit til að sjá lýsinguna á því"
+msgstr "Veldu forrit til að sjá lýsinguna á því."
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:824
-#, fuzzy
+#: ../libnautilus-private/nautilus-open-with-dialog.c:829
 msgid "_Use a custom command"
-msgstr "_Nota eigin skipun"
+msgstr "_Nota sérsniðna skipun"
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:841
-#, fuzzy
+#: ../libnautilus-private/nautilus-open-with-dialog.c:846
 msgid "_Browse..."
 msgstr "_Flakka..."
 
 #. name, stock id
 #. label, accelerator
-#: ../libnautilus-private/nautilus-open-with-dialog.c:870
+#: ../libnautilus-private/nautilus-open-with-dialog.c:882
 #: ../src/file-manager/fm-directory-view.c:6947
 #: ../src/file-manager/fm-directory-view.c:8462
 #: ../src/file-manager/fm-tree-view.c:1210
-#: ../src/nautilus-places-sidebar.c:2151
+#: ../src/nautilus-places-sidebar.c:2184
 msgid "_Open"
 msgstr "_Opna"
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:960
+#. first %s is a filename and second %s is a file extension
+#: ../libnautilus-private/nautilus-open-with-dialog.c:962
 #, fuzzy, c-format
-msgid "Open %s and other files of type \"%s\" with:"
-msgstr "Opna %s of aðrar skrár af sömu tegund og „%s“ með:"
+#| msgid "Open %s and other files of type \"%s\" with:"
+msgid "Open %s and other %s document with:"
+msgstr "Opna %s og aðrar skrár af tegundinni \"%s\" með:"
 
-#: ../libnautilus-private/nautilus-open-with-dialog.c:996
-#: ../libnautilus-private/nautilus-open-with-dialog.c:1011
-#, fuzzy
-msgid "_Add"
-msgstr "_Bæta við"
-
+#. the %s here is a file name
+#. %s is a filename
+#: ../libnautilus-private/nautilus-open-with-dialog.c:966
 #: ../libnautilus-private/nautilus-open-with-dialog.c:997
-#: ../libnautilus-private/nautilus-open-with-dialog.c:1012
-#, fuzzy
+#, fuzzy, c-format
+#| msgid "Open With"
+msgid "Open %s with:"
+msgstr "Opna með"
+
+#: ../libnautilus-private/nautilus-open-with-dialog.c:967
+#, fuzzy, c-format
+#| msgid "There is no application installed for %s files"
+msgid "_Remember this application for %s documents"
+msgstr "Það er ekkert forrit uppsett fyrir %s skrár"
+
+#. Only in add mode - the %s here is a file extension
+#: ../libnautilus-private/nautilus-open-with-dialog.c:976
+#, fuzzy, c-format
+#| msgid "Open all files of type \"%s\" with:"
+msgid "Open all %s documents with:"
+msgstr "Opna allar \"%s\" skrár með:"
+
+#. First %s is a filename, second is a description
+#. * of the type, eg "plain text document"
+#: ../libnautilus-private/nautilus-open-with-dialog.c:993
+#, fuzzy, c-format
+#| msgid "Open %s and other files of type \"%s\" with:"
+msgid "Open %s and other \"%s\" files with:"
+msgstr "Opna %s og aðrar skrár af tegundinni \"%s\" með:"
+
+#. %s is a file type description
+#: ../libnautilus-private/nautilus-open-with-dialog.c:999
+#, fuzzy, c-format
+#| msgid "There is no application installed for %s files"
+msgid "_Remember this application for \"%s\" files"
+msgstr "Það er ekkert forrit uppsett fyrir %s skrár"
+
+#. Only in add mode
+#: ../libnautilus-private/nautilus-open-with-dialog.c:1008
+#, fuzzy, c-format
+#| msgid "Open all files of type \"%s\" with:"
+msgid "Open all \"%s\" files with:"
+msgstr "Opna allar \"%s\" skrár með:"
+
+#: ../libnautilus-private/nautilus-open-with-dialog.c:1019
+msgid "_Add"
+msgstr "Bæt_a við"
+
+#: ../libnautilus-private/nautilus-open-with-dialog.c:1020
 msgid "Add Application"
 msgstr "Bæta við forriti"
 
 #: ../libnautilus-private/nautilus-program-choosing.c:80
-#, fuzzy
 msgid "Open Failed, would you like to choose another application?"
 msgstr "Opnun mistókst, viltu velja annað forrit?"
 
 #: ../libnautilus-private/nautilus-program-choosing.c:81
 #: ../libnautilus-private/nautilus-program-choosing.c:112
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\"%s\" cannot open \"%s\" because \"%s\" cannot access files at \"%s\" "
 "locations."
 msgstr ""
-"Er ekki fær um að sýna \"%s\", vegna þess að Nautilus  getur ekki meðhöndlað "
-"%s: staðsetningar."
+"\"%s\" getur ekki sýnt \"%s\", vegna þess að \"%s\" getur ekki meðhöndlað "
+"skrár frá \"%s\" staðsetningum."
 
 #: ../libnautilus-private/nautilus-program-choosing.c:86
-#, fuzzy
 msgid "Open Failed, would you like to choose another action?"
 msgstr "Opnun mistókst, viltu velja aðra aðgerð?"
 
 #: ../libnautilus-private/nautilus-program-choosing.c:87
 #: ../libnautilus-private/nautilus-program-choosing.c:119
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The default action cannot open \"%s\" because it cannot access files at \"%s"
 "\" locations."
 msgstr ""
-"Er ekki fær um að sýna \"%s\", vegna þess að Nautilus  getur ekki meðhöndlað "
-"%s: staðsetningar."
+"Sjálfgefna aðgerðin getur ekki opnað \"%s\" vegna þess að það getur ekki "
+"nálgast skrár á \"%s\" staðsetningum."
 
 #: ../libnautilus-private/nautilus-program-choosing.c:115
-#, fuzzy
 msgid ""
 "No other applications are available to view this file.  If you copy this "
 "file onto your computer, you may be able to open it."
@@ -3572,41 +3507,32 @@ msgstr ""
 "tölvuna þína, geturðu hugsanlega opnað hana."
 
 #: ../libnautilus-private/nautilus-program-choosing.c:121
-#, fuzzy
 msgid ""
 "No other actions are available to view this file.  If you copy this file "
 "onto your computer, you may be able to open it."
 msgstr ""
-"Engin önnur aðgerð getur skoðað þessa skrá. Ef þú afritar skránna yfir á "
-"tölvuna þína, geturðu hugsanlega opnað hana."
+"Engar aðrar aðgerðir er tiltækar til að skoða þessa skrá. Ef þú afritar "
+"skrána yfir á tölvuna þína, geturðu hugsanlega opnað hana."
 
 #: ../libnautilus-private/nautilus-program-choosing.c:372
-#, fuzzy
 msgid "Sorry, but you cannot execute commands from a remote site."
 msgstr "Því miður er ekki hægt að keyra skipanir frá fjartengdum stað."
 
 #: ../libnautilus-private/nautilus-program-choosing.c:374
-#, fuzzy
 msgid "This is disabled due to security considerations."
 msgstr "Þetta er óvirkt af öryggisástæðum."
 
 #: ../libnautilus-private/nautilus-program-choosing.c:385
 #: ../libnautilus-private/nautilus-program-choosing.c:453
-#, fuzzy
 msgid "There was an error launching the application."
-msgstr ""
-"Villa átti sér stað við ræsingu á forritinu.\n"
-"\n"
-"Nánar: "
+msgstr "Villa átti sér stað við ræsingu á forritinu."
 
 #: ../libnautilus-private/nautilus-program-choosing.c:410
 #: ../libnautilus-private/nautilus-program-choosing.c:421
-#, fuzzy
 msgid "This drop target only supports local files."
-msgstr "Dregið og sleppt er einungis stutt á staðbundnum skjalakerfum."
+msgstr "Aðeins er hægt að draga staðværar skrár hingað."
 
 #: ../libnautilus-private/nautilus-program-choosing.c:411
-#, fuzzy
 msgid ""
 "To open non-local files copy them to a local folder and then drop them again."
 msgstr ""
@@ -3614,7 +3540,6 @@ msgstr ""
 "þeim aftur."
 
 #: ../libnautilus-private/nautilus-program-choosing.c:422
-#, fuzzy
 msgid ""
 "To open non-local files copy them to a local folder and then drop them "
 "again. The local files you dropped have already been opened."
@@ -3624,42 +3549,35 @@ msgstr ""
 
 #: ../libnautilus-private/nautilus-program-choosing.c:451
 msgid "Details: "
-msgstr "Ítarlegra:"
+msgstr "Ítarlegra: "
 
 #: ../libnautilus-private/nautilus-progress-info.c:223
-#, fuzzy
-#| msgid "Fewer Options"
 msgid "File Operations"
-msgstr "Færri valmöguleikar"
+msgstr "Skráaraðgerðir"
 
 #: ../libnautilus-private/nautilus-progress-info.c:304
-#, fuzzy, c-format
+#, c-format
 msgid "%'d file operation active"
 msgid_plural "%'d file operations active"
 msgstr[0] "%'d skráaraðgerð í gangi"
-msgstr[1] "%'d skráaraðgerð í gangi"
+msgstr[1] "%'d skráaraðgerðir í gangi"
 
 #: ../libnautilus-private/nautilus-progress-info.c:495
 #: ../libnautilus-private/nautilus-progress-info.c:513
-#, fuzzy
-#| msgid "Warning"
 msgid "Preparing"
-msgstr "Viðvörun"
+msgstr "Undirbý"
 
 #: ../libnautilus-private/nautilus-query.c:135
 #: ../libnautilus-private/nautilus-search-directory-file.c:166
 #: ../libnautilus-private/nautilus-search-directory-file.c:192
 #: ../libnautilus-private/nautilus-search-directory-file.c:224
-#, fuzzy
-#| msgid "Search Results"
 msgid "Search"
-msgstr "Leitarniðurstöður"
+msgstr "Leita"
 
 #: ../libnautilus-private/nautilus-query.c:138
-#, fuzzy, c-format
-#| msgid "default for \"%s\""
+#, c-format
 msgid "Search for \"%s\""
-msgstr "sjálfgefið fyrir \"%s\""
+msgstr "Leita að \"%s\""
 
 #: ../libnautilus-private/nautilus-undo-signal-handlers.c:174
 #: ../src/nautilus-query-editor.c:983
@@ -3676,41 +3594,36 @@ msgstr "Hætta við breytingu"
 
 #: ../libnautilus-private/nautilus-undo-signal-handlers.c:177
 msgid "Redo Edit"
-msgstr "Endurvekja breytingar"
+msgstr "Endurtaka breytingu"
 
 #: ../libnautilus-private/nautilus-undo-signal-handlers.c:178
 msgid "Redo the edit"
-msgstr "Endurvekja breytingu"
+msgstr "Endurtaka breytinguna"
 
 #: ../data/nautilus-autorun-software.desktop.in.in.h:1
-#, fuzzy
 msgid "Autorun Prompt"
-msgstr "Autorun kvaðning"
+msgstr "Sjálfkeyrslukvaðning"
 
 #: ../data/nautilus-browser.desktop.in.in.h:1
-#, fuzzy
 msgid "Browse the file system with the file manager"
 msgstr "Vafra um skráarkerfið með skráarstjóranum"
 
 #: ../data/nautilus-browser.desktop.in.in.h:2
-#, fuzzy
 msgid "File Browser"
-msgstr "Eigandi skráar:"
+msgstr "Skráavafri"
 
 #. tooltip
 #: ../data/nautilus-computer.desktop.in.in.h:1
-#: ../src/nautilus-window-menus.c:854
-#, fuzzy
+#: ../src/nautilus-window-menus.c:859
 msgid ""
 "Browse all local and remote disks and folders accessible from this computer"
 msgstr ""
-"Flakka um alla staðbundna og fjartengda diska (og möppur) aðgengilega frá "
-"þessari tölvu"
+"Flakka um alla staðbundna og fjartengda diska (og möppur) sem aðgengileg eru "
+"frá þessari tölvu"
 
 #: ../data/nautilus-file-management-properties.desktop.in.in.h:1
-#, fuzzy
 msgid "Change the behaviour and appearance of file manager windows"
-msgstr "Breyta hegðan og útliti skráastjórnunarglugga"
+msgstr "Breyta hegðan og útliti skráastjóraglugga"
 
 #: ../data/nautilus-file-management-properties.desktop.in.in.h:2
 msgid "File Management"
@@ -3722,10 +3635,10 @@ msgid "Home Folder"
 msgstr "Eigin mappa"
 
 #. tooltip
-#: ../data/nautilus-home.desktop.in.in.h:2 ../src/nautilus-window-menus.c:850
-#, fuzzy
+#: ../data/nautilus-home.desktop.in.in.h:2
+#: ../src/nautilus-places-sidebar.c:306 ../src/nautilus-window-menus.c:855
 msgid "Open your personal folder"
-msgstr "[hlutir sem eru]möppur"
+msgstr "Opna einkamöppuna þína"
 
 #: ../data/nautilus.desktop.in.in.h:1
 msgid "File Manager"
@@ -3740,19 +3653,16 @@ msgstr "Bakgrunnur"
 #: ../src/file-manager/fm-desktop-icon-view.c:707
 #: ../src/file-manager/fm-directory-view.c:6979
 #: ../src/file-manager/fm-directory-view.c:8649
-#, fuzzy
 msgid "E_mpty Trash"
-msgstr "Tæma rusl"
+msgstr "Tæ_ma rusl"
 
 #. label, accelerator
 #. name, stock id
 #. label, accelerator
 #: ../src/file-manager/fm-desktop-icon-view.c:719
 #: ../src/file-manager/fm-directory-view.c:6943
-#, fuzzy
-#| msgid "Create L_auncher"
 msgid "Create L_auncher..."
-msgstr "Búa til r_æsir"
+msgstr "Bú_a til forritaræsi..."
 
 #. tooltip
 #: ../src/file-manager/fm-desktop-icon-view.c:721
@@ -3784,69 +3694,59 @@ msgid "Delete all items in the Trash"
 msgstr "Eyða öllum hlutum í ruslið"
 
 #: ../src/file-manager/fm-desktop-icon-view.c:826
-#, fuzzy
 msgid "The desktop view encountered an error."
 msgstr "Skjáborðssýnin lenti í villu."
 
 #: ../src/file-manager/fm-desktop-icon-view.c:827
-#, fuzzy
 msgid "The desktop view encountered an error while starting up."
 msgstr "Skjáborðssýnin lenti í villu við ræsingu."
 
 #: ../src/file-manager/fm-directory-view.c:633
-#, fuzzy, c-format
+#, c-format
 msgid "This will open %'d separate tab."
 msgid_plural "This will open %'d separate tabs."
 msgstr[0] "Þetta mun opna %'d aðskilinn flipa."
-msgstr[1] "Þetta mun opna %'d aðskilinn flipa."
+msgstr[1] "Þetta mun opna %'d aðskilda flipa."
 
 #: ../src/file-manager/fm-directory-view.c:636
-#, fuzzy, c-format
+#, c-format
 msgid "This will open %'d separate window."
 msgid_plural "This will open %'d separate windows."
 msgstr[0] "Þetta mun opna %'d annan glugga."
-msgstr[1] "Þetta mun opna %'d annan glugga."
+msgstr[1] "Þetta mun opna %'d aðra glugga."
 
 #: ../src/file-manager/fm-directory-view.c:1145
 #: ../src/file-manager/fm-properties-window.c:5455
 #: ../src/nautilus-connect-server-dialog.c:344
 #: ../src/nautilus-location-dialog.c:108
-#, fuzzy
 msgid "There was an error displaying help."
-msgstr "Villa kom upp þegar sýna átti hjálp: %s"
+msgstr "Villa kom upp þegar sýna átti hjálpina."
 
 #: ../src/file-manager/fm-directory-view.c:1165
-#, fuzzy
-#| msgid "Select all items in this window"
 msgid "Select Items Matching"
-msgstr "Velja alla hluti inn í þessum glugga"
+msgstr "Velja samsvarandi hluti"
 
 #: ../src/file-manager/fm-directory-view.c:1183
 msgid "_Pattern:"
 msgstr "M_ynstur:"
 
 #: ../src/file-manager/fm-directory-view.c:1281
-#, fuzzy
 msgid "Save Search as"
 msgstr "Vista leit sem"
 
 #  make the name label and field
 #: ../src/file-manager/fm-directory-view.c:1301
-#, fuzzy
-#| msgid "Color _name:"
 msgid "Search _name:"
-msgstr "Nafn lits:"
+msgstr "_Nafn leitar:"
 
 #: ../src/file-manager/fm-directory-view.c:1315
 #: ../src/nautilus-connect-server-dialog.c:521
-#, fuzzy
 msgid "_Folder:"
-msgstr "Sto_fna Möppu "
+msgstr "_Mappa:"
 
 #: ../src/file-manager/fm-directory-view.c:1320
-#, fuzzy
 msgid "Select Folder to Save Search In"
-msgstr "Veldu möppu til að vista leit í"
+msgstr "Veldu möppu til að vista leitina í"
 
 #: ../src/file-manager/fm-directory-view.c:2148
 #: ../src/file-manager/fm-directory-view.c:2185
@@ -3855,41 +3755,41 @@ msgid "\"%s\" selected"
 msgstr "\"%s\" valin"
 
 #: ../src/file-manager/fm-directory-view.c:2150
-#, fuzzy, c-format
+#, c-format
 msgid "%'d folder selected"
 msgid_plural "%'d folders selected"
-msgstr[0] "\"%s\" valin"
-msgstr[1] "\"%s\" valin"
+msgstr[0] "%'d mappa valin"
+msgstr[1] "%'d möppur valdar"
 
 #: ../src/file-manager/fm-directory-view.c:2160
-#, fuzzy, c-format
+#, c-format
 msgid " (containing %'d item)"
 msgid_plural " (containing %'d items)"
-msgstr[0] "[hlutir] sem innihalda \"%s\" í heiti"
-msgstr[1] "[hlutir] sem innihalda \"%s\" í heiti"
+msgstr[0] " (inniheldur %'d hlut)"
+msgstr[1] " (inniheldur %'d hluti)"
 
 #. translators: this is preceded with a string of form 'N folders' (N more than 1)
 #: ../src/file-manager/fm-directory-view.c:2171
-#, fuzzy, c-format
+#, c-format
 msgid " (containing a total of %'d item)"
 msgid_plural " (containing a total of %'d items)"
-msgstr[0] "[hlutir] sem innihalda \"%s\" í heiti"
-msgstr[1] "[hlutir] sem innihalda \"%s\" í heiti"
+msgstr[0] " (innihaldur samtals %'d hlut)"
+msgstr[1] " (innihaldur samtals %'d hluti)"
 
 #: ../src/file-manager/fm-directory-view.c:2188
-#, fuzzy, c-format
+#, c-format
 msgid "%'d item selected"
 msgid_plural "%'d items selected"
-msgstr[0] "\"%s\" valin (%s)"
-msgstr[1] "\"%s\" valin (%s)"
+msgstr[0] "%'d hlutur valinn"
+msgstr[1] "%'d hlutir valdir"
 
 #. Folders selected also, use "other" terminology
 #: ../src/file-manager/fm-directory-view.c:2195
-#, fuzzy, c-format
+#, c-format
 msgid "%'d other item selected"
 msgid_plural "%'d other items selected"
-msgstr[0] "\"%s\" valin (%s)"
-msgstr[1] "\"%s\" valin (%s)"
+msgstr[0] "%'d annar hlutur valinn"
+msgstr[1] "%'d aðrir hlutir valdir"
 
 #  localizers: appended to first file copy
 #. This is marked for translation in case a localiser
@@ -3898,15 +3798,14 @@ msgstr[1] "\"%s\" valin (%s)"
 #. * the message in parentheses the size of those items.
 #.
 #: ../src/file-manager/fm-directory-view.c:2210
-#, fuzzy, c-format
-#| msgid "%s (copy)%s"
+#, c-format
 msgid "%s (%s)"
-msgstr "%s (afrit)%s"
+msgstr "%s (%s)"
 
 #: ../src/file-manager/fm-directory-view.c:2232
-#, fuzzy, c-format
+#, c-format
 msgid "%s, Free space: %s"
-msgstr "Laust pláss:"
+msgstr "%s, laust pláss: %s"
 
 #  This is marked for translation in case a localizer
 #  * needs to change ", " to something else. The comma
@@ -3931,14 +3830,11 @@ msgstr "%s%s, %s"
 #. * no more than the constant limit are displayed.
 #.
 #: ../src/file-manager/fm-directory-view.c:2339
-#, fuzzy, c-format
+#, c-format
 msgid "The folder \"%s\" contains more files than Nautilus can handle."
-msgstr ""
-"Mappan \"%s\" inniheldur fleiri skrár en Nautilus ræður við. Sumar skrár "
-"verða ekki birtar."
+msgstr "Mappan \"%s\" inniheldur fleiri skrár en Nautilus ræður við."
 
 #: ../src/file-manager/fm-directory-view.c:2345
-#, fuzzy
 msgid "Some files will not be displayed."
 msgstr "Sumar skrár verða ekki birtar."
 
@@ -3949,41 +3845,36 @@ msgid "Open with %s"
 msgstr "Opna með %s"
 
 #: ../src/file-manager/fm-directory-view.c:4297
-#, fuzzy, c-format
-#| msgid "Use \"%s\" to open the selected item"
+#, c-format
 msgid "Use \"%s\" to open the selected item"
 msgid_plural "Use \"%s\" to open the selected items"
-msgstr[0] "Nota \"%s\" til að opna valdan hlut"
-msgstr[1] "Nota \"%s\" til að opna valdan hlut"
+msgstr[0] "Nota \"%s\" til að opna valinn hlut"
+msgstr[1] "Nota \"%s\" til að opna valda hluti"
 
 #: ../src/file-manager/fm-directory-view.c:5078
 #, c-format
 msgid "Run \"%s\" on any selected items"
-msgstr "Keyra \"%s\" á hvern valdan hlut"
+msgstr "Keyra \"%s\" á hvern valinn hlut"
 
 #: ../src/file-manager/fm-directory-view.c:5329
-#, fuzzy, c-format
+#, c-format
 msgid "Create Document from template \"%s\""
 msgstr "Búa til skjal úr sniðmátinu \"%s\""
 
 #: ../src/file-manager/fm-directory-view.c:5579
-#, fuzzy
 msgid "All executable files in this folder will appear in the Scripts menu."
 msgstr ""
-"Allar keyranlegar skrár úr þessari möppu munu birtast í Forskrifta-"
-"valmyndinni."
+"Allar keyranlegar skrár úr þessari möppu munu birtast í Skriftu-valmyndinni."
 
 #: ../src/file-manager/fm-directory-view.c:5581
-#, fuzzy
 msgid ""
 "Choosing a script from the menu will run that script with any selected items "
 "as input."
 msgstr ""
-"Með því að velja forskrift úr valmyndinni mun sú forskrift keyra með völdum "
+"Með því að velja skriftu úr valmyndinni mun sú forskrift keyra með völdum "
 "hlutum í inntaki."
 
 #: ../src/file-manager/fm-directory-view.c:5583
-#, fuzzy
 msgid ""
 "All executable files in this folder will appear in the Scripts menu. "
 "Choosing a script from the menu will run that script.\n"
@@ -4004,16 +3895,15 @@ msgid ""
 "\n"
 "NAUTILUS_SCRIPT_WINDOW_GEOMETRY: position and size of current window"
 msgstr ""
-"Allar keyranlegar skrár úr þessari möppu munu birtast í Forskrifta-"
-"valmyndinni. Með því að velja forskrift úr valmyndinni mun sú forskrift "
-"keyra.\n"
+"Allar keyranlegar skrár úr þessari möppu munu birtast í skriftu-valmyndinni. "
+"Með því að velja skriftu úr valmyndinni mun sú forskrift keyra.\n"
 "\n"
-"Ef forskriftir eru keyrðar úr staðbundinni möppu fá þær þau skráarnöfn sem "
+"Ef skriftur eru keyrðar úr staðbundinni möppu fá þær þau skráarnöfn sem "
 "valin eru. Ef þær eru keyrðar úr óstaðbundinni möppu (t.d. möppu með ftp eða "
 "vefefni) fá þær engin skilyrði.\n"
 "\n"
 "Í öllum tilvikum verða eftirfarandi umhverfisbreytur stilltar, sem "
-"forskriftirnar geta síðan notað:\n"
+"skrifturnar geta síðan notað:\n"
 "\n"
 "NAUTILUS_SCRIPT_SELECTED_FILE_PATHS: Slóðir í valdar skrár, aðgreindar með "
 "línubili (aðeins staðbundið)\n"
@@ -4027,89 +3917,78 @@ msgstr ""
 
 #: ../src/file-manager/fm-directory-view.c:5755
 #: ../src/file-manager/fm-tree-view.c:968
-#, fuzzy, c-format
-#| msgid "\"%s\" will be moved if you select the Paste Files command"
+#, c-format
 msgid "\"%s\" will be moved if you select the Paste command"
-msgstr "\"%s\" verður flutt ef þú velur \"Líma\" skráarskipunina"
+msgstr "\"%s\" verður flutt ef þú velur Líma-skipunina"
 
 #: ../src/file-manager/fm-directory-view.c:5759
 #: ../src/file-manager/fm-tree-view.c:972
-#, fuzzy, c-format
-#| msgid "\"%s\" will be copied if you select the Paste Files command"
+#, c-format
 msgid "\"%s\" will be copied if you select the Paste command"
-msgstr "\"%s\" verður afrituð ef þú velur \"Líma\" skráarskipunina"
+msgstr "\"%s\" verður afrituð ef þú velur Líma-skipunina"
 
 #: ../src/file-manager/fm-directory-view.c:5766
-#, fuzzy, c-format
+#, c-format
 msgid "The %'d selected item will be moved if you select the Paste command"
 msgid_plural ""
 "The %'d selected items will be moved if you select the Paste command"
-msgstr[0] "\"%s\" verður flutt ef þú velur \"Líma\" skráarskipunina"
-msgstr[1] "\"%s\" verður flutt ef þú velur \"Líma\" skráarskipunina"
+msgstr[0] "Valdi hluturinn %'d verður færður ef þú velur Líma-skipunina"
+msgstr[1] "Völdu hlutirnir %'d verða færðir ef þú velur Líma-skipunina"
 
 #: ../src/file-manager/fm-directory-view.c:5773
-#, fuzzy, c-format
+#, c-format
 msgid "The %'d selected item will be copied if you select the Paste command"
 msgid_plural ""
 "The %'d selected items will be copied if you select the Paste command"
-msgstr[0] "\"%s\" verður afrituð ef þú velur \"Líma\" skráarskipunina"
-msgstr[1] "\"%s\" verður afrituð ef þú velur \"Líma\" skráarskipunina"
+msgstr[0] "Valdi hluturinn %'d verður afritaður ef þú velur Líma-skipunina"
+msgstr[1] "Völdu hlutirnir %'d verða afritaðir ef þú velur Líma-skipunina"
 
 #: ../src/file-manager/fm-directory-view.c:5829
 #: ../src/file-manager/fm-tree-view.c:1011
-#, fuzzy
 msgid "There is nothing on the clipboard to paste."
-msgstr "Það er ekkert í úrklippusafni til að líma með."
+msgstr "Það er ekkert í úrklippusafni til að líma."
 
 #: ../src/file-manager/fm-directory-view.c:6012
-#, fuzzy
 msgid "Unable to unmount location"
-msgstr "Fara í eiginmöppu"
+msgstr "Get ekki aftengt staðsetninguna"
 
 #: ../src/file-manager/fm-directory-view.c:6027
-#, fuzzy
 msgid "Unable to eject location"
-msgstr "Fara í eiginmöppu"
+msgstr "Get ekki spýtt út staðsetningunni"
 
 #: ../src/file-manager/fm-directory-view.c:6042
-#, fuzzy
 msgid "Unable to stop drive"
-msgstr "Ekki tókst að útskipta skrá."
+msgstr "Ekki tókst að stððva drif"
 
 #: ../src/file-manager/fm-directory-view.c:6588
-#, fuzzy, c-format
+#, c-format
 msgid "Connect to Server %s"
-msgstr "Netþjónar"
+msgstr "Tengjast þjóninum %s"
 
 #: ../src/file-manager/fm-directory-view.c:6593
 #: ../src/file-manager/fm-directory-view.c:7893
 #: ../src/file-manager/fm-directory-view.c:7985
 #: ../src/file-manager/fm-directory-view.c:8095
-#, fuzzy
 msgid "_Connect"
 msgstr "_Tengjast"
 
 #: ../src/file-manager/fm-directory-view.c:6607
-#, fuzzy
 msgid "Link _name:"
-msgstr "_Skráarheiti:"
+msgstr "_Heiti tengils:"
 
 #: ../src/file-manager/fm-directory-view.c:6825
-#, fuzzy, c-format
-#| msgid "Could not complete specified action:  %s"
+#, c-format
 msgid "Could not determine original location of \"%s\" "
-msgstr "Ekki tókst að klára tilgreinda aðgerð: %s"
+msgstr "Ekki tókst að ákvarða upprunalega staðsetningu \"%s\" "
 
 #: ../src/file-manager/fm-directory-view.c:6829
-#, fuzzy
 msgid "The item cannot be restored from trash"
-msgstr "Ekki var hægt að ákvarða skráarréttindi fyrir \"%s\"."
+msgstr "Ekki var hægt að endurheimta hlutinn úr ruslinu"
 
 #. name, stock id, label
 #: ../src/file-manager/fm-directory-view.c:6917
-#, fuzzy
 msgid "Create _Document"
-msgstr "Sto_fna Möppu "
+msgstr "Búa til _skjal"
 
 #. name, stock id, label
 #: ../src/file-manager/fm-directory-view.c:6918
@@ -4135,10 +4014,8 @@ msgstr "Skoða eða breyta eigindum fyrir hvern valdan hlut"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:6930
-#, fuzzy
-#| msgid "View or modify the properties of each selected item"
 msgid "View or modify the properties of the open folder"
-msgstr "Skoða eða breyta eigindum fyrir hvern valdan hlut"
+msgstr "Skoða eða breyta eigindum fyrir opnu möppuna"
 
 #. name, stock id
 #. label, accelerator
@@ -4155,23 +4032,20 @@ msgstr "Búa til nýja tóma möppu inn í þessari möppu"
 
 #. name, stock id, label
 #: ../src/file-manager/fm-directory-view.c:6936
-#, fuzzy
 msgid "No templates installed"
-msgstr "Enginn snið"
+msgstr "Enginn sniðmát uppsett"
 
 #. name, stock id
 #. translators: this is used to indicate that a file doesn't contain anything
 #. label, accelerator
 #: ../src/file-manager/fm-directory-view.c:6939
-#, fuzzy
 msgid "_Empty File"
-msgstr "_Afrita skrá"
+msgstr "_Tóm skrá"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:6940
-#, fuzzy
 msgid "Create a new empty file inside this folder"
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Búa til nýja tóma skrá inni í þessari möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:6948
@@ -4201,7 +4075,7 @@ msgstr "Opna hvern valinn hlut í vafraglugga"
 #: ../src/file-manager/fm-directory-view.c:8227
 #: ../src/file-manager/fm-directory-view.c:8537
 #: ../src/file-manager/fm-tree-view.c:1221
-#: ../src/nautilus-places-sidebar.c:2159
+#: ../src/nautilus-places-sidebar.c:2192
 msgid "Open in New _Tab"
 msgstr "Opna í nýjum _flipa"
 
@@ -4304,16 +4178,13 @@ msgstr "Velja alla hluti inn í þessum glugga"
 #. name, stock id
 #. label, accelerator
 #: ../src/file-manager/fm-directory-view.c:7005
-#, fuzzy
-#| msgid "_Select Custom Icon..."
 msgid "Select I_tems Matching..."
-msgstr "_Veldu sérvalda táknmynd..."
+msgstr "Velja hlu_ti sem samsvara..."
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7006
-#, fuzzy
 msgid "Select items in this window matching a given pattern"
-msgstr "Velja alla hluti inn í þessum glugga"
+msgstr "Velja alla hluti í þessum glugga sem samsvara ákveðnu mynstri"
 
 #. name, stock id
 #. label, accelerator
@@ -4323,7 +4194,6 @@ msgstr "_Snúa vali við"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7010
-#, fuzzy
 msgid "Select all and only the items that are not currently selected"
 msgstr "Velja allt og aðeins þá hluti sem eru ekki nú þegar valdir"
 
@@ -4424,7 +4294,7 @@ msgstr "Búa til varanlega tengingu við þennan þjón"
 #: ../src/file-manager/fm-directory-view.c:7055
 #: ../src/file-manager/fm-directory-view.c:7083
 #: ../src/file-manager/fm-directory-view.c:7164
-#: ../src/nautilus-places-sidebar.c:2195
+#: ../src/nautilus-places-sidebar.c:2228
 msgid "_Mount"
 msgstr "_Tengja"
 
@@ -4448,7 +4318,7 @@ msgstr "Spýta valdri gagnahirslu út"
 #: ../src/file-manager/fm-directory-view.c:7067
 #: ../src/file-manager/fm-directory-view.c:7095
 #: ../src/file-manager/fm-directory-view.c:7176
-#: ../src/nautilus-places-sidebar.c:2223
+#: ../src/nautilus-places-sidebar.c:2256
 msgid "_Format"
 msgstr "_Forsníða"
 
@@ -4469,7 +4339,7 @@ msgstr "Forsníða valda gagnahirslu"
 #: ../src/file-manager/fm-directory-view.c:7981
 #: ../src/file-manager/fm-directory-view.c:8087
 #: ../src/file-manager/fm-directory-view.c:8091
-#: ../src/nautilus-places-sidebar.c:1410 ../src/nautilus-places-sidebar.c:2230
+#: ../src/nautilus-places-sidebar.c:1443 ../src/nautilus-places-sidebar.c:2263
 msgid "_Start"
 msgstr "_Ræsa"
 
@@ -4486,8 +4356,8 @@ msgstr "Ræsa valda gagnahirslu"
 #: ../src/file-manager/fm-directory-view.c:7914
 #: ../src/file-manager/fm-directory-view.c:8006
 #: ../src/file-manager/fm-directory-view.c:8116
-#: ../src/nautilus-places-sidebar.c:1411 ../src/nautilus-places-sidebar.c:2237
-#: ../src/nautilus-window-menus.c:805
+#: ../src/nautilus-places-sidebar.c:1444 ../src/nautilus-places-sidebar.c:2270
+#: ../src/nautilus-window-menus.c:810
 msgid "_Stop"
 msgstr "_Stopp"
 
@@ -4502,7 +4372,7 @@ msgstr "Stöðva valda gagnahirslu"
 #: ../src/file-manager/fm-directory-view.c:7079
 #: ../src/file-manager/fm-directory-view.c:7107
 #: ../src/file-manager/fm-directory-view.c:7188
-#: ../src/nautilus-places-sidebar.c:2216
+#: ../src/nautilus-places-sidebar.c:2249
 msgid "_Detect Media"
 msgstr "_Finna miðla"
 
@@ -4510,59 +4380,50 @@ msgstr "_Finna miðla"
 #: ../src/file-manager/fm-directory-view.c:7080
 #: ../src/file-manager/fm-directory-view.c:7108
 #: ../src/file-manager/fm-directory-view.c:7189
-#, fuzzy
 msgid "Detect media in the selected drive"
-msgstr "Verja valda gagnahirslu"
+msgstr "Skynja miðil í völdu drifi"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7084
-#, fuzzy
 msgid "Mount the volume associated with the open folder"
-msgstr "Tengjast diskinum sem tengist opnu möppunni"
+msgstr "Tengja diskinn sem tengist þessari opnu möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7088
-#, fuzzy
 msgid "Unmount the volume associated with the open folder"
-msgstr "Aftengdu diskinn sem er í tengslum við opnu möppuna"
+msgstr "Aftengja diskinn sem tengist þessari opnu möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7092
-#, fuzzy
 msgid "Eject the volume associated with the open folder"
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Spýta út disknum sem tengist þessari opnu möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7096
-#, fuzzy
 msgid "Format the volume associated with the open folder"
-msgstr "Forsníða diskinn sem er í tengslum við opnu möppuna"
+msgstr "Forsníða diskinn sem tengist þessari opnu möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7100
-#, fuzzy
 msgid "Start the volume associated with the open folder"
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Ræsa diskinn sem tengist þessari opnu möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7104
-#, fuzzy
 msgid "Stop the volume associated with the open folder"
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Stöðva diskinn sem tengist þessari opnu möppu"
 
 #. name, stock id
 #. label, accelerator
 #: ../src/file-manager/fm-directory-view.c:7111
-#, fuzzy
 msgid "Open File and Close window"
-msgstr "Opna í Nýjum _glugga"
+msgstr "Opna skrá og loka glugga"
 
 #. name, stock id
 #. label, accelerator
 #: ../src/file-manager/fm-directory-view.c:7115
-#, fuzzy
 msgid "Sa_ve Search"
-msgstr "V_ista Leit"
+msgstr "_Vista leit"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7116
@@ -4599,12 +4460,9 @@ msgstr "Opna þessa möppu í möppuglugga"
 #. label, accelerator
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7140
-#, fuzzy
-#| msgid "Prepare the selected files to be moved with a Paste Files command"
 msgid "Prepare this folder to be moved with a Paste command"
 msgstr ""
-"Undirbýr valdar skrár undir það að verða fluttar með \"Líma\" "
-"skráarskipuninni"
+"Undirbúa þessa möppu undir það að verða flutta með Líma skráarskipuninni"
 
 #. name, stock id
 #. label, accelerator
@@ -4615,7 +4473,6 @@ msgstr "Búa þessa möppu undir að verða afritaða með Líma-skipun"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7148
-#, fuzzy
 msgid ""
 "Move or copy files previously selected by a Cut or Copy command into this "
 "folder"
@@ -4625,60 +4482,48 @@ msgstr ""
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7153
-#, fuzzy
-#| msgid "Moving files to the Trash"
 msgid "Move this folder to the Trash"
-msgstr "Flyt skrár í ruslatunnuna"
+msgstr "Færa þessa möppu í ruslið"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7157
-#, fuzzy
-#| msgid "Delete each selected item, without moving to the Trash"
 msgid "Delete this folder, without moving to the Trash"
-msgstr "Eyða hverjum völdum hlut, án þess að henda í ruslið"
+msgstr "Eyða þessari möppu, án þess að henda í ruslið"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7165
-#, fuzzy
 msgid "Mount the volume associated with this folder"
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Tengja diskinn sem tengist þessari möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7169
-#, fuzzy
 msgid "Unmount the volume associated with this folder"
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Aftengja diskinn sem tengist þessari möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7173
-#, fuzzy
 msgid "Eject the volume associated with this folder"
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Spýta út disknum sem tengist þessari möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7177
-#, fuzzy
 msgid "Format the volume associated with this folder"
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Forsníða diskinn sem tengist þessari möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7181
-#, fuzzy
 msgid "Start the volume associated with this folder"
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Ræsa diskinn sem tengist þessari möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7185
-#, fuzzy
 msgid "Stop the volume associated with this folder"
-msgstr "Búa til nýja tóma möppu inn í þessari möppu"
+msgstr "Stöðva diskinn sem tengist þessari möppu"
 
 #. tooltip
 #: ../src/file-manager/fm-directory-view.c:7194
-#, fuzzy
-#| msgid "View or modify the properties of each selected item"
 msgid "View or modify the properties of this folder"
-msgstr "Skoða eða breyta eigindum fyrir hvern valdan hlut"
+msgstr "Skoða eða breyta eigindum fyrir þessa möppu"
 
 #. Translators: %s is a directory
 #: ../src/file-manager/fm-directory-view.c:7276
@@ -4692,61 +4537,57 @@ msgid "_Scripts"
 msgstr "_Skriftur"
 
 #: ../src/file-manager/fm-directory-view.c:7733
-#, fuzzy, c-format
+#, c-format
 msgid "Move the open folder out of the trash to \"%s\""
-msgstr "Færa opnu möppuna úr ruslinu og yfir í „%s“"
+msgstr "Færa opnu möppuna úr ruslinu og yfir í \"%s\""
 
 #: ../src/file-manager/fm-directory-view.c:7736
-#, fuzzy, c-format
-#| msgid "Move each selected item to the Trash"
+#, c-format
 msgid "Move the selected folder out of the trash to \"%s\""
 msgid_plural "Move the selected folders out of the trash to \"%s\""
-msgstr[0] "Flytja hvern og einn valin hlut í ruslið"
-msgstr[1] "Flytja hvern og einn valin hlut í ruslið"
+msgstr[0] "Flytja valda möppu úr ruslinu í \"%s\""
+msgstr[1] "Flytja valdar möppur úr ruslinu í \"%s\""
 
 #: ../src/file-manager/fm-directory-view.c:7740
-#, fuzzy, c-format
-#| msgid "Move each selected item to the Trash"
+#, c-format
 msgid "Move the selected folder out of the trash"
 msgid_plural "Move the selected folders out of the trash"
-msgstr[0] "Flytja hvern og einn valin hlut í ruslið"
-msgstr[1] "Flytja hvern og einn valin hlut í ruslið"
+msgstr[0] "Flytja valda möppu úr ruslinu"
+msgstr[1] "Flytja valdar möppur úr ruslinu"
 
 #: ../src/file-manager/fm-directory-view.c:7746
-#, fuzzy, c-format
-#| msgid "Move each selected item to the Trash"
+#, c-format
 msgid "Move the selected file out of the trash to \"%s\""
 msgid_plural "Move the selected files out of the trash to \"%s\""
-msgstr[0] "Flytja hvern og einn valin hlut í ruslið"
-msgstr[1] "Flytja hvern og einn valin hlut í ruslið"
+msgstr[0] "Flytja valda skrá úr ruslinu í \"%s\""
+msgstr[1] "Flytja valdar skrár úr ruslinu í \"%s\""
 
 #: ../src/file-manager/fm-directory-view.c:7750
-#, fuzzy, c-format
-#| msgid "Move each selected item to the Trash"
+#, c-format
 msgid "Move the selected file out of the trash"
 msgid_plural "Move the selected files out of the trash"
-msgstr[0] "Flytja hvern og einn valin hlut í ruslið"
-msgstr[1] "Flytja hvern og einn valin hlut í ruslið"
+msgstr[0] "Flytja valda skrá úr ruslinu"
+msgstr[1] "Flytja valdar skrár úr ruslinu"
 
 #: ../src/file-manager/fm-directory-view.c:7756
-#, fuzzy, c-format
-#| msgid "Move each selected item to the Trash"
+#, c-format
 msgid "Move the selected item out of the trash to \"%s\""
 msgid_plural "Move the selected items out of the trash to \"%s\""
-msgstr[0] "Flytja hvern og einn valin hlut í ruslið"
-msgstr[1] "Flytja hvern og einn valin hlut í ruslið"
+msgstr[0] "Flytja valinn hlut úr ruslinu í \"%s\""
+msgstr[1] "Flytja valda hluti úr ruslinu í \"%s\""
 
 #: ../src/file-manager/fm-directory-view.c:7760
-#, fuzzy, c-format
-#| msgid "Move each selected item to the Trash"
+#, c-format
 msgid "Move the selected item out of the trash"
 msgid_plural "Move the selected items out of the trash"
-msgstr[0] "Flytja hvern og einn valin hlut í ruslið"
-msgstr[1] "Flytja hvern og einn valin hlut í ruslið"
+msgstr[0] "Flytja valinn hlut úr ruslinu"
+msgstr[1] "Flytja valda hluti úr ruslinu"
 
 #: ../src/file-manager/fm-directory-view.c:7886
 #: ../src/file-manager/fm-directory-view.c:7890
-msgid "Start the select drive"
+#: ../src/file-manager/fm-directory-view.c:8088
+#: ../src/file-manager/fm-directory-view.c:8092
+msgid "Start the selected drive"
 msgstr "Ræsa valið drif"
 
 #: ../src/file-manager/fm-directory-view.c:7894
@@ -4781,7 +4622,7 @@ msgstr "Stöðva valið drif"
 #: ../src/file-manager/fm-directory-view.c:7918
 #: ../src/file-manager/fm-directory-view.c:8010
 #: ../src/file-manager/fm-directory-view.c:8120
-#: ../src/nautilus-places-sidebar.c:1417
+#: ../src/nautilus-places-sidebar.c:1450
 msgid "_Safely Remove Drive"
 msgstr "_Fjarlægja drif á öruggan máta"
 
@@ -4815,7 +4656,7 @@ msgstr "Stöða valið margdiska-drif"
 #: ../src/file-manager/fm-directory-view.c:7930
 #: ../src/file-manager/fm-directory-view.c:8022
 #: ../src/file-manager/fm-directory-view.c:8132
-#: ../src/nautilus-places-sidebar.c:1430
+#: ../src/nautilus-places-sidebar.c:1463
 msgid "_Lock Drive"
 msgstr "_Læsa drifi"
 
@@ -4840,7 +4681,7 @@ msgstr "Ræsa margdiska-drifið sem tengt er opnu möppunni"
 #. stop() for type G_DRIVE_START_STOP_TYPE_PASSWORD is normally not used
 #: ../src/file-manager/fm-directory-view.c:7993
 #: ../src/file-manager/fm-directory-view.c:8103
-#: ../src/nautilus-places-sidebar.c:1429
+#: ../src/nautilus-places-sidebar.c:1462
 msgid "_Unlock Drive"
 msgstr "_Aflæsa drifi"
 
@@ -4868,16 +4709,11 @@ msgstr "Stöðva margdiska-drifið sem tengt er opnu möppunni"
 msgid "Lock the drive associated with the open folder"
 msgstr "Læsa drifinu sem tengt er opnu möppunni"
 
-#: ../src/file-manager/fm-directory-view.c:8088
-#: ../src/file-manager/fm-directory-view.c:8092
-msgid "Start the selected drive"
-msgstr "Ræsa valið drif"
-
 #. add the "open in new window" menu item
 #: ../src/file-manager/fm-directory-view.c:8202
 #: ../src/file-manager/fm-directory-view.c:8497
 #: ../src/file-manager/fm-tree-view.c:1230
-#: ../src/nautilus-places-sidebar.c:2166
+#: ../src/nautilus-places-sidebar.c:2199
 msgid "Open in New _Window"
 msgstr "Opna í nýjum _glugga"
 
@@ -5042,7 +4878,7 @@ msgstr ""
 #: ../src/file-manager/fm-error-reporting.c:119
 #, c-format
 msgid "You do not have the permissions necessary to rename \"%s\"."
-msgstr "Þú hefur ekki nægjanleg réttindi til að endurnefna \"%s\""
+msgstr "Þú hefur ekki nægjanleg réttindi til að endurnefna \"%s\"."
 
 #: ../src/file-manager/fm-error-reporting.c:124
 #, c-format
@@ -5308,40 +5144,40 @@ msgstr "(Tóm)"
 msgid "Loading..."
 msgstr "Hleð..."
 
-#: ../src/file-manager/fm-list-view.c:2128
+#: ../src/file-manager/fm-list-view.c:2156
 #, c-format
 msgid "%s Visible Columns"
 msgstr "%s sýnilegir dálkar"
 
-#: ../src/file-manager/fm-list-view.c:2147
+#: ../src/file-manager/fm-list-view.c:2175
 msgid "Choose the order of information to appear in this folder:"
 msgstr "Veldu í hvaða röð upplýsingar skulu birtast í þessari möppu:"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/file-manager/fm-list-view.c:2201
+#: ../src/file-manager/fm-list-view.c:2229
 msgid "Visible _Columns..."
 msgstr "Sýnilegir _dálkar..."
 
 #. tooltip
-#: ../src/file-manager/fm-list-view.c:2202
+#: ../src/file-manager/fm-list-view.c:2230
 msgid "Select the columns visible in this folder"
 msgstr "Veldu dálkana sem eiga að vera sýnilegir í möppunni"
 
 #. translators: this is used in the view menu
-#: ../src/file-manager/fm-list-view.c:2925
+#: ../src/file-manager/fm-list-view.c:2956
 msgid "_List"
 msgstr "_Listi"
 
-#: ../src/file-manager/fm-list-view.c:2926
+#: ../src/file-manager/fm-list-view.c:2957
 msgid "The list view encountered an error."
 msgstr "Listasýnin lenti í villu."
 
-#: ../src/file-manager/fm-list-view.c:2927
+#: ../src/file-manager/fm-list-view.c:2958
 msgid "The list view encountered an error while starting up."
 msgstr "Listasýnin lenti í villu við ræsingu."
 
-#: ../src/file-manager/fm-list-view.c:2928
+#: ../src/file-manager/fm-list-view.c:2959
 msgid "Display this location with the list view."
 msgstr "Sýna þessa staðsetningu í listasýn."
 
@@ -5667,14 +5503,14 @@ msgstr "Ekki var hægt að ákvarða skráarréttindi fyrir valda skrá."
 
 #: ../src/file-manager/fm-properties-window.c:5428
 msgid "Creating Properties window."
-msgstr "Bý til eiginleikaglugga"
+msgstr "Bý til eiginleikaglugga."
 
 #: ../src/file-manager/fm-properties-window.c:5718
 msgid "Select Custom Icon"
 msgstr "Veldu sérsniðna táknmynd"
 
 #: ../src/file-manager/fm-tree-view.c:1381
-#: ../src/nautilus-places-sidebar.c:325
+#: ../src/nautilus-places-sidebar.c:331
 msgid "File System"
 msgstr "Skráarkerfi"
 
@@ -5690,12 +5526,12 @@ msgstr "Greinar"
 msgid "Show Tree"
 msgstr "Sýna greinar"
 
-#: ../src/nautilus-application.c:418
+#: ../src/nautilus-application.c:413
 #, c-format
 msgid "Nautilus could not create the required folder \"%s\"."
 msgstr "Nautilus gat ekki búið til nauðsynlegu möppuna \"%s\"."
 
-#: ../src/nautilus-application.c:420
+#: ../src/nautilus-application.c:415
 msgid ""
 "Before running Nautilus, please create the following folder, or set "
 "permissions such that Nautilus can create it."
@@ -5703,12 +5539,12 @@ msgstr ""
 "Áður en þú keyrir Nautilus, vinsamlegast búðu til eftirfarandi möppu eða "
 "stilltu réttindi svo að Nautilus geti búið hana til."
 
-#: ../src/nautilus-application.c:423
+#: ../src/nautilus-application.c:418
 #, c-format
 msgid "Nautilus could not create the following required folders: %s."
 msgstr "Nautilus gat ekki búið til eftirfarandi nauðsynlegar möppur: %s."
 
-#: ../src/nautilus-application.c:425
+#: ../src/nautilus-application.c:420
 msgid ""
 "Before running Nautilus, please create these folders, or set permissions "
 "such that Nautilus can create them."
@@ -5716,8 +5552,8 @@ msgstr ""
 "Áður en þú keyrir Nautilus, vinsamlegast búðu til eftirfarandi möppur eða "
 "stilltu réttindi svo að Nautilus geti búið þær til."
 
-#: ../src/nautilus-application.c:1503 ../src/nautilus-places-sidebar.c:1775
-#: ../src/nautilus-places-sidebar.c:1798 ../src/nautilus-places-sidebar.c:1821
+#: ../src/nautilus-application.c:1493 ../src/nautilus-places-sidebar.c:1808
+#: ../src/nautilus-places-sidebar.c:1831 ../src/nautilus-places-sidebar.c:1854
 #, c-format
 msgid "Unable to eject %s"
 msgstr "Ekki tókst að spýta út %s"
@@ -5760,7 +5596,7 @@ msgstr ""
 
 #: ../src/nautilus-bookmarks-window.c:158
 #: ../src/nautilus-file-management-properties.c:209
-#: ../src/nautilus-property-browser.c:1569 ../src/nautilus-window-menus.c:584
+#: ../src/nautilus-property-browser.c:1569 ../src/nautilus-window-menus.c:589
 #, c-format
 msgid ""
 "There was an error displaying help: \n"
@@ -5897,7 +5733,7 @@ msgstr "_Tengjast"
 
 #  Special Desktop window title (displayed in the Ctrl-Alt-Tab window)
 #: ../src/nautilus-desktop-window.c:243 ../src/nautilus-pathbar.c:1244
-#: ../src/nautilus-places-sidebar.c:313
+#: ../src/nautilus-places-sidebar.c:318
 msgid "Desktop"
 msgstr "Skjáborð"
 
@@ -6469,232 +6305,232 @@ msgid "nautilus: --geometry cannot be used with more than one URI.\n"
 msgstr ""
 "nautilus: --geometry er ekki hægt að nota með fleiri en einni URI slóð.\n"
 
-#: ../src/nautilus-navigation-window-menus.c:119
+#: ../src/nautilus-navigation-window-menus.c:124
 msgid "Are you sure you want to clear the list of locations you have visited?"
 msgstr ""
 "Ertu viss um að þú viljir hreinsa listann yfir staðsetningar sem þú hefur "
 "heimsótt?"
 
-#: ../src/nautilus-navigation-window-menus.c:313
+#: ../src/nautilus-navigation-window-menus.c:318
 #: ../src/nautilus-window-bookmarks.c:99
 #, c-format
 msgid "The location \"%s\" does not exist."
 msgstr "Staðsetningin \"%s\" er ekki til."
 
-#: ../src/nautilus-navigation-window-menus.c:315
+#: ../src/nautilus-navigation-window-menus.c:320
 msgid "The history location doesn't exist."
 msgstr "Ferilsstaðsetningin er ekki til."
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:790
+#: ../src/nautilus-navigation-window-menus.c:795
 msgid "_Go"
 msgstr "Fa_ra"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:791
+#: ../src/nautilus-navigation-window-menus.c:796
 msgid "_Bookmarks"
 msgstr "_Bókamerki"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:792
+#: ../src/nautilus-navigation-window-menus.c:797
 msgid "_Tabs"
 msgstr "F_lipar"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:793
+#: ../src/nautilus-navigation-window-menus.c:798
 msgid "New _Window"
 msgstr "Nýr _gluggi"
 
-#: ../src/nautilus-navigation-window-menus.c:794
+#: ../src/nautilus-navigation-window-menus.c:799
 msgid "Open another Nautilus window for the displayed location"
 msgstr "Opna annan Nautilus glugga fyrir sýnda staðsetningu"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:796
+#: ../src/nautilus-navigation-window-menus.c:801
 msgid "New _Tab"
 msgstr "Nýr _Flipi"
 
-#: ../src/nautilus-navigation-window-menus.c:797
+#: ../src/nautilus-navigation-window-menus.c:802
 msgid "Open another tab for the displayed location"
 msgstr "Opna annan flipa til að birta staðsetninguna"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:799
+#: ../src/nautilus-navigation-window-menus.c:804
 msgid "Open Folder W_indow"
 msgstr "Opna _möppuglugga"
 
-#: ../src/nautilus-navigation-window-menus.c:800
+#: ../src/nautilus-navigation-window-menus.c:805
 msgid "Open a folder window for the displayed location"
 msgstr "Opna glugga fyrir möppuna til að sjá staðsetninguna"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:802
+#: ../src/nautilus-navigation-window-menus.c:807
 msgid "Close _All Windows"
 msgstr "Loka _öllum gluggum"
 
-#: ../src/nautilus-navigation-window-menus.c:803
+#: ../src/nautilus-navigation-window-menus.c:808
 msgid "Close all Navigation windows"
 msgstr "Loka öllum vafurgluggum"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:805
+#: ../src/nautilus-navigation-window-menus.c:810
 msgid "_Location..."
 msgstr "S_taðsetning..."
 
-#: ../src/nautilus-navigation-window-menus.c:806
+#: ../src/nautilus-navigation-window-menus.c:811
 #: ../src/nautilus-spatial-window.c:927
 msgid "Specify a location to open"
 msgstr "Tilgreindu staðsetningu til að opna"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:808
+#: ../src/nautilus-navigation-window-menus.c:813
 msgid "Clea_r History"
 msgstr "_Hreinsa feril"
 
-#: ../src/nautilus-navigation-window-menus.c:809
+#: ../src/nautilus-navigation-window-menus.c:814
 msgid "Clear contents of Go menu and Back/Forward lists"
 msgstr "Hreinsa innihald Fara valmyndar og Áfram/Tilbaka lista"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:811
+#: ../src/nautilus-navigation-window-menus.c:816
 #: ../src/nautilus-spatial-window.c:935
 msgid "_Add Bookmark"
 msgstr "Bæt_a við bókamerki"
 
-#: ../src/nautilus-navigation-window-menus.c:812
+#: ../src/nautilus-navigation-window-menus.c:817
 #: ../src/nautilus-spatial-window.c:936
 msgid "Add a bookmark for the current location to this menu"
 msgstr "Bæta við bókamerki fyrir núverandi staðsetningu í þessa valmynd"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:814
+#: ../src/nautilus-navigation-window-menus.c:819
 #: ../src/nautilus-spatial-window.c:938
 msgid "_Edit Bookmarks..."
 msgstr "Br_eyta bókamerkjunum..."
 
-#: ../src/nautilus-navigation-window-menus.c:815
+#: ../src/nautilus-navigation-window-menus.c:820
 #: ../src/nautilus-spatial-window.c:939
 msgid "Display a window that allows editing the bookmarks in this menu"
 msgstr ""
 "Sýna glugga sem gerir þér kleift að breyta bókamerkjum í þessari valmynd"
 
 #. name, stock id, label
-#: ../src/nautilus-navigation-window-menus.c:817
+#: ../src/nautilus-navigation-window-menus.c:822
 #: ../src/nautilus-spatial-window.c:941
 msgid "_Search for Files..."
 msgstr "Leita að skrám..."
 
-#: ../src/nautilus-navigation-window-menus.c:818
+#: ../src/nautilus-navigation-window-menus.c:823
 #: ../src/nautilus-spatial-window.c:942
 msgid "Locate documents and folders on this computer by name or content"
 msgstr "Staðsetja skrár og möppur á þessari tölvu eftir nafni eða innihaldi"
 
-#: ../src/nautilus-navigation-window-menus.c:821
+#: ../src/nautilus-navigation-window-menus.c:826
 msgid "_Previous Tab"
 msgstr "_Fyrri flipi"
 
-#: ../src/nautilus-navigation-window-menus.c:822
+#: ../src/nautilus-navigation-window-menus.c:827
 msgid "Activate previous tab"
 msgstr "Virkja fyrri flipa"
 
-#: ../src/nautilus-navigation-window-menus.c:824
+#: ../src/nautilus-navigation-window-menus.c:829
 msgid "_Next Tab"
 msgstr "_Næsti flipi"
 
-#: ../src/nautilus-navigation-window-menus.c:825
+#: ../src/nautilus-navigation-window-menus.c:830
 msgid "Activate next tab"
 msgstr "Virkja næsta flipa"
 
-#: ../src/nautilus-navigation-window-menus.c:827
+#: ../src/nautilus-navigation-window-menus.c:832
 #: ../src/nautilus-navigation-window.c:273
 msgid "Move Tab _Left"
 msgstr "Færa f_lipa til hægri"
 
-#: ../src/nautilus-navigation-window-menus.c:828
+#: ../src/nautilus-navigation-window-menus.c:833
 msgid "Move current tab to left"
 msgstr "Flytja núverandi flipa til vinstri"
 
-#: ../src/nautilus-navigation-window-menus.c:830
+#: ../src/nautilus-navigation-window-menus.c:835
 #: ../src/nautilus-navigation-window.c:281
 msgid "Move Tab _Right"
 msgstr "Fæ_ra flipa til hægri"
 
-#: ../src/nautilus-navigation-window-menus.c:831
+#: ../src/nautilus-navigation-window-menus.c:836
 msgid "Move current tab to right"
 msgstr "Flytja núverandi flipa til hægri"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-navigation-window-menus.c:838
+#: ../src/nautilus-navigation-window-menus.c:843
 msgid "_Main Toolbar"
 msgstr "_Aðaltækjaslá"
 
 #. tooltip
-#: ../src/nautilus-navigation-window-menus.c:839
+#: ../src/nautilus-navigation-window-menus.c:844
 msgid "Change the visibility of this window's main toolbar"
 msgstr "Breyta sýnileika aðaltækjaslárinnar í þessum glugga"
 
 #. is_active
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-navigation-window-menus.c:843
+#: ../src/nautilus-navigation-window-menus.c:848
 msgid "_Side Pane"
 msgstr "_Síðustika"
 
 #. tooltip
-#: ../src/nautilus-navigation-window-menus.c:844
+#: ../src/nautilus-navigation-window-menus.c:849
 msgid "Change the visibility of this window's side pane"
 msgstr "Breyta sýnileika hliðarstiku gluggans"
 
 #. is_active
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-navigation-window-menus.c:848
+#: ../src/nautilus-navigation-window-menus.c:853
 msgid "Location _Bar"
 msgstr "Staðsetningarr_önd"
 
 #. tooltip
-#: ../src/nautilus-navigation-window-menus.c:849
+#: ../src/nautilus-navigation-window-menus.c:854
 msgid "Change the visibility of this window's location bar"
 msgstr "Breyta sjónrænu útliti fyrir staðsetningarrönd þessa glugga"
 
 #. is_active
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-navigation-window-menus.c:853
+#: ../src/nautilus-navigation-window-menus.c:858
 msgid "St_atusbar"
 msgstr "Stöðustik_a"
 
 #. tooltip
-#: ../src/nautilus-navigation-window-menus.c:854
+#: ../src/nautilus-navigation-window-menus.c:859
 msgid "Change the visibility of this window's statusbar"
 msgstr "Breyta sjónrænu útliti fyrir stöðustiku þessa glugga"
 
-#: ../src/nautilus-navigation-window-menus.c:878
+#: ../src/nautilus-navigation-window-menus.c:883
 msgid "_Back"
 msgstr "Til_baka"
 
-#: ../src/nautilus-navigation-window-menus.c:880
+#: ../src/nautilus-navigation-window-menus.c:885
 msgid "Go to the previous visited location"
 msgstr "Fara á fyrri heimsóttu staðsetningu"
 
-#: ../src/nautilus-navigation-window-menus.c:881
+#: ../src/nautilus-navigation-window-menus.c:886
 msgid "Back history"
 msgstr "Afturábak í ferli"
 
-#: ../src/nautilus-navigation-window-menus.c:895
+#: ../src/nautilus-navigation-window-menus.c:900
 msgid "_Forward"
 msgstr "Á_fram"
 
-#: ../src/nautilus-navigation-window-menus.c:897
+#: ../src/nautilus-navigation-window-menus.c:902
 msgid "Go to the next visited location"
 msgstr "Fara á næstu heimsóttu staðsetningu"
 
-#: ../src/nautilus-navigation-window-menus.c:898
+#: ../src/nautilus-navigation-window-menus.c:903
 msgid "Forward history"
 msgstr "Áfram í ferli"
 
-#: ../src/nautilus-navigation-window-menus.c:912
+#: ../src/nautilus-navigation-window-menus.c:917
 msgid "_Search"
 msgstr "_Leita"
 
@@ -6707,7 +6543,7 @@ msgstr ""
 msgid "_Close Tab"
 msgstr "_Loka flipa"
 
-#: ../src/nautilus-navigation-window.c:1272
+#: ../src/nautilus-navigation-window.c:1269
 #, c-format
 msgid "%s - File Browser"
 msgstr "%s - Skráarvafri"
@@ -6724,59 +6560,84 @@ msgstr "Athugasemd"
 msgid "Show Notes"
 msgstr "Sýna athugasemdir"
 
-#: ../src/nautilus-places-sidebar.c:335 ../src/network-scheme.desktop.in.h:2
+#: ../src/nautilus-places-sidebar.c:320
+#, fuzzy
+#| msgid "Open your personal folder"
+msgid "Open the contents of your desktop in a folder"
+msgstr "Opna einkamöppuna þína"
+
+#: ../src/nautilus-places-sidebar.c:333
+msgid "Open the contents of the File System"
+msgstr ""
+
+#: ../src/nautilus-places-sidebar.c:342 ../src/network-scheme.desktop.in.h:2
 msgid "Network"
 msgstr "Netkerfi"
 
+#: ../src/nautilus-places-sidebar.c:344
+msgid "Browse the contents of the network"
+msgstr ""
+
+#: ../src/nautilus-places-sidebar.c:392 ../src/nautilus-places-sidebar.c:415
+#, c-format
+msgid "Mount and open %s"
+msgstr ""
+
+#: ../src/nautilus-places-sidebar.c:510
+#, fuzzy
+#| msgid "Open with %s"
+msgid "Open the trash"
+msgstr "Opna með %s"
+
 #. start() for type G_DRIVE_START_STOP_TYPE_SHUTDOWN is normally not used
-#: ../src/nautilus-places-sidebar.c:1416
+#: ../src/nautilus-places-sidebar.c:1449
 msgid "_Power On"
 msgstr "_Kveikja"
 
-#: ../src/nautilus-places-sidebar.c:1420
+#: ../src/nautilus-places-sidebar.c:1453
 msgid "_Connect Drive"
 msgstr "_Tengja drif"
 
-#: ../src/nautilus-places-sidebar.c:1421
+#: ../src/nautilus-places-sidebar.c:1454
 msgid "_Disconnect Drive"
 msgstr "Aftengja _drif"
 
-#: ../src/nautilus-places-sidebar.c:1424
+#: ../src/nautilus-places-sidebar.c:1457
 msgid "_Start Multi-disk Device"
 msgstr "Ræ_sa margdiskatæki"
 
-#: ../src/nautilus-places-sidebar.c:1425
+#: ../src/nautilus-places-sidebar.c:1458
 msgid "_Stop Multi-disk Device"
 msgstr "_Stöðva margdiskatæki"
 
-#: ../src/nautilus-places-sidebar.c:1505 ../src/nautilus-places-sidebar.c:2010
+#: ../src/nautilus-places-sidebar.c:1538 ../src/nautilus-places-sidebar.c:2043
 #, c-format
 msgid "Unable to start %s"
 msgstr "Get ekki ræst %s"
 
-#: ../src/nautilus-places-sidebar.c:1958
+#: ../src/nautilus-places-sidebar.c:1991
 #, c-format
 msgid "Unable to poll %s for media changes"
 msgstr "Ekki náðist að kanna %s til að sjá breytingar á miðlum"
 
-#: ../src/nautilus-places-sidebar.c:2061
+#: ../src/nautilus-places-sidebar.c:2094
 #, c-format
 msgid "Unable to stop %s"
 msgstr "Get ekki stöðvað %s"
 
-#: ../src/nautilus-places-sidebar.c:2174
+#: ../src/nautilus-places-sidebar.c:2207
 msgid "Remove"
 msgstr "Fjarlægja"
 
-#: ../src/nautilus-places-sidebar.c:2183
+#: ../src/nautilus-places-sidebar.c:2216
 msgid "Rename..."
 msgstr "Endurnefna..."
 
-#: ../src/nautilus-places-sidebar.c:2596
+#: ../src/nautilus-places-sidebar.c:2633
 msgid "Places"
 msgstr "Staðir"
 
-#: ../src/nautilus-places-sidebar.c:2602
+#: ../src/nautilus-places-sidebar.c:2639
 msgid "Show Places"
 msgstr "Sýna staði"
 
@@ -7052,8 +6913,8 @@ msgstr "Loka síðustiku"
 
 #  Set initial window title
 #. Set initial window title
-#: ../src/nautilus-spatial-window.c:395 ../src/nautilus-window-menus.c:526
-#: ../src/nautilus-window.c:154
+#: ../src/nautilus-spatial-window.c:395 ../src/nautilus-window-menus.c:531
+#: ../src/nautilus-window.c:153
 msgid "Nautilus"
 msgstr "Nautilus"
 
@@ -7181,11 +7042,11 @@ msgstr ""
 "Villa: %s\n"
 "Veldu annan skoðara og reyndu aftur."
 
-#: ../src/nautilus-window-menus.c:183
+#: ../src/nautilus-window-menus.c:188
 msgid "Go to the location specified by this bookmark"
 msgstr "Fara á staðsetninguna sem er skilgreind í þessu bókarmerki"
 
-#: ../src/nautilus-window-menus.c:508
+#: ../src/nautilus-window-menus.c:513
 msgid ""
 "Nautilus is free software; you can redistribute it and/or modify it under "
 "the terms of the GNU General Public License as published by the Free "
@@ -7196,7 +7057,7 @@ msgstr ""
 "undir GNU General Public License og er gefið út af Free Software Foundation; "
 "annað hvort undir útgáfu 2 af leyfinu eða undir einhverri síðari tíma útgáfu."
 
-#: ../src/nautilus-window-menus.c:512
+#: ../src/nautilus-window-menus.c:517
 msgid ""
 "Nautilus is distributed in the hope that it will be useful, but WITHOUT ANY "
 "WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS "
@@ -7208,7 +7069,7 @@ msgstr ""
 "SELJANLEIKA eða að Nautilius hæfi einhverjum SÉRSTÖKUM tilgangi. Ef þú vilt "
 "fá frekari upplýsingar má sjá GNU General Public License."
 
-#: ../src/nautilus-window-menus.c:516
+#: ../src/nautilus-window-menus.c:521
 msgid ""
 "You should have received a copy of the GNU General Public License along with "
 "Nautilus; if not, write to the Free Software Foundation, Inc., 51 Franklin "
@@ -7218,7 +7079,7 @@ msgstr ""
 "svo er ekki þá er hægt að senda bréf til Free Software Foundation, Inc., 51 "
 "Franklin Street, Fifth Floor, Boston, MA 02110-1301 Bandaríkjunum (USA)"
 
-#: ../src/nautilus-window-menus.c:528
+#: ../src/nautilus-window-menus.c:533
 msgid ""
 "Nautilus lets you organize files and folders, both on your computer and "
 "online."
@@ -7226,7 +7087,7 @@ msgstr ""
 "Nautilus gerir þér kleift að skipuleggja skrár og möppur, bæði á tölvunni "
 "þinni og netinu."
 
-#: ../src/nautilus-window-menus.c:531
+#: ../src/nautilus-window-menus.c:536
 msgid "Copyright © 1999-2009 The Nautilus authors"
 msgstr "Höfundarréttur © 1999-2009 Höfundar Nautilus"
 
@@ -7234,229 +7095,230 @@ msgstr "Höfundarréttur © 1999-2009 Höfundar Nautilus"
 #. * which will be displayed at the bottom of the about
 #. * box to give credit to the translator(s).
 #.
-#: ../src/nautilus-window-menus.c:541
+#: ../src/nautilus-window-menus.c:546
 msgid "translator-credits"
 msgstr ""
-"Samúel Jón Gunnarsson <sammi@techattack.nu>, 2003\n"
-"Sveinn í Felli <sveinki@nett.is>, 2008, 2009"
+"Samúel Jón Gunnarsson, sammi@techattack.nu, 2003\n"
+"Anna Jonna Ármannsdóttir annajonna@gmail.com 2009. \n"
+"Sveinn í Felli, sveinki@nett.is, 2008, 2009"
 
-#: ../src/nautilus-window-menus.c:544
+#: ../src/nautilus-window-menus.c:549
 msgid "Nautilus Web Site"
 msgstr "Nautilus vefsvæðið"
 
 #. name, stock id, label
-#: ../src/nautilus-window-menus.c:779
+#: ../src/nautilus-window-menus.c:784
 msgid "_File"
 msgstr "_Skrá"
 
 #. name, stock id, label
-#: ../src/nautilus-window-menus.c:780
+#: ../src/nautilus-window-menus.c:785
 msgid "_Edit"
 msgstr "Br_eyta"
 
 #. name, stock id, label
-#: ../src/nautilus-window-menus.c:781
+#: ../src/nautilus-window-menus.c:786
 msgid "_View"
 msgstr "Sko_ða"
 
 #. name, stock id, label
-#: ../src/nautilus-window-menus.c:782
+#: ../src/nautilus-window-menus.c:787
 msgid "_Help"
 msgstr "_Hjálp"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:784
+#: ../src/nautilus-window-menus.c:789
 msgid "_Close"
 msgstr "_Loka"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:785
+#: ../src/nautilus-window-menus.c:790
 msgid "Close this folder"
 msgstr "Loka þessari möppu"
 
-#: ../src/nautilus-window-menus.c:788
+#: ../src/nautilus-window-menus.c:793
 msgid "_Backgrounds and Emblems..."
 msgstr "_Bakgrunnar og merki..."
 
-#: ../src/nautilus-window-menus.c:789
+#: ../src/nautilus-window-menus.c:794
 msgid ""
 "Display patterns, colors, and emblems that can be used to customize "
 "appearance"
 msgstr "Sýna mynstur, liti og merki sem gera þér kleift að sérsníða útlit"
 
-#: ../src/nautilus-window-menus.c:792
+#: ../src/nautilus-window-menus.c:797
 msgid "Prefere_nces"
 msgstr "Stilli_ngar"
 
-#: ../src/nautilus-window-menus.c:793
+#: ../src/nautilus-window-menus.c:798
 msgid "Edit Nautilus preferences"
 msgstr "Breyta stillingum fyrir Nautilus"
 
 #. name, stock id, label
-#: ../src/nautilus-window-menus.c:795
+#: ../src/nautilus-window-menus.c:800
 msgid "_Undo"
 msgstr "Aft_urkalla"
 
-#: ../src/nautilus-window-menus.c:796
+#: ../src/nautilus-window-menus.c:801
 msgid "Undo the last text change"
 msgstr "Afturkalla síðustu breytingu á texta"
 
 #. name, stock id, label
-#: ../src/nautilus-window-menus.c:798
+#: ../src/nautilus-window-menus.c:803
 msgid "Open _Parent"
 msgstr "Opna yfirmö_ppu"
 
-#: ../src/nautilus-window-menus.c:799
+#: ../src/nautilus-window-menus.c:804
 msgid "Open the parent folder"
 msgstr "Opna yfirmöppuna"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:806
+#: ../src/nautilus-window-menus.c:811
 msgid "Stop loading the current location"
 msgstr "Hætta við að hlaða núverandi staðsetningu"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:809
+#: ../src/nautilus-window-menus.c:814
 msgid "_Reload"
 msgstr "Endu_rhlaða"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:810
+#: ../src/nautilus-window-menus.c:815
 msgid "Reload the current location"
 msgstr "Endurhlaða núverandi staðsetningu"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:813
+#: ../src/nautilus-window-menus.c:818
 msgid "_Contents"
 msgstr "_Innihald"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:814
+#: ../src/nautilus-window-menus.c:819
 msgid "Display Nautilus help"
 msgstr "Sýna hjálp fyrir Nautilus"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:817
+#: ../src/nautilus-window-menus.c:822
 msgid "_About"
 msgstr "_Um"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:818
+#: ../src/nautilus-window-menus.c:823
 msgid "Display credits for the creators of Nautilus"
 msgstr "Sýna þakkir til stofnenda Nautilus"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:821
+#: ../src/nautilus-window-menus.c:826
 msgid "Zoom _In"
 msgstr "Renna _að"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:822 ../src/nautilus-zoom-control.c:91
+#: ../src/nautilus-window-menus.c:827 ../src/nautilus-zoom-control.c:91
 #: ../src/nautilus-zoom-control.c:345
 msgid "Increase the view size"
 msgstr "Stækka sýn"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:833
+#: ../src/nautilus-window-menus.c:838
 msgid "Zoom _Out"
 msgstr "Renna _frá"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:834 ../src/nautilus-zoom-control.c:92
+#: ../src/nautilus-window-menus.c:839 ../src/nautilus-zoom-control.c:92
 #: ../src/nautilus-zoom-control.c:294
 msgid "Decrease the view size"
 msgstr "Minnka sýn"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:841
+#: ../src/nautilus-window-menus.c:846
 msgid "Normal Si_ze"
 msgstr "Venjuleg st_ærð"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:842 ../src/nautilus-zoom-control.c:93
+#: ../src/nautilus-window-menus.c:847 ../src/nautilus-zoom-control.c:93
 #: ../src/nautilus-zoom-control.c:307
 msgid "Use the normal view size"
 msgstr "Nota venjulega stærð sýnar"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:845
+#: ../src/nautilus-window-menus.c:850
 msgid "Connect to _Server..."
 msgstr "Tengjast _netþjóni..."
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:846
+#: ../src/nautilus-window-menus.c:851
 msgid "Connect to a remote computer or shared disk"
 msgstr "Tengjast fjarlægri tölvu eða sameiginlegum diski"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:849
+#: ../src/nautilus-window-menus.c:854
 msgid "_Home Folder"
 msgstr "_Heimamappa"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:853
+#: ../src/nautilus-window-menus.c:858
 msgid "_Computer"
 msgstr "_Tölva"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:857
+#: ../src/nautilus-window-menus.c:862
 msgid "_Network"
 msgstr "_Netkerfi"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:858 ../src/network-scheme.desktop.in.h:1
+#: ../src/nautilus-window-menus.c:863 ../src/network-scheme.desktop.in.h:1
 msgid "Browse bookmarked and local network locations"
 msgstr "Flakka um bókamerktar og staðbundnar nettengingar"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:861
+#: ../src/nautilus-window-menus.c:866
 msgid "T_emplates"
 msgstr "_Sniðmát"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:862
+#: ../src/nautilus-window-menus.c:867
 msgid "Open your personal templates folder"
 msgstr "Opna sniðmátamöppuna þína"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:865
+#: ../src/nautilus-window-menus.c:870
 msgid "_Trash"
 msgstr "_Rusl"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:866
+#: ../src/nautilus-window-menus.c:871
 msgid "Open your personal trash folder"
 msgstr "Opna ruslmöppuna þína"
 
 #. name, stock id
 #. label, accelerator
-#: ../src/nautilus-window-menus.c:872
+#: ../src/nautilus-window-menus.c:877
 msgid "Show _Hidden Files"
 msgstr "Sýna _faldar skrár"
 
 #. tooltip
-#: ../src/nautilus-window-menus.c:873
+#: ../src/nautilus-window-menus.c:878
 msgid "Toggle the display of hidden files in the current window"
 msgstr "Sýna/fela faldar skrár í núverandi glugga"
 
-#: ../src/nautilus-window-menus.c:903
+#: ../src/nautilus-window-menus.c:908
 msgid "_Up"
 msgstr "_Upp"
 
-#: ../src/nautilus-window-menus.c:906
+#: ../src/nautilus-window-menus.c:911
 msgid "_Home"
 msgstr "_Heim"
 
@@ -7525,3 +7387,7 @@ msgstr "Aðdráttur"
 #: ../src/nautilus-zoom-control.c:894
 msgid "Set the zoom level of the current view"
 msgstr "Setja aðdráttargildi fyrir núverandi sýn"
+
+#~| msgid "Format the selected volume"
+#~ msgid "Start the select drive"
+#~ msgstr "Ræsa valið drif"

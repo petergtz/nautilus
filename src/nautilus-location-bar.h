@@ -32,6 +32,8 @@
 
 #include "nautilus-navigation-bar.h"
 #include "nautilus-navigation-window.h"
+#include "nautilus-navigation-window-pane.h"
+#include <libnautilus-private/nautilus-entry.h>
 #include <gtk/gtk.h>
 
 #define NAUTILUS_TYPE_LOCATION_BAR nautilus_location_bar_get_type()
@@ -58,6 +60,9 @@ typedef struct {
 } NautilusLocationBarClass;
 
 GType      nautilus_location_bar_get_type     	(void);
-GtkWidget* nautilus_location_bar_new          	(NautilusNavigationWindow *window);
+GtkWidget* nautilus_location_bar_new          	(NautilusNavigationWindowPane *pane);
+void       nautilus_location_bar_set_active     (NautilusLocationBar *location_bar,
+						 gboolean is_active);
+NautilusEntry * nautilus_location_bar_get_entry (NautilusLocationBar *location_bar);
 
 #endif /* NAUTILUS_LOCATION_BAR_H */

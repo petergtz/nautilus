@@ -17,6 +17,9 @@ INCLUDES =						\
 
 libeel_2_la_LDFLAGS =				\
 	-no-undefined				\
+	$(NULL)
+
+libeel_2_la_LIBADD = 				\
 	$(CORE_LIBS)				\
 	$(RENDER_LIBS)				\
 	$(X_LIBS)				\
@@ -105,9 +108,9 @@ marshal_sources = 				\
 	$(NULL)
 
 eel-marshal.h: eelmarshal.list $(GLIB_GENMARSHAL)
-	$(GLIB_GENMARSHAL) $< --header --prefix=eel_marshal > $@
+	$(AM_V_GEN)$(GLIB_GENMARSHAL) $< --header --prefix=eel_marshal > $@
 eel-marshal.c: eelmarshal.list $(GLIB_GENMARSHAL)
-	$(GLIB_GENMARSHAL) $< --body --prefix=eel_marshal > $@
+	$(AM_V_GEN)$(GLIB_GENMARSHAL) $< --body --prefix=eel_marshal > $@
 
 stamp_sources =					\
 	eel-enums.defs				\
@@ -120,7 +123,7 @@ stamps =					\
 	$(NULL)
 
 eel-makeenums-stamp: makeenums.pl $(eel_headers)
-	$(PERL) $< defs $(filter-out $<,$^) > xgen-eed \
+	$(AM_V_GEN)$(PERL) $< defs $(filter-out $<,$^) > xgen-eed \
 	&& (cmp -s xgen-eed eel-enums.defs || mv -f xgen-eed eel-enums.defs) \
 	&& rm -f xgen-eed \
 	&& $(PERL) $< arrays $(filter-out $<,$^) > xgen-etbe \

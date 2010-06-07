@@ -239,7 +239,7 @@ activate_selected_items_alternate (FMListView *view,
 
 	flags = NAUTILUS_WINDOW_OPEN_FLAG_CLOSE_BEHIND;
 
-	if (open_in_tab && eel_preferences_get_boolean (NAUTILUS_PREFERENCES_ENABLE_TABS)) {
+	if (open_in_tab) {
 		flags |= NAUTILUS_WINDOW_OPEN_FLAG_NEW_TAB;
         } else {
 		flags |= NAUTILUS_WINDOW_OPEN_FLAG_NEW_WINDOW;
@@ -690,9 +690,36 @@ button_press_callback (GtkWidget *widget, GdkEventButton *event, gpointer callba
 				if (view->details->row_selected_on_button_down) {
 					call_parent = on_expander;
 					view->details->ignore_button_release = call_parent;
-				} else if  ((event->state & GDK_CONTROL_MASK) != 0) {
+				} else if ((event->state & GDK_CONTROL_MASK) != 0) {
+					GList *selected_rows;
+					GList *l;
+
 					call_parent = FALSE;
-					gtk_tree_selection_select_path (selection, path);
+					if ((event->state & GDK_SHIFT_MASK) != 0) {
+						GtkTreePath *cursor;
+						gtk_tree_view_get_cursor (tree_view, &cursor, NULL);
+						if (cursor != NULL) {
+							gtk_tree_selection_select_range (selection, cursor, path);
+						} else {
+							gtk_tree_selection_select_path (selection, path);
+						}
+					} else {
+						gtk_tree_selection_select_path (selection, path);
+					}
+					selected_rows = gtk_tree_selection_get_selected_rows (selection, NULL);
+
+					/* This unselects everything */
+					gtk_tree_view_set_cursor (tree_view, path, NULL, FALSE);
+
+					/* So select it again */
+					l = selected_rows;
+					while (l != NULL) {
+						GtkTreePath *p = l->data;
+						l = l->next;
+						gtk_tree_selection_select_path (selection, p);
+						gtk_tree_path_free (p);
+					}
+					g_list_free (selected_rows);
 				} else {
 					view->details->ignore_button_release = on_expander;
 				}
@@ -943,7 +970,7 @@ key_press_callback (GtkWidget *widget, GdkEventKey *event, gpointer callback_dat
 			handled = FALSE;
 			break;
 		}
-		if (!GTK_WIDGET_HAS_FOCUS (GTK_WIDGET (FM_LIST_VIEW (view)->details->tree_view))) {
+		if (!gtk_widget_has_focus (GTK_WIDGET (FM_LIST_VIEW (view)->details->tree_view))) {
 			handled = FALSE;
 			break;
 		}
@@ -1107,6 +1134,7 @@ cell_renderer_edited (GtkCellRendererText *cell,
 		g_object_set (G_OBJECT (view->details->file_name_cell),
 			      "editable", FALSE,
 			      NULL);
+		fm_directory_view_unfreeze_updates (FM_DIRECTORY_VIEW (view));
 		return;
 	}
 	
@@ -1189,6 +1217,16 @@ list_view_handle_text (NautilusTreeViewDragDest *dest, const char *text,
 {
 	fm_directory_view_handle_text_drop (FM_DIRECTORY_VIEW (view),
 					    text, target_uri, action, x, y);
+}
+
+static void
+list_view_handle_raw (NautilusTreeViewDragDest *dest, const char *raw_data,
+		       int length, const char *target_uri, const char *direct_save_uri,
+		       GdkDragAction action, int x, int y, FMListView *view)
+{
+	fm_directory_view_handle_raw_drop (FM_DIRECTORY_VIEW (view),
+					    raw_data, length, target_uri, direct_save_uri,
+					    action, x, y);
 }
 
 static void
@@ -1331,6 +1369,19 @@ filename_cell_data_func (GtkTreeViewColumn *column,
 	g_free (text);
 }
 
+static gboolean
+focus_in_event_callback (GtkWidget *widget, GdkEventFocus *event, gpointer user_data)
+{
+	NautilusWindowSlotInfo *slot_info;
+	FMListView *list_view = FM_LIST_VIEW (user_data);
+
+	/* make the corresponding slot (and the pane that contains it) active */
+	slot_info = fm_directory_view_get_nautilus_window_slot (FM_DIRECTORY_VIEW (list_view));
+	nautilus_window_slot_info_make_hosting_pane_active (slot_info);
+
+	return FALSE;
+}
+
 static void
 create_and_set_up_tree_view (FMListView *view)
 {
@@ -1373,6 +1424,8 @@ create_and_set_up_tree_view (FMListView *view)
 				 G_CALLBACK (list_view_handle_uri_list), view, 0);
 	g_signal_connect_object (view->details->drag_dest, "handle_text",
 				 G_CALLBACK (list_view_handle_text), view, 0);
+	g_signal_connect_object (view->details->drag_dest, "handle_raw",
+				 G_CALLBACK (list_view_handle_raw), view, 0);
 
 	g_signal_connect_object (gtk_tree_view_get_selection (view->details->tree_view),
 				 "changed",
@@ -1403,6 +1456,9 @@ create_and_set_up_tree_view (FMListView *view)
 	g_signal_connect_object (view->details->tree_view, "row-activated",
                                  G_CALLBACK (row_activated_callback), view, 0);
 	
+    	g_signal_connect_object (view->details->tree_view, "focus_in_event",
+				 G_CALLBACK(focus_in_event_callback), view, 0);
+    
 	view->details->model = g_object_new (FM_TYPE_LIST_MODEL, NULL);
 	gtk_tree_view_set_model (view->details->tree_view, GTK_TREE_MODEL (view->details->model));
 	/* Need the model for the dnd drop icon "accept" change */
@@ -2378,7 +2434,7 @@ static void
 fm_list_view_bump_zoom_level (FMDirectoryView *view, int zoom_increment)
 {
 	FMListView *list_view;
-	NautilusZoomLevel new_level;
+	gint new_level;
 
 	g_return_if_fail (FM_IS_LIST_VIEW (view));
 
@@ -2457,9 +2513,12 @@ fm_list_view_start_renaming_file (FMDirectoryView *view,
 	
 	list_view = FM_LIST_VIEW (view);
 	
-	/* Don't start renaming if another rename in this listview is
-	 * already in progress. */
+	/* Select all if we are in renaming mode already */
 	if (list_view->details->file_name_column && list_view->details->file_name_column->editable_widget) {
+		gtk_editable_select_region (
+				GTK_EDITABLE (list_view->details->file_name_column->editable_widget),
+				0,
+				-1);
 		return;
 	}
 
@@ -2535,7 +2594,7 @@ fm_list_view_click_policy_changed (FMDirectoryView *directory_view)
 		}
 
 		tree = view->details->tree_view;
-		if (GTK_WIDGET_REALIZED (GTK_WIDGET (tree))) {
+		if (gtk_widget_get_realized (GTK_WIDGET (tree))) {
 			win = GTK_WIDGET (tree)->window;
 			gdk_window_set_cursor (win, NULL);
 			
@@ -2770,11 +2829,26 @@ list_view_scroll_to_file (NautilusView *view,
 }
 
 static void
-fm_list_view_grab_focus (NautilusView *view)
+real_set_is_active (FMDirectoryView *view,
+		    gboolean is_active)
 {
-	gtk_widget_grab_focus (GTK_WIDGET (FM_LIST_VIEW (view)->details->tree_view));
-}
+	GtkWidget *tree_view;
+	GtkStyle *style;
+	GdkColor color;
 
+	tree_view = GTK_WIDGET (fm_list_view_get_tree_view (FM_LIST_VIEW (view)));
+
+	if (is_active) {
+		gtk_widget_modify_base (tree_view, GTK_STATE_NORMAL, NULL);
+	} else {
+		style = gtk_widget_get_style (tree_view);
+		color = style->base[GTK_STATE_INSENSITIVE];
+		gtk_widget_modify_base (tree_view, GTK_STATE_NORMAL, &color);
+	}
+
+	EEL_CALL_PARENT (FM_DIRECTORY_VIEW_CLASS,
+			 set_is_active, (view, is_active));
+}
 
 static void
 fm_list_view_class_init (FMListViewClass *class)
@@ -2817,6 +2891,7 @@ fm_list_view_class_init (FMListViewClass *class)
         fm_directory_view_class->emblems_changed = fm_list_view_emblems_changed;
 	fm_directory_view_class->end_file_changes = fm_list_view_end_file_changes;
 	fm_directory_view_class->using_manual_layout = fm_list_view_using_manual_layout;
+	fm_directory_view_class->set_is_active = real_set_is_active;
 
 	eel_preferences_add_auto_enum (NAUTILUS_PREFERENCES_CLICK_POLICY,
 				       &click_policy_auto_value);
@@ -2848,7 +2923,6 @@ fm_list_view_iface_init (NautilusViewIface *iface)
 	iface->get_first_visible_file = fm_list_view_get_first_visible_file;
 	iface->scroll_to_file = list_view_scroll_to_file;
 	iface->get_title = NULL;
-	iface->grab_focus = fm_list_view_grab_focus;
 }
 
 
@@ -2941,4 +3015,10 @@ fm_list_view_register (void)
 	fm_list_view.display_location_label = _(fm_list_view.display_location_label);
 
 	nautilus_view_factory_register (&fm_list_view);
+}
+
+GtkTreeView*
+fm_list_view_get_tree_view (FMListView *list_view)
+{
+	return list_view->details->tree_view;
 }

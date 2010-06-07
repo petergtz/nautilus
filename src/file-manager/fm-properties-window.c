@@ -833,7 +833,7 @@ name_field_focus_out (NautilusEntry *name_field,
 {
 	g_assert (FM_IS_PROPERTIES_WINDOW (callback_data));
 
-	if (GTK_WIDGET_SENSITIVE (name_field)) {
+	if (gtk_widget_get_sensitive (GTK_WIDGET (name_field))) {
 		name_field_done_editing (name_field, FM_PROPERTIES_WINDOW (callback_data));
 	}
 
@@ -3438,7 +3438,7 @@ create_emblems_page (FMPropertiesWindow *window)
 	NautilusIconInfo *info;
 
 	/* The emblems wrapped table */
-	scroller = eel_scrolled_wrap_table_new (TRUE, &emblems_table);
+	scroller = eel_scrolled_wrap_table_new (TRUE, GTK_SHADOW_NONE, &emblems_table);
 
 	gtk_container_set_border_width (GTK_CONTAINER (emblems_table), 12);
 	

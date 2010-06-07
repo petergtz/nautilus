@@ -37,6 +37,7 @@
 #define NAUTILUS_ACTION_SHOW_HIDE_SIDEBAR "Show Hide Sidebar"
 #define NAUTILUS_ACTION_SHOW_HIDE_STATUSBAR "Show Hide Statusbar"
 #define NAUTILUS_ACTION_SHOW_HIDE_LOCATION_BAR "Show Hide Location Bar"
+#define NAUTILUS_ACTION_SHOW_HIDE_EXTRA_PANE "Show Hide Extra Pane"
 #define NAUTILUS_ACTION_GO_TO_BURN_CD "Go to Burn CD"
 #define NAUTILUS_ACTION_GO_TO_LOCATION "Go to Location"
 #define NAUTILUS_ACTION_GO_HOME "Home"
@@ -50,7 +51,6 @@
 #define NAUTILUS_ACTION_CLOSE "Close"
 #define NAUTILUS_ACTION_SEARCH "Search"
 #define NAUTILUS_ACTION_FOLDER_WINDOW "Folder Window"
-#define NAUTILUS_ACTION_TABS "Tabs"
 #define NAUTILUS_ACTION_NEW_TAB "New Tab"
 
 #endif /* NAUTILUS_ACTIONS_H */

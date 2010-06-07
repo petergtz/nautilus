@@ -51,8 +51,6 @@ schemedir = $(datadir)/applications
 scheme_DATA = network-scheme.desktop
 
 nautilus_SOURCES = \
-	ephy-spinner.h				\
-	ephy-spinner.c				\
 	nautilus-actions.h			\
 	nautilus-application.c			\
 	nautilus-application.h			\
@@ -90,6 +88,8 @@ nautilus_SOURCES = \
 	nautilus-navigation-window-menus.c      \
 	nautilus-navigation-window.c            \
 	nautilus-navigation-window.h            \
+	nautilus-navigation-window-pane.c	\
+	nautilus-navigation-window-pane.h	\
 	nautilus-navigation-window-slot.c	\
 	nautilus-navigation-window-slot.h	\
 	nautilus-notebook.c			\
@@ -114,15 +114,17 @@ nautilus_SOURCES = \
 	nautilus-sidebar-title.h		\
 	nautilus-spatial-window.c               \
 	nautilus-spatial-window.h               \
-	nautilus-throbber.c			\
-	nautilus-throbber.h			\
 	nautilus-trash-bar.c			\
 	nautilus-trash-bar.h			\
+	nautilus-view-as-action.c		\
+	nautilus-view-as-action.h		\
 	nautilus-window-bookmarks.c		\
 	nautilus-window-bookmarks.h		\
 	nautilus-window-manage-views.c		\
 	nautilus-window-manage-views.h		\
 	nautilus-window-menus.c         	\
+	nautilus-window-pane.c	\
+	nautilus-window-pane.h	\
 	nautilus-window-private.h		\
 	nautilus-window-slot.c			\
 	nautilus-window-slot.h			\
@@ -131,6 +133,8 @@ nautilus_SOURCES = \
 	nautilus-window.h			\
 	nautilus-x-content-bar.c		\
 	nautilus-x-content-bar.h		\
+	nautilus-zoom-action.c			\
+	nautilus-zoom-action.h			\
 	nautilus-zoom-control.c			\
 	nautilus-zoom-control.h			\
 	$(NULL)

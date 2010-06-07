@@ -87,6 +87,7 @@ src/nautilus-location-dialog.c
 src/nautilus-location-entry.c
 src/nautilus-main.c
 src/nautilus-navigation-window-menus.c
+src/nautilus-navigation-window-pane.c
 src/nautilus-navigation-window-ui.xml
 src/nautilus-navigation-window.c
 src/nautilus-notebook.c
@@ -101,7 +102,6 @@ src/nautilus-side-pane.c
 src/nautilus-sidebar-title.c
 src/nautilus-spatial-window-ui.xml
 src/nautilus-spatial-window.c
-src/nautilus-throbber.c
 src/nautilus-trash-bar.c
 src/nautilus-window-bookmarks.c
 src/nautilus-window-manage-views.c
