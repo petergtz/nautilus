@@ -142,6 +142,37 @@ static const struct {
 };
 
 static void
+enter_restore_mode_event(DBusGProxy *object, gpointer user_data)
+{
+	DBusGConnection *bus;
+	gchar *dbus_window_as_string;
+	DBusGProxy *cozy_control_center;
+	GError *error = NULL;
+	gint result;
+	g_print("Received a signal from Cozy Restore Control Center\n");
+	if (gtk_window_has_toplevel_focus(GTK_WINDOW(user_data)))
+	{
+		g_print("Registering myself, because I'm the toplevel window with the focus.");
+		bus = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+		cozy_control_center = dbus_g_proxy_new_for_name(bus, "org.freedesktop.Cozy", "/org/freedesktop/Cozy/RestoreControlCenter",
+								"org.freedesktop.Cozy.RestoreControlCenter");
+		dbus_window_as_string = g_strdup_printf("/NautilusWindow/%p", GTK_WINDOW(user_data));
+		result = dbus_g_proxy_call(cozy_control_center, "register_me", &error,
+				G_TYPE_STRING, dbus_window_as_string,
+				G_TYPE_STRING, "org.gnome.NautilusWindow",
+				G_TYPE_STRING, "go_to",
+				G_TYPE_STRING, "get_location_uri",
+				G_TYPE_INVALID,
+				G_TYPE_INVALID);
+		if (!result)
+		{
+			g_printerr ("Error: Could not register myself at Cozy Control Center due to:\n%s\n", error->message);
+		}
+	}
+}
+
+
+static void
 nautilus_window_init (NautilusWindow *window)
 {
 	GtkWidget *table;
@@ -151,6 +182,9 @@ nautilus_window_init (NautilusWindow *window)
 	gchar *dbus_window_as_string;
 	DBusGConnection *bus;
 	GError *error = NULL;
+// Cozy specific:
+	DBusGProxy *cozy_control_center;
+
 
 	window->details = G_TYPE_INSTANCE_GET_PRIVATE (window, NAUTILUS_TYPE_WINDOW, NautilusWindowDetails);
 
@@ -201,6 +235,11 @@ nautilus_window_init (NautilusWindow *window)
 	dbus_g_object_type_install_info(NAUTILUS_TYPE_WINDOW, &dbus_glib_nautilus_window_object_info);
 	dbus_window_as_string = g_strdup_printf("/NautilusWindow/%p", window);
 	dbus_g_connection_register_g_object (bus, dbus_window_as_string, G_OBJECT (window));
+// cozy specific:
+	cozy_control_center = dbus_g_proxy_new_for_name(bus, "org.freedesktop.Cozy", "/org/freedesktop/Cozy/RestoreControlCenter",
+							"org.freedesktop.Cozy.RestoreControlCenter");
+	dbus_g_proxy_add_signal(cozy_control_center, "enter_restore_mode_event", G_TYPE_INVALID);
+	dbus_g_proxy_connect_signal(cozy_control_center, "enter_restore_mode_event", G_CALLBACK(enter_restore_mode_event), window, NULL);
 }
 
 /* Unconditionally synchronize the GtkUIManager of WINDOW. */
