@@ -181,7 +181,7 @@ eel_image_table_class_init (EelImageTableClass *image_table_class)
 static void
 eel_image_table_init (EelImageTable *image_table)
 {
-	GTK_WIDGET_SET_FLAGS (image_table, GTK_NO_WINDOW);
+	gtk_widget_set_has_window (GTK_WIDGET (image_table), FALSE);
 
 	image_table->details = g_new0 (EelImageTableDetails, 1);
 }
@@ -343,7 +343,7 @@ image_table_handle_motion (EelImageTable *image_table,
 
 	child = eel_wrap_table_find_child_at_event_point (EEL_WRAP_TABLE (image_table), x, y);
 
-	if (child && !GTK_WIDGET_SENSITIVE (child)) {
+	if (child && !gtk_widget_get_sensitive (child)) {
 		return;
 	}
 
@@ -458,7 +458,7 @@ ancestor_button_press_event (GtkWidget *widget,
 
 	child = eel_wrap_table_find_child_at_event_point (EEL_WRAP_TABLE (image_table), event->x, event->y);
 
-	if (child && !GTK_WIDGET_SENSITIVE (child)) {
+	if (child && !gtk_widget_get_sensitive (child)) {
 		return FALSE;
 	}
 
@@ -497,7 +497,7 @@ ancestor_button_release_event (GtkWidget *widget,
 
 	child = eel_wrap_table_find_child_at_event_point (EEL_WRAP_TABLE (image_table), event->x, event->y);
 
-	if (child && !GTK_WIDGET_SENSITIVE (child)) {
+	if (child && !gtk_widget_get_sensitive (child)) {
 		return FALSE;
 	}
 

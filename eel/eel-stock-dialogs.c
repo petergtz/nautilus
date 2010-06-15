@@ -195,7 +195,7 @@ timed_wait_callback (gpointer callback_data)
 
 	/* Put up the timed wait window. */
 	button = wait->cancel_callback != NULL ? GTK_STOCK_CANCEL : GTK_STOCK_OK;
-	dialog = GTK_DIALOG (eel_alert_dialog_new (NULL,
+	dialog = GTK_DIALOG (eel_alert_dialog_new (wait->parent_window,
 		                                   0,
 		                                   GTK_MESSAGE_INFO,
 		                                   GTK_BUTTONS_NONE,
@@ -566,6 +566,5 @@ eel_create_question_dialog (const char *primary_text,
 					GTK_BUTTONS_NONE,
 					parent);
 	gtk_dialog_add_buttons (dialog, answer_1, response_1, answer_2, response_2, NULL);
-	gtk_dialog_set_default_response (dialog, response_2);
 	return dialog;
 }

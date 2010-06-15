@@ -61,7 +61,8 @@ typedef enum {
 	NAUTILUS_FILE_SORT_BY_TYPE,
 	NAUTILUS_FILE_SORT_BY_MTIME,
         NAUTILUS_FILE_SORT_BY_ATIME,
-	NAUTILUS_FILE_SORT_BY_EMBLEMS
+	NAUTILUS_FILE_SORT_BY_EMBLEMS,
+	NAUTILUS_FILE_SORT_BY_TRASHED_TIME
 } NautilusFileSortType;	
 
 typedef enum {
@@ -78,7 +79,11 @@ typedef enum {
 	NAUTILUS_FILE_ICON_FLAGS_FOR_DRAG_ACCEPT = (1<<3),
 	NAUTILUS_FILE_ICON_FLAGS_FOR_OPEN_FOLDER = (1<<4),
 	/* whether the thumbnail size must match the display icon size */
-	NAUTILUS_FILE_ICON_FLAGS_FORCE_THUMBNAIL_SIZE = (1<<5)
+	NAUTILUS_FILE_ICON_FLAGS_FORCE_THUMBNAIL_SIZE = (1<<5),
+	/* uses the icon of the mount if present */
+	NAUTILUS_FILE_ICON_FLAGS_USE_MOUNT_ICON = (1<<6),
+	/* render the mount icon as an emblem over the regular one */
+	NAUTILUS_FILE_ICON_FLAGS_USE_MOUNT_ICON_AS_EMBLEM = (1<<7)
 } NautilusFileIconFlags;	
 
 /* Emblems sometimes displayed for NautilusFiles. Do not localize. */ 
@@ -183,6 +188,8 @@ gboolean                nautilus_file_is_broken_symbolic_link           (Nautilu
 gboolean                nautilus_file_is_nautilus_link                  (NautilusFile                   *file);
 gboolean                nautilus_file_is_executable                     (NautilusFile                   *file);
 gboolean                nautilus_file_is_directory                      (NautilusFile                   *file);
+gboolean                nautilus_file_is_user_special_directory         (NautilusFile                   *file,
+									 GUserDirectory                 special_directory);
 gboolean		nautilus_file_is_archive			(NautilusFile			*file);
 gboolean                nautilus_file_is_in_trash                       (NautilusFile                   *file);
 gboolean                nautilus_file_is_in_desktop                     (NautilusFile                   *file);
@@ -385,6 +392,11 @@ gboolean                nautilus_file_matches_uri                       (Nautilu
 gboolean                nautilus_file_is_local                          (NautilusFile                   *file);
 
 /* Comparing two file objects for sorting */
+NautilusFileSortType    nautilus_file_get_default_sort_type             (NautilusFile                   *file,
+									 gboolean                       *reversed);
+const gchar *           nautilus_file_get_default_sort_attribute        (NautilusFile                   *file,
+									 gboolean                       *reversed);
+
 int                     nautilus_file_compare_for_sort                  (NautilusFile                   *file_1,
 									 NautilusFile                   *file_2,
 									 NautilusFileSortType            sort_type,
@@ -404,6 +416,8 @@ gboolean                nautilus_file_is_date_sort_attribute_q          (GQuark 
 
 int                     nautilus_file_compare_display_name              (NautilusFile                   *file_1,
 									 const char                     *pattern);
+int                     nautilus_file_compare_location                  (NautilusFile                    *file_1,
+                                                                         NautilusFile                    *file_2);
 
 /* filtering functions for use by various directory views */
 gboolean                nautilus_file_is_hidden_file                    (NautilusFile                   *file);
@@ -483,7 +497,8 @@ typedef enum {
 	NAUTILUS_DATE_TYPE_MODIFIED,
 	NAUTILUS_DATE_TYPE_CHANGED,
 	NAUTILUS_DATE_TYPE_ACCESSED,
-	NAUTILUS_DATE_TYPE_PERMISSIONS_CHANGED
+	NAUTILUS_DATE_TYPE_PERMISSIONS_CHANGED,
+	NAUTILUS_DATE_TYPE_TRASHED
 } NautilusDateType;
 
 typedef struct {

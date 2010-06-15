@@ -144,7 +144,7 @@ set_displayed_location (NautilusWindowSlot *slot, GFile *location)
 		slot->last_location_bookmark = slot->current_location_bookmark;
 		name = g_file_get_uri (location);
 		slot->current_location_bookmark = (location == NULL) ? NULL
-                        : nautilus_bookmark_new (location, name);
+                        : nautilus_bookmark_new (location, name, TRUE, NULL);
 		g_free (name);
         }
 }
@@ -1399,7 +1399,7 @@ location_has_really_changed (NautilusWindowSlot *slot)
 	if (slot->new_content_view != NULL) {
 		widget = nautilus_view_get_widget (slot->new_content_view);
 		/* Switch to the new content view. */
-		if (widget->parent == NULL) {
+		if (gtk_widget_get_parent (widget) == NULL) {
 			if (slot->content_view != NULL) {
 				nautilus_window_slot_disconnect_content_view (slot, slot->content_view);
 			}
@@ -1487,11 +1487,12 @@ nautilus_window_slot_show_x_content_bar (NautilusWindowSlot *slot, GMount *mount
 }
 
 static void
-nautilus_window_slot_show_trash_bar (NautilusWindowSlot *slot)
+nautilus_window_slot_show_trash_bar (NautilusWindowSlot *slot,
+				     NautilusWindow *window)
 {
 	GtkWidget *bar;
 
-	bar = nautilus_trash_bar_new ();
+	bar = nautilus_trash_bar_new (window);
 	gtk_widget_show (bar);
 
 	nautilus_window_slot_add_extra_location_widget (slot, bar);
@@ -1624,7 +1625,7 @@ update_for_new_location (NautilusWindowSlot *slot)
 		nautilus_window_slot_update_query_editor (slot);
 
 		if (nautilus_directory_is_in_trash (directory)) {
-			nautilus_window_slot_show_trash_bar (slot);
+			nautilus_window_slot_show_trash_bar (slot, window);
 		}
 
 		/* need the mount to determine if we should put up the x-content cluebar */

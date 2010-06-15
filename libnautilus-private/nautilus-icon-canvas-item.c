@@ -117,12 +117,14 @@ struct NautilusIconCanvasItemDetails {
    	guint is_highlighted_for_selection : 1;
 	guint is_highlighted_as_keyboard_focus: 1;
    	guint is_highlighted_for_drop : 1;
+	guint is_highlighted_for_clipboard : 1;
 	guint show_stretch_handles : 1;
 	guint is_prelit : 1;
 
 	guint rendered_is_active : 1;
 	guint rendered_is_highlighted_for_selection : 1;
 	guint rendered_is_highlighted_for_drop : 1;
+	guint rendered_is_highlighted_for_clipboard : 1;
 	guint rendered_is_prelit : 1;
 	guint rendered_is_focused : 1;
 	
@@ -160,7 +162,8 @@ enum {
 	PROP_ADDITIONAL_TEXT,
     	PROP_HIGHLIGHTED_FOR_SELECTION,
     	PROP_HIGHLIGHTED_AS_KEYBOARD_FOCUS,
-    	PROP_HIGHLIGHTED_FOR_DROP
+    	PROP_HIGHLIGHTED_FOR_DROP,
+	PROP_HIGHLIGHTED_FOR_CLIPBOARD
 };
 
 typedef enum {
@@ -243,7 +246,6 @@ static void      draw_embedded_text                  (NautilusIconCanvasItem    
 						      int                            x,
 						      int                            y);
 
-static GdkPixbuf *nautilus_icon_canvas_lighten_pixbuf (GdkPixbuf* src, guint lighten_value);
 static void       nautilus_icon_canvas_item_ensure_bounds_up_to_date (NautilusIconCanvasItem *icon_item);
 
 
@@ -447,7 +449,14 @@ nautilus_icon_canvas_item_set_property (GObject        *object,
 		}
 		details->is_highlighted_for_drop = g_value_get_boolean (value);
 		break;
-		
+
+	case PROP_HIGHLIGHTED_FOR_CLIPBOARD:
+		if (!details->is_highlighted_for_clipboard == !g_value_get_boolean (value)) {
+			return;
+		}
+		details->is_highlighted_for_clipboard = g_value_get_boolean (value);
+		break;
+
 	default:
 		g_warning ("nautilus_icons_view_item_item_set_arg on unknown argument");
 		return;
@@ -487,6 +496,10 @@ nautilus_icon_canvas_item_get_property (GObject        *object,
 		
         case PROP_HIGHLIGHTED_FOR_DROP:
 		g_value_set_boolean (value, details->is_highlighted_for_drop);
+                break;
+
+	case PROP_HIGHLIGHTED_FOR_CLIPBOARD:
+		g_value_set_boolean (value, details->is_highlighted_for_clipboard);
                 break;
 
         default:
@@ -537,7 +550,7 @@ nautilus_icon_canvas_item_get_image (NautilusIconCanvasItem *item,
 	
 	pixmap = gdk_pixmap_new (gdk_screen_get_root_window (screen),
 				 width,	height,
-				 gdk_colormap_get_visual (colormap)->depth);
+				 gdk_visual_get_depth (gdk_colormap_get_visual (colormap)));
 	gdk_drawable_set_colormap (GDK_DRAWABLE (pixmap), colormap);
 
 	pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB,
@@ -1332,7 +1345,7 @@ draw_label_text (NautilusIconCanvasItem *item,
 		   (details->is_prelit ||
 		    details->is_highlighted_as_keyboard_focus)) {
 		/* clear the underlying icons, where the text or overlaps them. */
-		gdk_window_clear_area (EEL_CANVAS (container)->layout.bin_window,
+		gdk_window_clear_area (gtk_layout_get_bin_window (&EEL_CANVAS (container)->layout),
 				       text_rect.x0,
 				       text_rect.y0,
 				       text_rect.x1 - text_rect.x0,
@@ -1404,7 +1417,7 @@ draw_label_text (NautilusIconCanvasItem *item,
 	}
 
 	if (!create_mask && item->details->is_highlighted_as_keyboard_focus) {
-		gtk_paint_focus (GTK_WIDGET (EEL_CANVAS_ITEM (item)->canvas)->style,
+		gtk_paint_focus (gtk_widget_get_style (GTK_WIDGET (EEL_CANVAS_ITEM (item)->canvas)),
 				 drawable,
 				 needs_highlight ? GTK_STATE_SELECTED : GTK_STATE_NORMAL,
 				 NULL,
@@ -1488,12 +1501,14 @@ draw_stretch_handles (NautilusIconCanvasItem *item, GdkDrawable *drawable,
 	GdkPixbuf *knob_pixbuf;
 	GdkBitmap *stipple;
 	int knob_width, knob_height;
+	GtkStyle *style;
 	
 	if (!item->details->show_stretch_handles) {
 		return;
 	}
 
 	widget = GTK_WIDGET (EEL_CANVAS_ITEM (item)->canvas);
+	style = gtk_widget_get_style (widget);
 
 	gc = gdk_gc_new (drawable);
 	knob_pixbuf = get_knob_pixbuf ();
@@ -1504,7 +1519,7 @@ draw_stretch_handles (NautilusIconCanvasItem *item, GdkDrawable *drawable,
 			gdk_drawable_get_screen (GDK_DRAWABLE (drawable)));
 	
 	/* first draw the box */
-	gdk_gc_set_rgb_fg_color (gc, &widget->style->white);
+	gdk_gc_set_rgb_fg_color (gc, &style->white);
 	gdk_draw_rectangle
 		(drawable, gc, FALSE,
 			    rect->x0,
@@ -1512,7 +1527,7 @@ draw_stretch_handles (NautilusIconCanvasItem *item, GdkDrawable *drawable,
 			    rect->x1 - rect->x0 - 1,
 			    rect->y1 - rect->y0 - 1);
 
-	gdk_gc_set_rgb_fg_color (gc, &widget->style->black);
+	gdk_gc_set_rgb_fg_color (gc, &style->black);
 	gdk_gc_set_stipple (gc, stipple);
 	gdk_gc_set_fill (gc, GDK_STIPPLED);
 	gdk_draw_rectangle
@@ -1692,112 +1707,6 @@ draw_pixbuf (GdkPixbuf *pixbuf, GdkDrawable *drawable, int x, int y)
 			 GDK_RGB_DITHER_NORMAL, 0, 0);
 }
 
-/* should be moved to libeel! */
-static guchar
-nautilus_icon_canvas_lighten_pixbuf_component (guchar cur_value, guint lighten_value) {
-	int new_value = cur_value;
-	if (lighten_value > 0) {
-		new_value += lighten_value + (new_value >> 3);
-		if (new_value > 255) {
-			new_value = 255;
-		}
-	}
-	return (guchar) new_value;
-}
-
-/* should be moved to libeel! */
-static GdkPixbuf *
-nautilus_icon_canvas_lighten_pixbuf (GdkPixbuf* src, guint lighten_value) {
-	GdkPixbuf *dest;
-	int i, j;
-	int width, height, has_alpha, src_row_stride, dst_row_stride;
-	guchar *target_pixels, *original_pixels;
-	guchar *pixsrc, *pixdest;
-
-	g_assert (gdk_pixbuf_get_colorspace (src) == GDK_COLORSPACE_RGB);
-	g_assert ((!gdk_pixbuf_get_has_alpha (src)
-			       && gdk_pixbuf_get_n_channels (src) == 3)
-			      || (gdk_pixbuf_get_has_alpha (src)
-				  && gdk_pixbuf_get_n_channels (src) == 4));
-	g_assert (gdk_pixbuf_get_bits_per_sample (src) == 8);
-
-	dest = gdk_pixbuf_new (gdk_pixbuf_get_colorspace (src),
-			       gdk_pixbuf_get_has_alpha (src),
-			       gdk_pixbuf_get_bits_per_sample (src),
-			       gdk_pixbuf_get_width (src),
-			       gdk_pixbuf_get_height (src));
-	
-	has_alpha = gdk_pixbuf_get_has_alpha (src);
-	width = gdk_pixbuf_get_width (src);
-	height = gdk_pixbuf_get_height (src);
-	dst_row_stride = gdk_pixbuf_get_rowstride (dest);
-	src_row_stride = gdk_pixbuf_get_rowstride (src);
-	target_pixels = gdk_pixbuf_get_pixels (dest);
-	original_pixels = gdk_pixbuf_get_pixels (src);
-
-	for (i = 0; i < height; i++) {
-		pixdest = target_pixels + i * dst_row_stride;
-		pixsrc = original_pixels + i * src_row_stride;
-		for (j = 0; j < width; j++) {		
-			*pixdest++ = nautilus_icon_canvas_lighten_pixbuf_component (*pixsrc++, lighten_value);
-			*pixdest++ = nautilus_icon_canvas_lighten_pixbuf_component (*pixsrc++, lighten_value);
-			*pixdest++ = nautilus_icon_canvas_lighten_pixbuf_component (*pixsrc++, lighten_value);
-			if (has_alpha) {
-				*pixdest++ = *pixsrc++;
-			}
-		}
-	}
-	return dest;
-}
-
-
-
-static GdkPixbuf *
-render_icon (GdkPixbuf *pixbuf, guint render_mode, guint saturation, guint brightness, guint lighten_value, guint color)
-{
- 	GdkPixbuf *temp_pixbuf, *old_pixbuf;
-
-	if (render_mode == 1) {
-	/* lighten icon */
-		temp_pixbuf = eel_create_spotlight_pixbuf (pixbuf);
-	}
-	else if (render_mode == 2) {
-	/* colorize icon */
-		temp_pixbuf = eel_create_colorized_pixbuf (pixbuf,
-				   EEL_RGBA_COLOR_GET_R (color),
-				   EEL_RGBA_COLOR_GET_G (color),
-				   EEL_RGBA_COLOR_GET_B (color));
-	} else if (render_mode == 3) {
-	/* monochromely colorize icon */
-		old_pixbuf = eel_create_darkened_pixbuf (pixbuf, 0, 255);		
-		temp_pixbuf = eel_create_colorized_pixbuf (old_pixbuf,
-				   EEL_RGBA_COLOR_GET_R (color),
-				   EEL_RGBA_COLOR_GET_G (color),
-				   EEL_RGBA_COLOR_GET_B (color));
-		g_object_unref (old_pixbuf);
-	} else {
-		temp_pixbuf = NULL;
-	}
-
-	if (saturation < 255 || brightness < 255 || temp_pixbuf == NULL) { // temp_pixbuf == NULL just for safer code (return copy)
-		old_pixbuf = temp_pixbuf;
-		temp_pixbuf = eel_create_darkened_pixbuf (temp_pixbuf ? temp_pixbuf : pixbuf, saturation, brightness);
-		if (old_pixbuf) {
-			g_object_unref (old_pixbuf);
-		}
-	}
-
-	if (lighten_value > 0) {
-		old_pixbuf = temp_pixbuf;
-  		temp_pixbuf = nautilus_icon_canvas_lighten_pixbuf (temp_pixbuf ? temp_pixbuf : pixbuf, lighten_value);
-		if (old_pixbuf) {
-			g_object_unref (old_pixbuf);
-		}
-	}
-
-	return temp_pixbuf;
-}
-
 /* shared code to highlight or dim the passed-in pixbuf */
 static GdkPixbuf *
 real_map_pixbuf (NautilusIconCanvasItem *icon_item)
@@ -1815,7 +1724,8 @@ real_map_pixbuf (NautilusIconCanvasItem *icon_item)
 
 	g_object_ref (temp_pixbuf);
 
-	if (icon_item->details->is_prelit) {
+	if (icon_item->details->is_prelit ||
+	    icon_item->details->is_highlighted_for_clipboard) {
 		old_pixbuf = temp_pixbuf;
 
 		gtk_widget_style_get (GTK_WIDGET (container),
@@ -1826,12 +1736,12 @@ real_map_pixbuf (NautilusIconCanvasItem *icon_item)
 			      NULL);
 
 		if (render_mode > 0 || saturation < 255 || brightness < 255) {
-			temp_pixbuf = render_icon (temp_pixbuf,
-				render_mode,
-				saturation,
-				brightness,
-				lighten,
-				container->details->prelight_icon_color_rgba);
+			temp_pixbuf = eel_gdk_pixbuf_render (temp_pixbuf,
+					render_mode,
+					saturation,
+					brightness,
+					lighten,
+					container->details->prelight_icon_color_rgba);
 			g_object_unref (old_pixbuf);
        	}
 
@@ -1864,8 +1774,8 @@ real_map_pixbuf (NautilusIconCanvasItem *icon_item)
 					(audio_pixbuf,
 					 temp_pixbuf,
 					 0, 0,
-					 gdk_pixbuf_get_width (temp_pixbuf),
-					 gdk_pixbuf_get_height(temp_pixbuf),
+					 gdk_pixbuf_get_width (audio_pixbuf),
+					 gdk_pixbuf_get_height (audio_pixbuf),
 					 0, 0,
 					 1.0, 1.0,
 					 GDK_INTERP_BILINEAR, 0xFF);
@@ -1907,7 +1817,7 @@ real_map_pixbuf (NautilusIconCanvasItem *icon_item)
 			      NULL);
 		if (render_mode > 0 || saturation < 255 || brightness < 255) {
 			/* if theme requests colorization */
-			temp_pixbuf = render_icon (temp_pixbuf,
+			temp_pixbuf = eel_gdk_pixbuf_render (temp_pixbuf,
 					    render_mode,
 					    saturation,
 					    brightness,
@@ -1928,6 +1838,7 @@ map_pixbuf (NautilusIconCanvasItem *icon_item)
 	      && icon_item->details->rendered_is_prelit == icon_item->details->is_prelit
 	      && icon_item->details->rendered_is_highlighted_for_selection == icon_item->details->is_highlighted_for_selection
 	      && icon_item->details->rendered_is_highlighted_for_drop == icon_item->details->is_highlighted_for_drop
+	      && icon_item->details->rendered_is_highlighted_for_clipboard == icon_item->details->is_highlighted_for_clipboard
 	      && (icon_item->details->is_highlighted_for_selection && icon_item->details->rendered_is_focused == gtk_widget_has_focus (GTK_WIDGET (EEL_CANVAS_ITEM (icon_item)->canvas))))) {
 		if (icon_item->details->rendered_pixbuf != NULL) {
 			g_object_unref (icon_item->details->rendered_pixbuf);
@@ -1937,6 +1848,7 @@ map_pixbuf (NautilusIconCanvasItem *icon_item)
 		icon_item->details->rendered_is_prelit = icon_item->details->is_prelit;
 		icon_item->details->rendered_is_highlighted_for_selection = icon_item->details->is_highlighted_for_selection;
 		icon_item->details->rendered_is_highlighted_for_drop = icon_item->details->is_highlighted_for_drop;
+	        icon_item->details->rendered_is_highlighted_for_clipboard = icon_item->details->is_highlighted_for_clipboard;
 		icon_item->details->rendered_is_focused = gtk_widget_has_focus (GTK_WIDGET (EEL_CANVAS_ITEM (icon_item)->canvas));
 	}
 
@@ -2179,7 +2091,7 @@ draw_label_layout (NautilusIconCanvasItem *item,
 		/* draw a drop shadow */
 		eel_gdk_draw_layout_with_drop_shadow (drawable, gc,
 						      label_color,
-						      &GTK_WIDGET (EEL_CANVAS_ITEM (item)->canvas)->style->black,
+						      &gtk_widget_get_style (GTK_WIDGET (EEL_CANVAS_ITEM (item)->canvas))->black,
 						      x, y,
 						      layout);
 	} else {
@@ -3625,7 +3537,15 @@ nautilus_icon_canvas_item_class_init (NautilusIconCanvasItemClass *class)
 		g_param_spec_boolean ("highlighted_for_drop",
 				      "highlighted for drop",
 				      "whether we are highlighted for a D&D drop",
-				      FALSE, G_PARAM_READWRITE)); 
+				      FALSE, G_PARAM_READWRITE));
+
+	g_object_class_install_property (
+		object_class,
+		PROP_HIGHLIGHTED_FOR_CLIPBOARD,
+		g_param_spec_boolean ("highlighted_for_clipboard",
+				      "highlighted for clipboard",
+				      "whether we are highlighted for a clipboard paste (after we have been cut)",
+ 				      FALSE, G_PARAM_READWRITE));
 
 	item_class->update = nautilus_icon_canvas_item_update;
 	item_class->draw = nautilus_icon_canvas_item_draw;

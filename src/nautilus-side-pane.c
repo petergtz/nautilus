@@ -128,7 +128,7 @@ nautilus_side_pane_size_allocate (GtkWidget *widget,
 				  GtkAllocation *allocation)
 {
 	int width;
-	GtkAllocation child_allocation;
+	GtkAllocation child_allocation, frame_allocation;
 	NautilusSidePane *pane;
 	GtkWidget *frame;
 	GtkWidget *hbox;
@@ -143,8 +143,9 @@ nautilus_side_pane_size_allocate (GtkWidget *widget,
 	gtk_widget_get_child_requisition (hbox, &child_requisition);
 	width = child_requisition.width;
 
-	child_allocation = frame->allocation;
-	child_allocation.width = MAX (width, frame->allocation.width);
+	gtk_widget_get_allocation (frame, &frame_allocation);
+	child_allocation = frame_allocation;
+	child_allocation.width = MAX (width, frame_allocation.width);
 
 	gtk_widget_size_allocate (frame, &child_allocation);
 }
@@ -208,16 +209,18 @@ menu_position_under (GtkMenu *menu,
 		     gpointer user_data)
 {
 	GtkWidget *widget;
+	GtkAllocation allocation;
 	
 	g_return_if_fail (GTK_IS_BUTTON (user_data));
 	g_return_if_fail (!gtk_widget_get_has_window (GTK_WIDGET (user_data)));
 
 	widget = GTK_WIDGET (user_data);
 	
-	gdk_window_get_origin (widget->window, x, y);
+	gdk_window_get_origin (gtk_widget_get_window (widget), x, y);
+	gtk_widget_get_allocation (widget, &allocation);
 	
-	*x += widget->allocation.x;
-	*y += widget->allocation.y + widget->allocation.height;
+	*x += allocation.x;
+	*y += allocation.y + allocation.height;
 
 	*push_in = FALSE;
 }
@@ -232,6 +235,17 @@ select_button_press_callback (GtkWidget *widget,
 	side_pane = NAUTILUS_SIDE_PANE (user_data);
 
 	if ((event->type == GDK_BUTTON_PRESS) && event->button == 1) {
+                GtkRequisition requisition;
+                GtkAllocation allocation;
+                gint width;
+
+                gtk_widget_get_allocation (widget, &allocation);
+                width = allocation.width;
+                gtk_widget_set_size_request (side_pane->details->menu, -1, -1);
+                gtk_widget_size_request (side_pane->details->menu, &requisition);
+                gtk_widget_set_size_request (side_pane->details->menu,
+                                             MAX (width, requisition.width), -1);
+
 		gtk_widget_grab_focus (widget);
 		
 		gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (widget), TRUE);
@@ -359,7 +373,7 @@ nautilus_side_pane_init (GObject *object)
 	gtk_box_pack_end (GTK_BOX (select_hbox), arrow, FALSE, FALSE, 0);
 	
 	gtk_container_add (GTK_CONTAINER (select_button), select_hbox);
-	gtk_box_pack_start (GTK_BOX (hbox), select_button, FALSE, FALSE, 0);
+	gtk_box_pack_start (GTK_BOX (hbox), select_button, TRUE, TRUE, 0);
 
 	close_button = gtk_button_new ();
 	gtk_button_set_relief (GTK_BUTTON (close_button), GTK_RELIEF_NONE);

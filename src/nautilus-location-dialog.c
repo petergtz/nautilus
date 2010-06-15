@@ -168,7 +168,7 @@ nautilus_location_dialog_init (NautilusLocationDialog *dialog)
 	gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 	gtk_dialog_set_has_separator (GTK_DIALOG (dialog), FALSE);
 	gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
-	gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->vbox), 2);
+	gtk_box_set_spacing (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), 2);
 	
 	box = gtk_hbox_new (FALSE, 12);
 	gtk_container_set_border_width (GTK_CONTAINER (box), 5);
@@ -180,10 +180,10 @@ nautilus_location_dialog_init (NautilusLocationDialog *dialog)
 	
 	dialog->details->entry = nautilus_location_entry_new ();
         gtk_entry_set_width_chars (GTK_ENTRY (dialog->details->entry), 30);
-	g_signal_connect (dialog->details->entry,
-			  "activate", 
-			  G_CALLBACK (entry_activate_callback),
-			  dialog);
+	g_signal_connect_after (dialog->details->entry,
+				"activate",
+				G_CALLBACK (entry_activate_callback),
+				dialog);
 	
 	gtk_widget_show (dialog->details->entry);
 	
@@ -192,7 +192,7 @@ nautilus_location_dialog_init (NautilusLocationDialog *dialog)
 	gtk_box_pack_start (GTK_BOX (box), dialog->details->entry, 
 			    TRUE, TRUE, 0);
 	
-	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox),
+	gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))),
 			    box, FALSE, TRUE, 0);
 
 	gtk_dialog_add_button (GTK_DIALOG (dialog),
@@ -219,17 +219,19 @@ GtkWidget *
 nautilus_location_dialog_new (NautilusWindow *window)
 {
 	NautilusWindowSlot *slot;
+	NautilusLocationDialog *loc_dialog;
 	GtkWidget *dialog;
 	GFile *location;
 	char *formatted_location;
 	
 	dialog = gtk_widget_new (NAUTILUS_TYPE_LOCATION_DIALOG, NULL);
+	loc_dialog = NAUTILUS_LOCATION_DIALOG (dialog);
 
 	if (window) {
 		gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (window));
 		gtk_window_set_screen (GTK_WINDOW (dialog),
 				       gtk_window_get_screen (GTK_WINDOW (window)));
-		NAUTILUS_LOCATION_DIALOG (dialog)->details->window = window;
+		loc_dialog->details->window = window;
 	}
 
 	slot = window->details->active_pane->active_slot;
@@ -241,13 +243,12 @@ nautilus_location_dialog_new (NautilusWindow *window)
 		} else {
 			formatted_location = g_file_get_parse_name (location);
 		}
-		nautilus_entry_set_text (NAUTILUS_ENTRY (NAUTILUS_LOCATION_DIALOG (dialog)->details->entry), formatted_location);
-		gtk_editable_select_region (GTK_EDITABLE (NAUTILUS_LOCATION_DIALOG (dialog)->details->entry), 0, -1);
-		gtk_editable_set_position (GTK_EDITABLE (NAUTILUS_LOCATION_DIALOG (dialog)->details->entry), -1);
+		nautilus_location_entry_update_current_location (NAUTILUS_LOCATION_ENTRY (loc_dialog->details->entry),
+								 formatted_location);
 		g_free (formatted_location);
 	}
 	
-	gtk_widget_grab_focus (NAUTILUS_LOCATION_DIALOG (dialog)->details->entry);
+	gtk_widget_grab_focus (loc_dialog->details->entry);
 
 	return dialog;
 }
@@ -256,7 +257,6 @@ void
 nautilus_location_dialog_set_location (NautilusLocationDialog *dialog,
 				       const char *location)
 {
-	nautilus_entry_set_text (NAUTILUS_ENTRY (NAUTILUS_LOCATION_DIALOG (dialog)->details->entry), location);
-	gtk_editable_select_region (GTK_EDITABLE (NAUTILUS_LOCATION_DIALOG (dialog)->details->entry), 0, 0);
-	gtk_editable_set_position (GTK_EDITABLE (NAUTILUS_LOCATION_DIALOG (dialog)->details->entry), -1);
+	nautilus_location_entry_update_current_location (NAUTILUS_LOCATION_ENTRY (dialog->details->entry),
+							 location);
 }

@@ -383,10 +383,10 @@ update_cursor (NautilusWindow *window)
 
 	if (slot->allow_stop) {
 		cursor = gdk_cursor_new (GDK_WATCH);
-		gdk_window_set_cursor (GTK_WIDGET (window)->window, cursor);
+		gdk_window_set_cursor (gtk_widget_get_window (GTK_WIDGET (window)), cursor);
 		gdk_cursor_unref (cursor);
 	} else {
-		gdk_window_set_cursor (GTK_WIDGET (window)->window, NULL);
+		gdk_window_set_cursor (gtk_widget_get_window (GTK_WIDGET (window)), NULL);
 	}
 }
 
@@ -565,11 +565,14 @@ nautilus_window_set_initial_window_geometry (NautilusWindow *window)
 				          max_height_for_screen));
 }
 
-void
-nautilus_window_constructed (NautilusWindow *window)
+static void
+nautilus_window_constructed (GObject *self)
 {
-	g_return_if_fail (NAUTILUS_IS_WINDOW (window));
+	NautilusWindow *window;
 
+	window = NAUTILUS_WINDOW (self);
+
+	nautilus_window_initialize_bookmarks_menu (window);
 	nautilus_window_set_initial_window_geometry (window);
 	nautilus_undo_manager_attach (window->application->undo_manager, G_OBJECT (window));
 }
@@ -642,10 +645,12 @@ nautilus_window_finalize (GObject *object)
 
 	window = NAUTILUS_WINDOW (object);
 
-	nautilus_window_remove_bookmarks_menu_callback (window);
 	nautilus_window_remove_trash_monitor_callback (window);
-
 	free_stored_viewers (window);
+
+	if (window->details->bookmark_list != NULL) {
+		g_object_unref (window->details->bookmark_list);
+	}
 
 	/* nautilus_window_close() should have run */
 	g_assert (window->details->panes == NULL);
@@ -1714,7 +1719,7 @@ nautilus_remove_from_history_list_no_notify (GFile *location)
 {
 	NautilusBookmark *bookmark;
 
-	bookmark = nautilus_bookmark_new (location, "");
+	bookmark = nautilus_bookmark_new (location, "", FALSE, NULL);
 	remove_from_history_list (bookmark);
 	g_object_unref (bookmark);
 }
@@ -1728,7 +1733,7 @@ nautilus_add_to_history_list_no_notify (GFile *location,
 	NautilusBookmark *bookmark;
 	gboolean ret;
 
-	bookmark = nautilus_bookmark_new_with_icon (location, name, has_custom_name, icon);
+	bookmark = nautilus_bookmark_new (location, name, has_custom_name, icon);
 	ret = nautilus_add_bookmark_to_history_list (bookmark);
 	g_object_unref (bookmark);
 
@@ -1903,12 +1908,6 @@ nautilus_window_set_initiated_unmount (NautilusWindowInfo *window,
 	window->details->initiated_unmount = initiated_unmount;
 }
 
-static NautilusBookmarkList *
-nautilus_window_get_bookmark_list (NautilusWindowInfo *window)
-{
-  return nautilus_get_bookmark_list ();
-}
-
 static char *
 nautilus_window_get_cached_title (NautilusWindow *window)
 {
@@ -1987,7 +1986,6 @@ nautilus_window_info_iface_init (NautilusWindowInfoIface *iface)
 	iface->get_window_type = nautilus_window_get_window_type;
 	iface->get_title = nautilus_window_get_cached_title;
 	iface->get_history = nautilus_window_get_history;
-	iface->get_bookmark_list = nautilus_window_get_bookmark_list;
 	iface->get_current_location = nautilus_window_get_location_uri;
 	iface->get_ui_manager = nautilus_window_get_ui_manager;
 	iface->get_selection_count = nautilus_window_get_selection_count;
@@ -2007,6 +2005,7 @@ nautilus_window_class_init (NautilusWindowClass *class)
 
 	G_OBJECT_CLASS (class)->finalize = nautilus_window_finalize;
 	G_OBJECT_CLASS (class)->constructor = nautilus_window_constructor;
+	G_OBJECT_CLASS (class)->constructed = nautilus_window_constructed;
 	G_OBJECT_CLASS (class)->get_property = nautilus_window_get_property;
 	G_OBJECT_CLASS (class)->set_property = nautilus_window_set_property;
 	GTK_OBJECT_CLASS (class)->destroy = nautilus_window_destroy;

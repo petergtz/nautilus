@@ -56,11 +56,11 @@
 #include "nautilus-window-private.h"
 #include "nautilus-window-manage-views.h"
 #include <unistd.h>
+#include <errno.h>
 #include <libxml/xmlsave.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
-#include <dbus/dbus-glib.h>
 #include <eel/eel-gtk-extensions.h>
 #include <eel/eel-gtk-macros.h>
 #include <eel/eel-stock-dialogs.h>
@@ -127,10 +127,6 @@ static void     drive_listen_for_eject_button      (GDrive *drive,
 						    NautilusApplication *application);
 static void     nautilus_application_load_session     (NautilusApplication *application); 
 static char *   nautilus_application_get_session_data (void);
-static void     ck_session_active_changed_cb (DBusGProxy *proxy,
-		                              gboolean is_active,
-                		              void *user_data);
-
 
 G_DEFINE_TYPE (NautilusApplication, nautilus_application, G_TYPE_OBJECT);
 
@@ -360,11 +356,9 @@ nautilus_application_finalize (GObject *object)
 		application->automount_idle_id = 0;
 	}
 
-	if (application->ck_session_proxy != NULL) {
-		dbus_g_proxy_disconnect_signal (application->ck_session_proxy, "ActiveChanged",
-						G_CALLBACK (ck_session_active_changed_cb), NULL);
-		g_object_unref (application->ck_session_proxy);
-		application->ck_session_proxy = NULL;
+	if (application->ck_watch_id != 0) {
+		g_bus_unwatch_proxy (application->ck_watch_id);
+		application->ck_watch_id = 0;
 	}
 
         G_OBJECT_CLASS (nautilus_application_parent_class)->finalize (object);
@@ -532,106 +526,152 @@ mark_desktop_files_trusted (void)
 	g_free (do_once_file);
 }
 
-#define CK_NAME "org.freedesktop.ConsoleKit"
-#define CK_PATH "/org/freedesktop/ConsoleKit"
+#define CK_NAME       "org.freedesktop.ConsoleKit"
+#define CK_PATH       "/org/freedesktop/ConsoleKit"
+#define CK_INTERFACE  "org.freedesktop.ConsoleKit"
 
 static void
-ck_session_active_changed_cb (DBusGProxy *proxy,
-			      gboolean is_active,
-			      void *user_data)
+ck_session_proxy_signal_cb (GDBusProxy *proxy,
+			    const char *sender_name,
+			    const char *signal_name,
+			    GVariant   *parameters,
+			    gpointer    user_data)
 {
 	NautilusApplication *application = user_data;
 
-	application->session_is_active = is_active;
+	if (g_strcmp0 (signal_name, "ActiveChanged") == 0) {
+		g_variant_get (parameters, "(b)", &application->session_is_active);
+	}
 }
 
 static void
-ck_call_is_active_cb (DBusGProxy *proxy,
-		      DBusGProxyCall *call_id,
-		      void *user_data)
+ck_call_is_active_cb (GDBusProxy   *proxy,
+		      GAsyncResult *result,
+		      gpointer      user_data)
 {
-	gboolean res, is_active;
-	NautilusApplication *application;
+	NautilusApplication *application = user_data;
+	GVariant *variant;
+	GError *error = NULL;
 
-	application = user_data;
+	variant = g_dbus_proxy_call_finish (proxy, result, &error);
 
-	res = dbus_g_proxy_end_call (proxy, call_id, NULL,
-				     G_TYPE_BOOLEAN, &is_active,
-				     G_TYPE_INVALID);
-	if (!res) {
-		g_object_unref (proxy);
+	if (variant == NULL) {
+		g_warning ("Error when calling IsActive(): %s\n", error->message);
+		application->session_is_active = TRUE;
+
+		g_error_free (error);
+		return;
+	}
+
+	g_variant_get (variant, "(b)", &application->session_is_active);
+
+	g_variant_unref (variant);
+}
+
+static void
+session_proxy_vanished (GDBusConnection *connection,
+                        const gchar *name,
+                        gpointer user_data)
+{
+	NautilusApplication *application = user_data;
+
+	application->session_is_active = TRUE;
+}
+
+static void
+session_proxy_appeared (GDBusConnection *connection,
+                        const gchar *name,
+                        const gchar *name_owner,
+                        GDBusProxy *proxy,
+                        gpointer user_data)
+{
+	NautilusApplication *application = user_data;
+
+	g_signal_connect (proxy, "g-signal",
+			  G_CALLBACK (ck_session_proxy_signal_cb),
+			  application);
+
+	g_dbus_proxy_call (proxy,
+			   "IsActive",
+			   g_variant_new ("()"),
+			   G_DBUS_CALL_FLAGS_NONE,
+			   -1,
+			   NULL,
+			   (GAsyncReadyCallback) ck_call_is_active_cb,
+			   application);	
+}
+
+static void
+ck_get_current_session_cb (GDBusConnection *connection,
+			   GAsyncResult    *result,
+			   gpointer         user_data)
+{
+	NautilusApplication *application = user_data;
+	GVariant *variant;
+	const char *session_path = NULL;
+	GError *error = NULL;
+
+	variant = g_dbus_connection_call_finish (connection, result, &error);
+
+	if (variant == NULL) {
+		g_warning ("Failed to get the current CK session: %s", error->message);
+		g_error_free (error);
 
 		application->session_is_active = TRUE;
 		return;
 	}
 
-	application->session_is_active = is_active;
+	g_variant_get (variant, "(&o)", &session_path);
 
-	dbus_g_proxy_add_signal (proxy, "ActiveChanged", G_TYPE_BOOLEAN, G_TYPE_INVALID);
-	dbus_g_proxy_connect_signal (proxy, "ActiveChanged",
-				     G_CALLBACK (ck_session_active_changed_cb), application,
-				     NULL);
+	application->ck_watch_id = g_bus_watch_proxy (G_BUS_TYPE_SYSTEM,
+						      CK_NAME,
+						      0, session_path,
+						      CK_INTERFACE ".Session",
+						      G_TYPE_DBUS_PROXY,
+						      G_DBUS_PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES,
+						      session_proxy_appeared,
+						      session_proxy_vanished,
+						      application,
+						      NULL);
+
+	g_variant_unref (variant);
 }
-
-static void
-ck_get_current_session_cb (DBusGProxy *proxy,
-			   DBusGProxyCall *call_id,
-			   void *user_data)
-{
-	gboolean res;
-	char *session_id;
-	NautilusApplication *application;
-
-	application = user_data;
-
-	res = dbus_g_proxy_end_call (proxy, call_id, NULL,
-				     DBUS_TYPE_G_OBJECT_PATH, &session_id, G_TYPE_INVALID);
-	if (!res) {
-		g_object_unref (proxy);
-
-		application->session_is_active = TRUE;
-		return;
-	}
-
-	application->ck_session_proxy = dbus_g_proxy_new_from_proxy (proxy, CK_NAME ".Session",
-								     session_id);
-	dbus_g_proxy_begin_call (application->ck_session_proxy, "IsActive", ck_call_is_active_cb,
-				 application, NULL, G_TYPE_INVALID);
-
-	g_free (session_id);
-	g_object_unref (proxy);
-}
-
 
 static void
 do_initialize_consolekit (NautilusApplication *application)
 {
-	DBusGConnection *conn;
-	DBusGProxy *proxy;
-	GError *error = NULL;
+	GDBusConnection *connection;
 
-	conn = dbus_g_bus_get (DBUS_BUS_SYSTEM, &error);
-	if (error) {
-		g_error_free (error);
+	connection = g_bus_get_sync (G_BUS_TYPE_SYSTEM, NULL, NULL);
 
+	if (connection == NULL) {
 		application->session_is_active = TRUE;
-
 		return;
 	}
 
-	proxy = dbus_g_proxy_new_for_name (conn, CK_NAME, CK_PATH "/Manager",
- 					   CK_NAME ".Manager");
-	dbus_g_proxy_begin_call (proxy, "GetCurrentSession",
-				 ck_get_current_session_cb, application,
-				 NULL, G_TYPE_INVALID);
+	g_dbus_connection_call (connection,
+				CK_NAME,
+				CK_PATH "/Manager",
+				CK_INTERFACE ".Manager",
+				"GetCurrentSession",
+				g_variant_new ("()"),
+				G_VARIANT_TYPE ("(o)"),
+				G_DBUS_CALL_FLAGS_NONE,
+				-1,
+				NULL,
+				(GAsyncReadyCallback) ck_get_current_session_cb,
+				application);
+
+	g_object_unref (connection);
 }
 
 static void
 do_upgrades_once (NautilusApplication *application,
 		  gboolean no_desktop)
 {
-	char *metafile_dir, *updated;
-	int fd;
+	char *metafile_dir, *updated, *nautilus_dir, *xdg_dir;
+	const gchar *message;
+	int fd, res;
 
 	if (!no_desktop) {
 		mark_desktop_files_trusted ();
@@ -651,6 +691,35 @@ do_upgrades_once (NautilusApplication *application,
 		g_free (updated);
 	}
 	g_free (metafile_dir);
+
+	nautilus_dir = g_build_filename (g_get_home_dir (),
+					 ".nautilus", NULL);
+	xdg_dir = nautilus_get_user_directory ();
+	if (g_file_test (nautilus_dir, G_FILE_TEST_IS_DIR)) {
+		/* test if we already attempted to migrate first */
+		updated = g_build_filename (nautilus_dir, "DEPRECATED-DIRECTORY", NULL);
+		message = _("Nautilus 2.32 deprecated this directory and tried migrating "
+			    "this configuration to ~/.config/nautilus");
+		if (!g_file_test (updated, G_FILE_TEST_EXISTS)) {
+			/* rename() works fine if the destination directory is
+			 * empty.
+			 */
+			res = g_rename (nautilus_dir, xdg_dir);
+
+			if (res == -1) {
+				fd = g_creat (updated, 0600);
+				if (fd != -1) {
+					res = write (fd, message, strlen (message));
+					close (fd);
+				}
+			}
+		}
+
+		g_free (updated);
+	}
+
+	g_free (nautilus_dir);
+	g_free (xdg_dir);
 }
 
 static void
@@ -1010,7 +1079,7 @@ get_desktop_manager_selection (GdkDisplay *display, int screen)
 	if (gtk_selection_owner_set_for_display (display,
 						 selection_widget,
 						 selection_atom,
-						 gdk_x11_get_server_time (selection_widget->window))) {
+						 gdk_x11_get_server_time (gtk_widget_get_window (selection_widget)))) {
 		
 		g_signal_connect (selection_widget, "selection_get",
 				  G_CALLBACK (selection_get_cb), NULL);
@@ -1269,8 +1338,6 @@ create_window (NautilusApplication *application,
 						  "app", application,
 						  "screen", screen,
 						  NULL));
-	/* Must be called after construction finished */
-	nautilus_window_constructed (window);
 
 	if (startup_id) {
 		gtk_window_set_startup_id (GTK_WINDOW (window), startup_id);
@@ -1826,22 +1893,26 @@ nautilus_application_get_session_data (void)
 		xmlNewProp (win_node, "type", NAUTILUS_IS_NAVIGATION_WINDOW (window) ? "navigation" : "spatial");
 
 		if (NAUTILUS_IS_NAVIGATION_WINDOW (window)) { /* spatial windows store their state as file metadata */
+			GdkWindow *gdk_window;
+
 			tmp = eel_gtk_window_get_geometry_string (GTK_WINDOW (window));
 			xmlNewProp (win_node, "geometry", tmp);
 			g_free (tmp);
 
-			if (GTK_WIDGET (window)->window &&
-			    gdk_window_get_state (GTK_WIDGET (window)->window) & GDK_WINDOW_STATE_MAXIMIZED) {
+			gdk_window = gtk_widget_get_window (GTK_WIDGET (window));
+
+			if (gdk_window &&
+			    gdk_window_get_state (gdk_window) & GDK_WINDOW_STATE_MAXIMIZED) {
 				xmlNewProp (win_node, "maximized", "TRUE");
 			}
 
-			if (GTK_WIDGET (window)->window &&
-			    gdk_window_get_state (GTK_WIDGET (window)->window) & GDK_WINDOW_STATE_STICKY) {
+			if (gdk_window &&
+			    gdk_window_get_state (gdk_window) & GDK_WINDOW_STATE_STICKY) {
 				xmlNewProp (win_node, "sticky", "TRUE");
 			}
 
-			if (GTK_WIDGET (window)->window &&
-			    gdk_window_get_state (GTK_WIDGET (window)->window) & GDK_WINDOW_STATE_ABOVE) {
+			if (gdk_window &&
+			    gdk_window_get_state (gdk_window) & GDK_WINDOW_STATE_ABOVE) {
 				xmlNewProp (win_node, "keep-above", "TRUE");
 			}
 		}

@@ -29,6 +29,7 @@
 #include "nautilus-open-with-dialog.h"
 #include "nautilus-signaller.h"
 
+#include <eel/eel-glib-extensions.h>
 #include <eel/eel-stock-dialogs.h>
 
 #include <string.h>
@@ -213,8 +214,9 @@ add_or_find_application (NautilusOpenWithDialog *dialog)
 	char *app_name;
 	const char *commandline;
 	GError *error;
-	gboolean success;
+	gboolean success, should_set_default;
 	char *message;
+	GList *applications;
 
 	error = NULL;
 	app = NULL;
@@ -242,33 +244,46 @@ add_or_find_application (NautilusOpenWithDialog *dialog)
 		return NULL;
 	}
 
+	should_set_default = (dialog->details->add_mode) ||
+		(!dialog->details->add_mode &&
+		 gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->details->checkbox)));
+	success = TRUE;
 
-	if (dialog->details->add_mode || 
-			(!dialog->details->add_mode &&
-			gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->details->checkbox)))) {
+	if (should_set_default) {
 		if (dialog->details->content_type) {
-			success = g_app_info_add_supports_type (app,
-								dialog->details->content_type,
-								&error);
+			success = g_app_info_set_as_default_for_type (app,
+								      dialog->details->content_type,
+								      &error);
 		} else {
 			success = g_app_info_set_as_default_for_extension (app,
 									   dialog->details->extension,
 									   &error);
 		}
-	
-		if (!success) {
-			message = g_strdup_printf (_("Could not set application as the default: %s"), error->message);
-			eel_show_error_dialog (_("Could not set as default application"),
-					       message,
-					       GTK_WINDOW (dialog));
-			g_free (message);
-			g_error_free (error);
+	} else {
+		applications = g_app_info_get_all_for_type (dialog->details->content_type);
+		if (dialog->details->content_type && applications != NULL) {
+			/* we don't care about reporting errors here */
+			g_app_info_add_supports_type (app,
+						      dialog->details->content_type,
+						      NULL);
 		}
 
-		g_signal_emit_by_name (nautilus_signaller_get_current (),
-				       "mime_data_changed");
+		if (applications != NULL) {
+			eel_g_object_list_free (applications);
+		}
 	}
 
+	if (!success && should_set_default) {
+		message = g_strdup_printf (_("Could not set application as the default: %s"), error->message);
+		eel_show_error_dialog (_("Could not set as default application"),
+				       message,
+				       GTK_WINDOW (dialog));
+		g_free (message);
+		g_error_free (error);
+	}
+
+	g_signal_emit_by_name (nautilus_signaller_get_current (),
+			       "mime_data_changed");
 	return app;
 }
 
@@ -604,7 +619,6 @@ nautilus_open_with_dialog_add_items_idle (NautilusOpenWithDialog *dialog)
 	GtkTreeModel      *sort;
 	GList             *all_applications;
 	GList             *l;
-	const char        *prev_name;
 
 	/* create list store */
 	dialog->details->program_list_store = gtk_list_store_new (NUM_COLUMNS,
@@ -617,7 +631,6 @@ nautilus_open_with_dialog_add_items_idle (NautilusOpenWithDialog *dialog)
 	sort = gtk_tree_model_sort_new_with_model (GTK_TREE_MODEL (dialog->details->program_list_store));
 	all_applications = g_app_info_get_all ();
 	
-	prev_name = NULL;
 	for (l = all_applications; l; l = l->next) {
 		GAppInfo *app = l->data;
 		GtkTreeIter     iter;
@@ -632,7 +645,7 @@ nautilus_open_with_dialog_add_items_idle (NautilusOpenWithDialog *dialog)
 				    COLUMN_APP_INFO,  app,
 				    COLUMN_ICON,      NULL,
 				    COLUMN_GICON,     g_app_info_get_icon (app),
-				    COLUMN_NAME,      g_app_info_get_name (app),
+				    COLUMN_NAME,      g_app_info_get_display_name (app),
 				    COLUMN_COMMENT,   g_app_info_get_description (app),
 				    COLUMN_EXEC,      g_app_info_get_executable,
 				    -1);
@@ -770,7 +783,7 @@ nautilus_open_with_dialog_init (NautilusOpenWithDialog *dialog)
 	gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 	gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
-	gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->vbox), 2);
+	gtk_box_set_spacing (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), 2);
 
 	vbox = gtk_vbox_new (FALSE, 12);
 	gtk_container_set_border_width (GTK_CONTAINER (vbox), 5);
@@ -822,7 +835,7 @@ nautilus_open_with_dialog_init (NautilusOpenWithDialog *dialog)
 						      dialog, NULL);
 
 	
-	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), vbox, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), vbox, TRUE, TRUE, 0);
 	gtk_widget_show_all (vbox);
 
 
@@ -890,7 +903,7 @@ nautilus_open_with_dialog_init (NautilusOpenWithDialog *dialog)
 	gtk_widget_show (align);
 
 	gtk_widget_show (dialog->details->button);
-	GTK_WIDGET_SET_FLAGS (dialog->details->button, GTK_CAN_DEFAULT);
+	gtk_widget_set_can_default (dialog->details->button, TRUE);
 
 
 	gtk_container_add (GTK_CONTAINER (align), hbox);

@@ -202,6 +202,35 @@
     </schema>
     
     <schema>
+      <key>/schemas/apps/nautilus/preferences/navigation_window_saved_geometry</key>
+      <applyto>/apps/nautilus/preferences/navigation_window_saved_geometry</applyto>
+      <owner>nautilus</owner>
+      <type>string</type>
+      <default></default>
+      <locale name="C">
+         <short>The geometry string for a navigation window.</short>
+         <long>
+           A string containing the saved geometry and coordinates string for
+           navigation windows.
+         </long>
+      </locale>
+    </schema>
+    
+    <schema>
+      <key>/schemas/apps/nautilus/preferences/navigation_window_saved_maximized</key>
+      <applyto>/apps/nautilus/preferences/navigation_window_saved_maximized</applyto>
+      <owner>nautilus</owner>
+      <type>boolean</type>
+      <default></default>
+      <locale name="C">
+         <short>Whether the navigation window should be maximized.</short>
+         <long>
+           Whether the navigation window should be maximized by default.
+         </long>
+      </locale>
+    </schema>
+
+    <schema>
       <key>/schemas/apps/nautilus/preferences/confirm_trash</key>
       <applyto>/apps/nautilus/preferences/confirm_trash</applyto>
       <owner>nautilus</owner>
@@ -756,14 +785,14 @@ most cases, this should be left alone. -->Sans 10</default>
       <applyto>/apps/nautilus/icon_view/thumbnail_size</applyto>
       <owner>nautilus</owner>
       <type>int</type>
-      <default>96</default>
+      <default>64</default>
       <locale name="C">
          <short>Default Thumbnail Icon Size</short>
          <long>
              The default size of an icon for a thumbnail in the icon view.
          </long>
       </locale>
-    </schema>    
+    </schema>
 
     <schema>
       <key>/schemas/apps/nautilus/icon_view/text_ellipsis_limit</key>

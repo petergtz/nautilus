@@ -1,3 +1,5 @@
+CLEANFILES = $(NULL)
+
 include $(top_srcdir)/Makefile.shared
 
 lib_LTLIBRARIES=libnautilus-extension.la
@@ -6,6 +8,7 @@ INCLUDES=\
 	-I$(top_srcdir) \
 	-I$(top_builddir) \
 	$(LIBNAUTILUS_EXTENSION_CFLAGS) \
+	$(WARNING_CFLAGS) \
 	$(DISABLE_DEPRECATED_CFLAGS) \
 	-DDATADIR=\""$(datadir)"\" \
 	$(NULL)
@@ -55,3 +58,31 @@ pkgconfig_DATA=libnautilus-extension.pc
 EXTRA_DIST = \
 	libnautilus-extension.pc.in \
 	$(NULL)
+
+-include $(INTROSPECTION_MAKEFILE)
+INTROSPECTION_GIRS =
+INTROSPECTION_SCANNER_ARGS = --add-include-path=$(srcdir)
+INTROSPECTION_COMPILER_ARGS = --includedir=$(srcdir)
+
+if HAVE_INTROSPECTION
+introspection_files =					\
+	$(libnautilus_extension_include_HEADERS)	\
+	$(libnautilus_extension_la_SOURCES)
+Nautilus-2.0.gir: libnautilus-extension.la Makefile
+Nautilus_2_0_gir_INCLUDES = Gtk-2.0 Gio-2.0 GLib-2.0
+Nautilus_2_0_gir_CFLAGS = \
+	-I$(top_srcdir) \
+	-I$(top_builddir) \
+	$(LIBNAUTILUS_EXTENSION_CFLAGS)
+Nautilus_2_0_gir_LIBS = libnautilus-extension.la
+Nautilus_2_0_gir_FILES = $(addprefix $(srcdir)/, $(introspection_files))
+INTROSPECTION_GIRS += Nautilus-2.0.gir
+
+girdir = $(datadir)/gir-1.0/
+gir_DATA = $(INTROSPECTION_GIRS)
+
+typelibsdir = $(libdir)/girepository-1.0/
+typelibs_DATA = $(INTROSPECTION_GIRS:.gir=.typelib)
+
+CLEANFILES += $(gir_DATA) $(typelibs_DATA)
+endif

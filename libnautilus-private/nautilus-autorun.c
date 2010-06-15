@@ -564,7 +564,7 @@ nautilus_autorun_prepare_combo_box (GtkWidget *combo_box,
 			pixbuf = nautilus_icon_info_get_pixbuf_at_size (icon_info, icon_size);
 			g_object_unref (icon_info);
 			
-			open_string = g_strdup_printf (_("Open %s"), g_app_info_get_name (app_info));
+			open_string = g_strdup_printf (_("Open %s"), g_app_info_get_display_name (app_info));
 
 			gtk_list_store_append (list_store, &iter);
 			gtk_list_store_set (list_store, &iter, 
@@ -911,7 +911,7 @@ show_dialog:
 
 	gtk_dialog_set_has_separator (GTK_DIALOG (dialog), FALSE);
 	hbox = gtk_hbox_new (FALSE, 12);
-	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), hbox, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), hbox, TRUE, TRUE, 0);
 	gtk_container_set_border_width (GTK_CONTAINER (hbox), 12);
 
 	icon = g_mount_get_icon (mount);
@@ -1030,7 +1030,7 @@ show_dialog:
 		data->should_eject = FALSE;
 	}
 	gtk_dialog_add_action_widget (GTK_DIALOG (dialog), eject_button, AUTORUN_DIALOG_RESPONSE_EJECT);
-	gtk_button_box_set_child_secondary (GTK_BUTTON_BOX (GTK_DIALOG (dialog)->action_area), eject_button, TRUE);
+	gtk_button_box_set_child_secondary (GTK_BUTTON_BOX (gtk_dialog_get_action_area (GTK_DIALOG (dialog))), eject_button, TRUE);
 
 	/* show the dialog */
 	gtk_widget_show_all (dialog);

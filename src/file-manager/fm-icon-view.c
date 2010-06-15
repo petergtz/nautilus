@@ -42,6 +42,7 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
+#include <libnautilus-private/nautilus-clipboard-monitor.h>
 #include <libnautilus-private/nautilus-directory-background.h>
 #include <libnautilus-private/nautilus-directory.h>
 #include <libnautilus-private/nautilus-dnd.h>
@@ -108,6 +109,8 @@ struct FMIconViewDetails
 	int num_screens;
 
 	gboolean compact;
+
+	gulong clipboard_handler_id;
 };
 
 
@@ -150,6 +153,13 @@ static const SortCriterion sort_criteria[] = {
 		"Sort by Emblems",
 		N_("by _Emblems"),
 		N_("Keep icons sorted by emblems in rows")
+	},
+	{
+		NAUTILUS_FILE_SORT_BY_TRASHED_TIME,
+		"trashed",
+		"Sort by Trash Time",
+		N_("by T_rash Time"),
+		N_("Keep icons sorted by trash time in rows")
 	}
 };
 
@@ -178,6 +188,8 @@ static void                 preview_audio                             (FMIconVie
 								       NautilusFile         *file,
 								       gboolean              start_flag);
 static void                 update_layout_menus                       (FMIconView           *view);
+static NautilusFileSortType get_default_sort_order                    (NautilusFile         *file,
+								       gboolean             *reversed);
 
 
 static void fm_icon_view_iface_init (NautilusViewIface *iface);
@@ -197,6 +209,12 @@ fm_icon_view_destroy (GtkObject *object)
                 g_source_remove (icon_view->details->react_to_icon_change_idle_id);
 		icon_view->details->react_to_icon_change_idle_id = 0;
         }
+
+	if (icon_view->details->clipboard_handler_id != 0) {
+		g_signal_handler_disconnect (nautilus_clipboard_monitor_get (),
+					     icon_view->details->clipboard_handler_id);
+		icon_view->details->clipboard_handler_id = 0;
+	}
 
 	/* kill any sound preview process that is ongoing */
 	preview_audio (icon_view, NULL, FALSE);
@@ -225,7 +243,7 @@ fm_icon_view_finalize (GObject *object)
 static NautilusIconContainer *
 get_icon_container (FMIconView *icon_view)
 {
-	return NAUTILUS_ICON_CONTAINER (GTK_BIN (icon_view)->child);
+	return NAUTILUS_ICON_CONTAINER (gtk_bin_get_child (GTK_BIN (icon_view)));
 }
 
 static gboolean
@@ -270,27 +288,51 @@ get_stored_icon_position_callback (NautilusIconContainer *container,
 	return position_good;
 }
 
-
-static gboolean
-set_sort_criterion (FMIconView *icon_view, const SortCriterion *sort)
+static void
+real_set_sort_criterion (FMIconView *icon_view,
+                         const SortCriterion *sort,
+                         gboolean clear)
 {
-	if (sort == NULL) {
-		return FALSE;
-	}
-	if (icon_view->details->sort == sort) {
-		return FALSE;
-	}
-	icon_view->details->sort = sort;
+	NautilusFile *file;
 
-	/* Store the new sort setting. */
-	fm_icon_view_set_directory_sort_by (icon_view,
-					    fm_directory_view_get_directory_as_file (FM_DIRECTORY_VIEW (icon_view)),
-					    sort->metadata_text);
-	
+	file = fm_directory_view_get_directory_as_file (FM_DIRECTORY_VIEW (icon_view));
+
+	if (clear) {
+		nautilus_file_set_metadata (file,
+					    NAUTILUS_METADATA_KEY_ICON_VIEW_SORT_BY, NULL, NULL);
+		nautilus_file_set_metadata (file,
+					    NAUTILUS_METADATA_KEY_ICON_VIEW_SORT_REVERSED, NULL, NULL);
+		icon_view->details->sort =
+			get_sort_criterion_by_sort_type	(get_default_sort_order
+							 (file, &icon_view->details->sort_reversed));
+	} else {
+		/* Store the new sort setting. */
+		fm_icon_view_set_directory_sort_by (icon_view,
+						    file,
+						    sort->metadata_text);
+	}
+
 	/* Update the layout menus to match the new sort setting. */
 	update_layout_menus (icon_view);
+}
 
-	return TRUE;
+static void
+set_sort_criterion (FMIconView *icon_view, const SortCriterion *sort)
+{
+	if (sort == NULL ||
+	    icon_view->details->sort == sort) {
+		return;
+	}
+
+	icon_view->details->sort = sort;
+
+        real_set_sort_criterion (icon_view, sort, FALSE);
+}
+
+static void
+clear_sort_criterion (FMIconView *icon_view)
+{
+	real_set_sort_criterion (icon_view, NULL, TRUE);
 }
 
 static void
@@ -617,12 +659,14 @@ update_layout_menus (FMIconView *view)
 	gboolean is_auto_layout;
 	GtkAction *action;
 	const char *action_name;
+	NautilusFile *file;
 
 	if (view->details->icon_action_group == NULL) {
 		return;
 	}
 
 	is_auto_layout = fm_icon_view_using_auto_layout (view);
+	file = fm_directory_view_get_directory_as_file (FM_DIRECTORY_VIEW (view));
 
 	if (fm_icon_view_supports_auto_layout (view)) {
 		/* Mark sort criterion. */
@@ -643,6 +687,15 @@ update_layout_menus (FMIconView *view)
 		gtk_toggle_action_set_active (GTK_TOGGLE_ACTION (action),
 					      view->details->sort_reversed);
 		gtk_action_set_sensitive (action, is_auto_layout);
+
+		action = gtk_action_group_get_action (view->details->icon_action_group,
+		                                      FM_ACTION_SORT_TRASH_TIME);
+
+		if (file != NULL && nautilus_file_is_in_trash (file)) {
+			gtk_action_set_visible (action, TRUE);
+		} else {
+			gtk_action_set_visible (action, FALSE);
+		}
 	}
 
 	action = gtk_action_group_get_action (view->details->icon_action_group,
@@ -681,17 +734,33 @@ fm_icon_view_get_directory_sort_by (FMIconView *icon_view,
 static NautilusFileSortType default_sort_order = NAUTILUS_FILE_SORT_BY_DISPLAY_NAME;
 
 static NautilusFileSortType
-get_default_sort_order (void)
+get_default_sort_order (NautilusFile *file, gboolean *reversed)
 {
 	static gboolean auto_storaged_added = FALSE;
+	NautilusFileSortType retval;
 
 	if (auto_storaged_added == FALSE) {
 		auto_storaged_added = TRUE;
 		eel_preferences_add_auto_enum (NAUTILUS_PREFERENCES_ICON_VIEW_DEFAULT_SORT_ORDER,
 					       (int *) &default_sort_order);
+		eel_preferences_add_auto_boolean (NAUTILUS_PREFERENCES_ICON_VIEW_DEFAULT_SORT_IN_REVERSE_ORDER,
+						  &default_sort_in_reverse_order);
+
 	}
 
-	return CLAMP (default_sort_order, NAUTILUS_FILE_SORT_BY_DISPLAY_NAME, NAUTILUS_FILE_SORT_BY_EMBLEMS);
+	retval = nautilus_file_get_default_sort_type (file, reversed);
+
+	if (retval == NAUTILUS_FILE_SORT_NONE) {
+
+		if (reversed != NULL) {
+			*reversed = default_sort_in_reverse_order;
+		}
+
+		retval = CLAMP (default_sort_order, NAUTILUS_FILE_SORT_BY_DISPLAY_NAME,
+				NAUTILUS_FILE_SORT_BY_EMBLEMS);		
+	}
+
+	return retval;
 }
 
 static char *
@@ -699,7 +768,7 @@ fm_icon_view_real_get_directory_sort_by (FMIconView *icon_view,
 					 NautilusFile *file)
 {
 	const SortCriterion *default_sort_criterion;
-	default_sort_criterion = get_sort_criterion_by_sort_type (get_default_sort_order ());
+	default_sort_criterion = get_sort_criterion_by_sort_type (get_default_sort_order (file, NULL));
 	g_return_val_if_fail (default_sort_criterion != NULL, NULL);
 
 	return nautilus_file_get_metadata
@@ -726,7 +795,7 @@ fm_icon_view_real_set_directory_sort_by (FMIconView *icon_view,
 					 const char *sort_by)
 {
 	const SortCriterion *default_sort_criterion;
-	default_sort_criterion = get_sort_criterion_by_sort_type (get_default_sort_order ());
+	default_sort_criterion = get_sort_criterion_by_sort_type (get_default_sort_order (file, NULL));
 	g_return_if_fail (default_sort_criterion != NULL);
 
 	nautilus_file_set_metadata
@@ -749,27 +818,16 @@ fm_icon_view_get_directory_sort_reversed (FMIconView *icon_view,
 }
 
 static gboolean
-get_default_sort_in_reverse_order (void)
-{
-	static gboolean auto_storaged_added = FALSE;
-	
-	if (auto_storaged_added == FALSE) {
-		auto_storaged_added = TRUE;
-		eel_preferences_add_auto_boolean (NAUTILUS_PREFERENCES_ICON_VIEW_DEFAULT_SORT_IN_REVERSE_ORDER,
-						  &default_sort_in_reverse_order);
-	}
-
-	return default_sort_in_reverse_order;
-}
-
-static gboolean
 fm_icon_view_real_get_directory_sort_reversed (FMIconView *icon_view,
 					       NautilusFile *file)
 {
+	gboolean reversed;
+
+	get_default_sort_order (file, &reversed);
 	return nautilus_file_get_boolean_metadata
 		(file,
 		 NAUTILUS_METADATA_KEY_ICON_VIEW_SORT_REVERSED,
-		 get_default_sort_in_reverse_order ());
+		 reversed);
 }
 
 static void
@@ -791,11 +849,13 @@ fm_icon_view_real_set_directory_sort_reversed (FMIconView *icon_view,
 					       NautilusFile *file,
 					       gboolean sort_reversed)
 {
+	gboolean reversed;
+
+	get_default_sort_order (file, &reversed);
 	nautilus_file_set_boolean_metadata
 		(file,
 		 NAUTILUS_METADATA_KEY_ICON_VIEW_SORT_REVERSED,
-		 get_default_sort_in_reverse_order (),
-		 sort_reversed);
+		 reversed, sort_reversed);
 }
 
 static gboolean
@@ -1195,16 +1255,39 @@ fm_icon_view_begin_loading (FMDirectoryView *view)
 }
 
 static void
+icon_view_notify_clipboard_info (NautilusClipboardMonitor *monitor,
+                                 NautilusClipboardInfo *info,
+                                 FMIconView *icon_view)
+{
+	GList *icon_data;
+
+	icon_data = NULL;
+	if (info && info->cut) {
+		icon_data = info->files;
+	}
+
+	nautilus_icon_container_set_highlighted_for_clipboard (
+		get_icon_container (icon_view), icon_data);
+}
+
+static void
 fm_icon_view_end_loading (FMDirectoryView *view,
 			  gboolean all_files_seen)
 {
 	FMIconView *icon_view;
 	GtkWidget *icon_container;
+	NautilusClipboardMonitor *monitor;
+	NautilusClipboardInfo *info;
 
 	icon_view = FM_ICON_VIEW (view);
 
 	icon_container = GTK_WIDGET (get_icon_container (icon_view));
 	nautilus_icon_container_end_loading (NAUTILUS_ICON_CONTAINER (icon_container), all_files_seen);
+
+	monitor = nautilus_clipboard_monitor_get ();
+	info = nautilus_clipboard_monitor_get_clipboard_info (monitor);
+
+	icon_view_notify_clipboard_info (monitor, info, icon_view);
 }
 
 static NautilusZoomLevel
@@ -1494,8 +1577,8 @@ fm_icon_view_start_renaming_file (FMDirectoryView *view,
 static const GtkActionEntry icon_view_entries[] = {
   /* name, stock id, label */  { "Arrange Items", NULL, N_("Arran_ge Items") }, 
   /* name, stock id */         { "Stretch", NULL,
-  /* label, accelerator */       N_("Stretc_h Icon..."), NULL,
-  /* tooltip */                  N_("Make the selected icon stretchable"),
+  /* label, accelerator */       N_("Resize Icon..."), NULL,
+  /* tooltip */                  N_("Make the selected icon resizable"),
                                  G_CALLBACK (action_stretch_callback) },
   /* name, stock id */         { "Unstretch", NULL,
   /* label, accelerator */       N_("Restore Icons' Original Si_zes"), NULL,
@@ -1550,6 +1633,10 @@ static const GtkRadioActionEntry arrange_radio_entries[] = {
     N_("By _Emblems"), NULL,
     N_("Keep icons sorted by emblems in rows"),
     NAUTILUS_FILE_SORT_BY_EMBLEMS },
+  { "Sort by Trash Time", NULL,
+    N_("By T_rash Time"), NULL,
+    N_("Keep icons sorted by trash time in rows"),
+    NAUTILUS_FILE_SORT_BY_TRASHED_TIME },
 };
 
 static void
@@ -1692,8 +1779,7 @@ fm_icon_view_reset_to_defaults (FMDirectoryView *view)
 	icon_view = FM_ICON_VIEW (view);
 	icon_container = get_icon_container (icon_view);
 
-	set_sort_criterion (icon_view, get_sort_criterion_by_sort_type (get_default_sort_order ()));
-	set_sort_reversed (icon_view, get_default_sort_in_reverse_order ());
+	clear_sort_criterion (icon_view);
 	nautilus_icon_container_set_keep_aligned 
 		(icon_container, get_default_directory_keep_aligned ());
 	nautilus_icon_container_set_tighter_layout
@@ -2681,7 +2767,7 @@ create_icon_container (FMIconView *icon_view)
 
 	icon_container = fm_icon_container_new (icon_view);
 
-	GTK_WIDGET_SET_FLAGS (icon_container, GTK_CAN_FOCUS);
+	gtk_widget_set_can_focus (GTK_WIDGET (icon_container), TRUE);
 	
 	g_signal_connect_object (icon_container, "focus_in_event",
 			 G_CALLBACK (focus_in_event_callback), icon_view, 0);
@@ -2960,7 +3046,7 @@ fm_icon_view_init (FMIconView *icon_view)
 	static gboolean setup_sound_preview = FALSE;
 	NautilusIconContainer *icon_container;
 
-        g_return_if_fail (GTK_BIN (icon_view)->child == NULL);
+        g_return_if_fail (gtk_bin_get_child (GTK_BIN (icon_view)) == NULL);
 
 	icon_view->details = g_new0 (FMIconViewDetails, 1);
 	icon_view->details->sort = &sort_criteria[0];
@@ -3015,6 +3101,11 @@ fm_icon_view_init (FMIconView *icon_view)
 				 G_CALLBACK (icon_view_handle_text), icon_view, 0);
 	g_signal_connect_object (get_icon_container (icon_view), "handle_raw",
 				 G_CALLBACK (icon_view_handle_raw), icon_view, 0);
+
+	icon_view->details->clipboard_handler_id = 
+		g_signal_connect (nautilus_clipboard_monitor_get (),
+		                  "clipboard_info",
+		                  G_CALLBACK (icon_view_notify_clipboard_info), icon_view);
 }
 
 static NautilusView *

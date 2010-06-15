@@ -33,6 +33,7 @@
 #include "fm-list-model.h"
 #include <string.h>
 #include <eel/eel-vfs-extensions.h>
+#include <eel/eel-gdk-extensions.h>
 #include <eel/eel-glib-extensions.h>
 #include <eel/eel-gtk-macros.h>
 #include <gdk/gdk.h>
@@ -42,6 +43,7 @@
 #include <glib/gi18n.h>
 #include <glib-object.h>
 #include <libnautilus-extension/nautilus-column-provider.h>
+#include <libnautilus-private/nautilus-clipboard-monitor.h>
 #include <libnautilus-private/nautilus-column-chooser.h>
 #include <libnautilus-private/nautilus-column-utilities.h>
 #include <libnautilus-private/nautilus-debug-log.h>
@@ -72,6 +74,7 @@ struct FMListViewDetails {
 	GtkCellRendererPixbuf *pixbuf_cell;
 	GtkCellRendererText   *file_name_cell;
 	GList *cells;
+	GtkCellEditable *editable_widget;
 
 	NautilusZoomLevel zoom_level;
 
@@ -103,6 +106,8 @@ struct FMListViewDetails {
 	NautilusFile *renaming_file;
 	gboolean rename_done;
 	guint renaming_file_activate_timeout;
+
+	gulong clipboard_handler_id;
 
 	GQuark last_sort_attr;
 };
@@ -155,8 +160,31 @@ G_DEFINE_TYPE_WITH_CODE (FMListView, fm_list_view, FM_TYPE_DIRECTORY_VIEW,
 			 G_IMPLEMENT_INTERFACE (NAUTILUS_TYPE_VIEW,
 						fm_list_view_iface_init));
 
+static const char * default_trash_visible_columns[] = {
+	"name", "size", "type", "trashed_on", "trash_orig_path", NULL
+};
+
+static const char * default_trash_columns_order[] = {
+	"name", "size", "type", "trashed_on", "trash_orig_path", NULL
+};
+
 /* for EEL_CALL_PARENT */
 #define parent_class fm_list_view_parent_class
+
+static const gchar*
+get_default_sort_order (NautilusFile *file, gboolean *reversed)
+{
+	const gchar *retval;
+
+	retval = nautilus_file_get_default_sort_attribute (file, reversed);
+
+	if (retval == NULL) {
+		retval = default_sort_order_auto_value;
+		*reversed = default_sort_reversed_auto_value;
+	}
+
+	return retval;
+}
 
 static void
 list_selection_changed_callback (GtkTreeSelection *selection, gpointer user_data)
@@ -479,9 +507,9 @@ motion_notify_callback (GtkWidget *widget,
 
 		if ((old_hover_path != NULL) != (view->details->hover_path != NULL)) {
 			if (view->details->hover_path != NULL) {
-				gdk_window_set_cursor (widget->window, hand_cursor);
+				gdk_window_set_cursor (gtk_widget_get_window (widget), hand_cursor);
 			} else {
-				gdk_window_set_cursor (widget->window, NULL);
+				gdk_window_set_cursor (gtk_widget_get_window (widget), NULL);
 			}
 		}
 
@@ -551,7 +579,7 @@ enter_notify_callback (GtkWidget *widget,
 					       NULL, NULL, NULL);
 
 		if (view->details->hover_path != NULL) {
-			gdk_window_set_cursor (widget->window, hand_cursor);
+			gdk_window_set_cursor (gtk_widget_get_window (widget), hand_cursor);
 		}
 	}
 
@@ -1064,6 +1092,7 @@ sort_column_changed_callback (GtkTreeSortable *sortable,
 	GtkSortType reversed;
 	GQuark sort_attr, default_sort_attr;
 	char *reversed_attr, *default_reversed_attr;
+	gboolean default_sort_reversed;
 
 	file = fm_directory_view_get_directory_as_file (FM_DIRECTORY_VIEW (view));
 
@@ -1071,12 +1100,12 @@ sort_column_changed_callback (GtkTreeSortable *sortable,
 	sort_attr = fm_list_model_get_attribute_from_sort_column_id (view->details->model, sort_column_id);
 
 	default_sort_column_id = fm_list_model_get_sort_column_id_from_attribute (view->details->model,
-										  g_quark_from_string (default_sort_order_auto_value));
+						g_quark_from_string (get_default_sort_order (file, &default_sort_reversed)));
 	default_sort_attr = fm_list_model_get_attribute_from_sort_column_id (view->details->model, default_sort_column_id);
 	nautilus_file_set_metadata (file, NAUTILUS_METADATA_KEY_LIST_VIEW_SORT_COLUMN,
 				    g_quark_to_string (default_sort_attr), g_quark_to_string (sort_attr));
 
-	default_reversed_attr = (default_sort_reversed_auto_value ? "true" : "false");
+	default_reversed_attr = (default_sort_reversed ? "true" : "false");
 
 	if (view->details->last_sort_attr != sort_attr &&
 	    sort_criterion_changes_due_to_user (view->details->tree_view)) {
@@ -1114,6 +1143,8 @@ static void
 cell_renderer_editing_canceled (GtkCellRendererText *cell,
 				FMListView          *view)
 {
+	view->details->editable_widget = NULL;
+
 	fm_directory_view_unfreeze_updates (FM_DIRECTORY_VIEW (view));
 }
 
@@ -1126,6 +1157,8 @@ cell_renderer_edited (GtkCellRendererText *cell,
 	GtkTreePath *path;
 	NautilusFile *file;
 	GtkTreeIter iter;
+
+	view->details->editable_widget = NULL;
 
 	/* Don't allow a rename with an empty string. Revert to original 
 	 * without notifying the user.
@@ -1258,15 +1291,19 @@ apply_columns_settings (FMListView *list_view,
 			char **visible_columns)
 {
 	GList *all_columns;
+	NautilusFile *file;
 	GList *old_view_columns, *view_columns;
 	GHashTable *visible_columns_hash;
 	GtkTreeViewColumn *prev_view_column;
 	GList *l;
 	int i;
 
+	file = fm_directory_view_get_directory_as_file (FM_DIRECTORY_VIEW (list_view));
+
 	/* prepare ordered list of view columns using column_order and visible_columns */
 	view_columns = NULL;
-	all_columns = nautilus_get_all_columns ();
+
+	all_columns = nautilus_get_columns_for_file (file);
 	all_columns = nautilus_sort_columns (all_columns, column_order);
 
 	/* hash table to lookup if a given column should be visible */
@@ -1606,7 +1643,13 @@ get_visible_columns (FMListView *list_view)
 		g_list_free (visible_columns);
 	}
 
-	return ret ? ret : g_strdupv (default_visible_columns_auto_value);
+	if (ret != NULL) {
+		return ret;
+	}
+
+	return nautilus_file_is_in_trash (file) ?
+		g_strdupv ((gchar **) default_trash_visible_columns) :
+		g_strdupv (default_visible_columns_auto_value);
 }
 
 static char **
@@ -1638,7 +1681,13 @@ get_column_order (FMListView *list_view)
 		g_list_free (column_order);
 	}
 
-	return ret ? ret : g_strdupv (default_visible_columns_auto_value);
+	if (ret != NULL) {
+		return ret;
+	}
+
+	return nautilus_file_is_in_trash (file) ?
+		g_strdupv ((gchar **) default_trash_columns_order) :
+		g_strdupv (default_column_order_auto_value);
 }
 
 static void
@@ -1662,7 +1711,8 @@ set_sort_order_from_metadata_and_preferences (FMListView *list_view)
 	char *sort_attribute;
 	int sort_column_id;
 	NautilusFile *file;
-	gboolean sort_reversed;
+	gboolean sort_reversed, default_sort_reversed;
+	const gchar *default_sort_order;
 	
 	file = fm_directory_view_get_directory_as_file (FM_DIRECTORY_VIEW (list_view));
 	sort_attribute = nautilus_file_get_metadata (file,
@@ -1671,15 +1721,18 @@ set_sort_order_from_metadata_and_preferences (FMListView *list_view)
 	sort_column_id = fm_list_model_get_sort_column_id_from_attribute (list_view->details->model,
 									  g_quark_from_string (sort_attribute));
 	g_free (sort_attribute);
+
+	default_sort_order = get_default_sort_order (file, &default_sort_reversed);
+	
 	if (sort_column_id == -1) {
 		sort_column_id =
 			fm_list_model_get_sort_column_id_from_attribute (list_view->details->model,
-									 g_quark_from_string (default_sort_order_auto_value));
+									 g_quark_from_string (default_sort_order));
 	}
 
 	sort_reversed = nautilus_file_get_boolean_metadata (file,
 							    NAUTILUS_METADATA_KEY_LIST_VIEW_SORT_REVERSED,
-							    default_sort_reversed_auto_value);
+							    default_sort_reversed);
 
 	gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (list_view->details->model),
 					      sort_column_id,
@@ -1750,11 +1803,10 @@ stop_cell_editing (FMListView *list_view)
 	 * changes directories without exiting cell edit mode. It also prevents
 	 * the edited handler from being called on the cleared list model.
 	 */
-
 	column = list_view->details->file_name_column;
-	if (column != NULL && column->editable_widget != NULL &&
-		GTK_IS_CELL_EDITABLE (column->editable_widget)) {
-		gtk_cell_editable_editing_done (column->editable_widget);
+	if (column != NULL && list_view->details->editable_widget != NULL &&
+		GTK_IS_CELL_EDITABLE (list_view->details->editable_widget)) {
+		gtk_cell_editable_editing_done (list_view->details->editable_widget);
 	}
 }
 
@@ -2128,27 +2180,37 @@ column_chooser_changed_callback (NautilusColumnChooser *chooser,
 }
 
 static void
+column_chooser_set_from_arrays (NautilusColumnChooser *chooser,
+                                FMListView *view,
+                                char **visible_columns,
+                                char **column_order)
+{
+	g_signal_handlers_block_by_func 
+		(chooser, G_CALLBACK (column_chooser_changed_callback), view);
+
+	nautilus_column_chooser_set_settings (chooser,
+					      visible_columns, 
+					      column_order);
+
+	g_signal_handlers_unblock_by_func 
+		(chooser, G_CALLBACK (column_chooser_changed_callback), view);
+}
+
+static void
 column_chooser_set_from_settings (NautilusColumnChooser *chooser,
 				  FMListView *view)
 {
 	char **visible_columns;
 	char **column_order;
 
-	g_signal_handlers_block_by_func 
-		(chooser, G_CALLBACK (column_chooser_changed_callback), view);
-
 	visible_columns = get_visible_columns (view);
 	column_order = get_column_order (view);
 
-	nautilus_column_chooser_set_settings (chooser,
-					      visible_columns, 
-					      column_order);
+	column_chooser_set_from_arrays (chooser, view,
+	                                visible_columns, column_order);
 
 	g_strfreev (visible_columns);
 	g_strfreev (column_order);
-
-	g_signal_handlers_unblock_by_func 
-		(chooser, G_CALLBACK (column_chooser_changed_callback), view);
 }
 
 static void
@@ -2156,6 +2218,8 @@ column_chooser_use_default_callback (NautilusColumnChooser *chooser,
 				     FMListView *view)
 {
 	NautilusFile *file;
+	char **default_columns;
+	char **default_order;
 
 	file = fm_directory_view_get_directory_as_file 
 		(FM_DIRECTORY_VIEW (view));
@@ -2163,8 +2227,23 @@ column_chooser_use_default_callback (NautilusColumnChooser *chooser,
 	nautilus_file_set_metadata_list (file, NAUTILUS_METADATA_KEY_LIST_VIEW_COLUMN_ORDER, NULL);
 	nautilus_file_set_metadata_list (file, NAUTILUS_METADATA_KEY_LIST_VIEW_VISIBLE_COLUMNS, NULL);
 
-	set_columns_settings_from_metadata_and_preferences (FM_LIST_VIEW (view));
-	column_chooser_set_from_settings (chooser, view);
+	/* set view values ourselves, as new metadata could not have been
+	 * updated yet.
+	 */
+	default_columns = nautilus_file_is_in_trash (file) ?
+		g_strdupv ((gchar **) default_trash_visible_columns) :
+		g_strdupv (default_visible_columns_auto_value);
+
+	default_order = nautilus_file_is_in_trash (file) ?
+		g_strdupv ((gchar **) default_trash_columns_order) :
+		g_strdupv (default_column_order_auto_value);
+
+	apply_columns_settings (view, default_order, default_columns);
+	column_chooser_set_from_arrays (chooser, view,
+	                                default_columns, default_order);
+
+	g_strfreev (default_columns);
+	g_strfreev (default_order);
 }
 
 static GtkWidget *
@@ -2199,7 +2278,7 @@ create_column_editor (FMListView *view)
 	box = gtk_vbox_new (FALSE, 12);
 	gtk_container_set_border_width (GTK_CONTAINER (box), 12);
 	gtk_widget_show (box);
-	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (window)->vbox), box);
+	gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG (window))), box);
 
 	label_text = _("Choose the order of information to appear in this folder:");
 	str = g_strconcat ("<b>", label_text, "</b>", NULL);
@@ -2218,7 +2297,7 @@ create_column_editor (FMListView *view)
 	gtk_widget_show (alignment);
 	gtk_box_pack_start (GTK_BOX (box), alignment, TRUE, TRUE, 0);
 
-	column_chooser = nautilus_column_chooser_new ();
+	column_chooser = nautilus_column_chooser_new (file);
 	gtk_widget_show (column_chooser);
 	gtk_container_add (GTK_CONTAINER (alignment), column_chooser);
 
@@ -2328,6 +2407,8 @@ static void
 fm_list_view_reset_to_defaults (FMDirectoryView *view)
 {
 	NautilusFile *file;
+	const gchar *default_sort_order;
+	gboolean default_sort_reversed;
 
 	file = fm_directory_view_get_directory_as_file (view);
 
@@ -2337,11 +2418,13 @@ fm_list_view_reset_to_defaults (FMDirectoryView *view)
 	nautilus_file_set_metadata_list (file, NAUTILUS_METADATA_KEY_LIST_VIEW_COLUMN_ORDER, NULL);
 	nautilus_file_set_metadata_list (file, NAUTILUS_METADATA_KEY_LIST_VIEW_VISIBLE_COLUMNS, NULL);
 
+	default_sort_order = get_default_sort_order (file, &default_sort_reversed);
+
 	gtk_tree_sortable_set_sort_column_id
 		(GTK_TREE_SORTABLE (FM_LIST_VIEW (view)->details->model),
 		 fm_list_model_get_sort_column_id_from_attribute (FM_LIST_VIEW (view)->details->model,
-								  g_quark_from_string (default_sort_order_auto_value)),
-		 default_sort_reversed_auto_value ? GTK_SORT_DESCENDING : GTK_SORT_ASCENDING);
+								  g_quark_from_string (default_sort_order)),
+		 default_sort_reversed ? GTK_SORT_DESCENDING : GTK_SORT_ASCENDING);
 
 	fm_list_view_set_zoom_level (FM_LIST_VIEW (view), get_default_zoom_level (), FALSE);
 	set_columns_settings_from_metadata_and_preferences (FM_LIST_VIEW (view));
@@ -2510,13 +2593,16 @@ fm_list_view_start_renaming_file (FMDirectoryView *view,
 	GtkTreePath *path;
 	GtkEntry *entry;
 	int start_offset, end_offset;
+	gchar *path_str;
+	GdkRectangle cell_area;
+	GdkRectangle background_area;
 	
 	list_view = FM_LIST_VIEW (view);
 	
 	/* Select all if we are in renaming mode already */
-	if (list_view->details->file_name_column && list_view->details->file_name_column->editable_widget) {
+	if (list_view->details->file_name_column && list_view->details->editable_widget) {
 		gtk_editable_select_region (
-				GTK_EDITABLE (list_view->details->file_name_column->editable_widget),
+				GTK_EDITABLE (list_view->details->editable_widget),
 				0,
 				-1);
 		return;
@@ -2530,13 +2616,21 @@ fm_list_view_start_renaming_file (FMDirectoryView *view,
 	fm_directory_view_freeze_updates (FM_DIRECTORY_VIEW (view));
 
 	path = gtk_tree_model_get_path (GTK_TREE_MODEL (list_view->details->model), &iter);
+	path_str = gtk_tree_path_to_string (path);
+	gtk_tree_view_get_cell_area (list_view->details->tree_view, path,
+				     list_view->details->file_name_column, &cell_area);
+	gtk_tree_view_get_background_area (list_view->details->tree_view, path,
+					   list_view->details->file_name_column, &background_area);
 
-	/*Make filename-cells editable.*/
+	/* Make filename-cells editable. */
 	g_object_set (G_OBJECT (list_view->details->file_name_cell),
 		      "editable", TRUE,
 		      NULL);
 
-	
+	list_view->details->editable_widget =
+		gtk_cell_renderer_start_editing (GTK_CELL_RENDERER (list_view->details->file_name_cell),
+						 NULL, NULL, path_str, &background_area,
+						 &cell_area, 0);
 	gtk_tree_view_scroll_to_cell (list_view->details->tree_view,
 				      NULL,
 				      list_view->details->file_name_column,
@@ -2546,7 +2640,7 @@ fm_list_view_start_renaming_file (FMDirectoryView *view,
 				  list_view->details->file_name_column,
 				  TRUE);
 
-	entry = GTK_ENTRY (list_view->details->file_name_column->editable_widget);
+	entry = GTK_ENTRY (list_view->details->editable_widget);
 
 	/* Free a previously allocated original_name */
 	g_free (list_view->details->original_name);
@@ -2595,7 +2689,7 @@ fm_list_view_click_policy_changed (FMDirectoryView *directory_view)
 
 		tree = view->details->tree_view;
 		if (gtk_widget_get_realized (GTK_WIDGET (tree))) {
-			win = GTK_WIDGET (tree)->window;
+			win = gtk_widget_get_window (GTK_WIDGET (tree));
 			gdk_window_set_cursor (win, NULL);
 			
 			display = gtk_widget_get_display (GTK_WIDGET (view));
@@ -2704,6 +2798,12 @@ fm_list_view_dispose (GObject *object)
 	if (list_view->details->renaming_file_activate_timeout != 0) {
 		g_source_remove (list_view->details->renaming_file_activate_timeout);
 		list_view->details->renaming_file_activate_timeout = 0;
+	}
+
+	if (list_view->details->clipboard_handler_id != 0) {
+		g_signal_handler_disconnect (nautilus_clipboard_monitor_get (),
+		                             list_view->details->clipboard_handler_id);
+		list_view->details->clipboard_handler_id = 0;
 	}
 
 	G_OBJECT_CLASS (parent_class)->dispose (object);
@@ -2829,6 +2929,31 @@ list_view_scroll_to_file (NautilusView *view,
 }
 
 static void
+list_view_notify_clipboard_info (NautilusClipboardMonitor *monitor,
+                                 NautilusClipboardInfo *info,
+                                 FMListView *view)
+{
+	if (info != NULL && info->cut) {
+		fm_list_model_set_highlight_for_files (view->details->model, info->files);
+	} else {
+		fm_list_model_set_highlight_for_files (view->details->model, NULL);
+	}
+}
+
+static void
+fm_list_view_end_loading (FMDirectoryView *view,
+                          gboolean all_files_seen)
+{
+	NautilusClipboardMonitor *monitor;
+	NautilusClipboardInfo *info;
+
+	monitor = nautilus_clipboard_monitor_get ();
+	info = nautilus_clipboard_monitor_get_clipboard_info (monitor);
+
+	list_view_notify_clipboard_info (monitor, info, FM_LIST_VIEW (view));
+}
+
+static void
 real_set_is_active (FMDirectoryView *view,
 		    gboolean is_active)
 {
@@ -2862,6 +2987,7 @@ fm_list_view_class_init (FMListViewClass *class)
 
 	fm_directory_view_class->add_file = fm_list_view_add_file;
 	fm_directory_view_class->begin_loading = fm_list_view_begin_loading;
+	fm_directory_view_class->end_loading = fm_list_view_end_loading;
 	fm_directory_view_class->bump_zoom_level = fm_list_view_bump_zoom_level;
 	fm_directory_view_class->can_zoom_in = fm_list_view_can_zoom_in;
 	fm_directory_view_class->can_zoom_out = fm_list_view_can_zoom_out;
@@ -2957,6 +3083,10 @@ fm_list_view_init (FMListView *list_view)
 	list_view->details->zoom_level = NAUTILUS_ZOOM_LEVEL_SMALLEST - 1;
 
 	list_view->details->hover_path = NULL;
+	list_view->details->clipboard_handler_id = 
+		g_signal_connect (nautilus_clipboard_monitor_get (),
+		                  "clipboard_info",
+		                  G_CALLBACK (list_view_notify_clipboard_info), list_view);
 }
 
 static NautilusView *

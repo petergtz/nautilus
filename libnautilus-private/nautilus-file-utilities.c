@@ -29,20 +29,21 @@
 #include "nautilus-lib-self-check-functions.h"
 #include "nautilus-metadata.h"
 #include "nautilus-file.h"
+#include "nautilus-file-operations.h"
 #include "nautilus-search-directory.h"
 #include "nautilus-signaller.h"
 #include <eel/eel-glib-extensions.h>
+#include <eel/eel-stock-dialogs.h>
 #include <eel/eel-string.h>
 #include <eel/eel-debug.h>
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include <gio/gio.h>
-#include <dbus/dbus-glib.h>
 #include <unistd.h>
 #include <stdlib.h>
 
-#define NAUTILUS_USER_DIRECTORY_NAME ".nautilus"
+#define NAUTILUS_USER_DIRECTORY_NAME "nautilus"
 #define DEFAULT_NAUTILUS_DIRECTORY_MODE (0755)
 
 #define DESKTOP_DIRECTORY_NAME "Desktop"
@@ -93,7 +94,7 @@ nautilus_get_user_directory (void)
 {
 	char *user_directory = NULL;
 
-	user_directory = g_build_filename (g_get_home_dir (),
+	user_directory = g_build_filename (g_get_user_config_dir (),
 					   NAUTILUS_USER_DIRECTORY_NAME,
 					   NULL);
 	
@@ -1002,47 +1003,31 @@ nautilus_is_file_roller_installed (void)
 
 #define GSM_NAME  "org.gnome.SessionManager"
 #define GSM_PATH "/org/gnome/SessionManager"
+#define GSM_INTERFACE "org.gnome.SessionManager"
 
 /* The following values come from
  * http://www.gnome.org/~mccann/gnome-session/docs/gnome-session.html#org.gnome.SessionManager.Inhibit 
  */
-#define INHIBIT_LOGOUT 1
-#define INHIBIT_SUSPEND 4
+#define INHIBIT_LOGOUT (1U)
+#define INHIBIT_SUSPEND (4U)
 
-static DBusGProxy *_gsm_proxy = NULL;
-
-static DBusGProxy *
-get_power_manager_proxy (void)
+static GDBusConnection *
+get_dbus_connection (void)
 {
-	if (!_gsm_proxy)
-	{
-		DBusGConnection *bus;
-		GError *error;
+	static GDBusConnection *conn = NULL;
 
-		error = NULL;
-		bus = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
-		if (!bus)
-		{
-			g_warning ("Could not connect to session bus: %s",
-				   error->message);
+	if (conn == NULL) {
+		GError *error = NULL;
+
+	        conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
+
+		if (conn == NULL) {
+	                g_warning ("Could not connect to session bus: %s", error->message);
 			g_error_free (error);
-			return NULL;
-		}
-
-		_gsm_proxy = dbus_g_proxy_new_for_name (bus,
-						        GSM_NAME,
-						        GSM_PATH,
-						        GSM_NAME);
-		dbus_g_connection_unref (bus);
-
-		if (!_gsm_proxy)
-		{
-			g_warning ("Creating DBus proxy failed.");
-			return NULL;
 		}
 	}
 
-	return _gsm_proxy;
+	return conn;
 }
 
 /**
@@ -1060,31 +1045,45 @@ get_power_manager_proxy (void)
 int
 nautilus_inhibit_power_manager (const char *message)
 {
-	DBusGProxy *proxy;
-	GError *error;
-	int cookie;
+	GDBusConnection *connection;
+	GVariant *result;
+	GError *error = NULL;
+	guint cookie = 0;
 
-	proxy = get_power_manager_proxy ();
+	g_return_val_if_fail (message != NULL, -1);
 
-	g_return_val_if_fail (proxy != NULL, -1);
+        connection = get_dbus_connection ();
 
-	error = NULL;
-	cookie = -1;
-	if (!dbus_g_proxy_call (proxy, "Inhibit", &error,
-				G_TYPE_STRING, "Nautilus",
-				G_TYPE_UINT, 0,
-				G_TYPE_STRING, message,
-				G_TYPE_UINT, INHIBIT_LOGOUT | INHIBIT_SUSPEND,
-				G_TYPE_INVALID,
-				G_TYPE_UINT, &cookie,
-				G_TYPE_INVALID))
-	{
+        if (connection == NULL) {
+                return -1;
+        }
+
+	result = g_dbus_connection_call_sync (connection,
+					      GSM_NAME,
+					      GSM_PATH,
+					      GSM_INTERFACE,
+					      "Inhibit",
+					      g_variant_new ("(susu)",
+							     "Nautilus",
+							     (guint) 0,
+							     message,
+							     (guint) (INHIBIT_LOGOUT | INHIBIT_SUSPEND)),
+					      G_VARIANT_TYPE ("(u)"),
+					      G_DBUS_CALL_FLAGS_NO_AUTO_START,
+					      -1,
+					      NULL,
+					      &error);
+
+	if (error != NULL) {
 		g_warning ("Could not inhibit power management: %s", error->message);
 		g_error_free (error);
 		return -1;
 	}
 
-	return cookie;
+	g_variant_get (result, "(u)", &cookie);
+	g_variant_unref (result);
+
+	return (int) cookie;
 }
 
 /**
@@ -1098,24 +1097,37 @@ nautilus_inhibit_power_manager (const char *message)
 void
 nautilus_uninhibit_power_manager (gint cookie)
 {
-	DBusGProxy *proxy;
-	GError *error;
+	GDBusConnection *connection;
+	GVariant *result;
+	GError *error = NULL;
+
 	g_return_if_fail (cookie > 0);
 
-	proxy = get_power_manager_proxy ();
+	connection = get_dbus_connection ();
 
-	g_return_if_fail (proxy != NULL);
+	if (connection == NULL) {
+		return;
+	}
 
-	error = NULL;
+	result = g_dbus_connection_call_sync (connection,
+					      GSM_NAME,
+					      GSM_PATH,
+					      GSM_INTERFACE,
+					      "Uninhibit",
+					      g_variant_new ("(u)", (guint) cookie),
+					      NULL,
+					      G_DBUS_CALL_FLAGS_NO_AUTO_START,
+					      -1,
+					      NULL,
+					      &error);
 
-	if (!dbus_g_proxy_call (proxy, "Uninhibit", &error,
-                                G_TYPE_UINT, cookie,
-                                G_TYPE_INVALID,
-                                G_TYPE_INVALID))
-	{
+	if (result == NULL) {
 		g_warning ("Could not uninhibit power management: %s", error->message);
 		g_error_free (error);
+		return;
 	}
+
+	g_variant_unref (result);
 }
 
 /* Returns TRUE if the file is in XDG_DATA_DIRS or
@@ -1159,6 +1171,125 @@ nautilus_is_in_system_dir (GFile *file)
 	return res;
 }
 
+GHashTable *
+nautilus_trashed_files_get_original_directories (GList *files,
+						 GList **unhandled_files)
+{
+	GHashTable *directories;
+	NautilusFile *file, *original_file, *original_dir;
+	GList *l, *m;
+
+	directories = NULL;
+
+	if (unhandled_files != NULL) {
+		*unhandled_files = NULL;
+	}
+
+	for (l = files; l != NULL; l = l->next) {
+		file = NAUTILUS_FILE (l->data);
+		original_file = nautilus_file_get_trash_original_file (file);
+
+		original_dir = NULL;
+		if (original_file != NULL) {
+			original_dir = nautilus_file_get_parent (original_file);
+		}
+
+		if (original_dir != NULL) {
+			if (directories == NULL) {
+				directories = g_hash_table_new_full (g_direct_hash, g_direct_equal,
+								     (GDestroyNotify) nautilus_file_unref,
+								     (GDestroyNotify) nautilus_file_list_unref);
+			}
+			nautilus_file_ref (original_dir);
+			m = g_hash_table_lookup (directories, original_dir);
+			if (m != NULL) {
+				g_hash_table_steal (directories, original_dir);
+				nautilus_file_unref (original_dir);
+			}
+			m = g_list_append (m, nautilus_file_ref (file));
+			g_hash_table_insert (directories, original_dir, m);
+		} else if (unhandled_files != NULL) {
+			*unhandled_files = g_list_append (*unhandled_files, nautilus_file_ref (file));
+		}
+
+		if (original_file != NULL) {
+			nautilus_file_unref (original_file);
+		}
+
+		if (original_dir != NULL) {
+			nautilus_file_unref (original_dir);
+		}
+	}
+
+	return directories;
+}
+
+static GList *
+locations_from_file_list (GList *file_list)
+{
+	NautilusFile *file;
+	GList *l, *ret;
+
+	ret = NULL;
+
+	for (l = file_list; l != NULL; l = l->next) {
+		file = NAUTILUS_FILE (l->data);
+		ret = g_list_prepend (ret, nautilus_file_get_location (file));
+	}
+
+	return g_list_reverse (ret);
+}
+
+void
+nautilus_restore_files_from_trash (GList *files,
+				   GtkWindow *parent_window)
+{
+	NautilusFile *file, *original_dir;
+	GHashTable *original_dirs_hash;
+	GList *original_dirs, *unhandled_files;
+	GFile *original_dir_location;
+	GList *locations, *l;
+	char *message, *file_name;
+
+	original_dirs_hash = nautilus_trashed_files_get_original_directories (files, &unhandled_files);
+
+	for (l = unhandled_files; l != NULL; l = l->next) {
+		file = NAUTILUS_FILE (l->data);
+		file_name = nautilus_file_get_display_name (file);
+		message = g_strdup_printf (_("Could not determine original location of \"%s\" "), file_name);
+		g_free (file_name);
+
+		eel_show_warning_dialog (message,
+					 _("The item cannot be restored from trash"),
+					 parent_window);
+		g_free (message);
+	}
+
+	if (original_dirs_hash != NULL) {
+		original_dirs = g_hash_table_get_keys (original_dirs_hash);
+		for (l = original_dirs; l != NULL; l = l->next) {
+			original_dir = NAUTILUS_FILE (l->data);
+			original_dir_location = nautilus_file_get_location (original_dir);
+
+			files = g_hash_table_lookup (original_dirs_hash, original_dir);
+			locations = locations_from_file_list (files);
+
+			nautilus_file_operations_move
+				(locations, NULL, 
+				 original_dir_location,
+				 parent_window,
+				 NULL, NULL);
+
+			eel_g_object_list_free (locations);
+			g_object_unref (original_dir_location);
+		}
+
+		g_list_free (original_dirs);
+		g_hash_table_destroy (original_dirs_hash);
+	}
+
+	nautilus_file_list_unref (unhandled_files);
+}
 
 #if !defined (NAUTILUS_OMIT_SELF_CHECK)
 

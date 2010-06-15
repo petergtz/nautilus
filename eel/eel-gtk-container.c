@@ -75,9 +75,9 @@ eel_gtk_container_child_map (GtkContainer *container,
 		return;
 	}
 
-	g_return_if_fail (child->parent == GTK_WIDGET (container));
+	g_return_if_fail (gtk_widget_get_parent (child) == GTK_WIDGET (container));
 
-	if (GTK_WIDGET_VISIBLE (child) && !GTK_WIDGET_MAPPED (child)) {
+	if (gtk_widget_get_visible (child) && !gtk_widget_get_mapped (child)) {
 		gtk_widget_map (child);
 	}
 }
@@ -101,9 +101,9 @@ eel_gtk_container_child_unmap (GtkContainer *container,
 		return;
 	}
 
-	g_return_if_fail (child->parent == GTK_WIDGET (container));
+	g_return_if_fail (gtk_widget_get_parent (child) == GTK_WIDGET (container));
 	
-	if (GTK_WIDGET_VISIBLE (child) && GTK_WIDGET_MAPPED (child)) {
+	if (gtk_widget_get_visible (child) && gtk_widget_get_mapped (child)) {
 		gtk_widget_unmap (child);
 	}
 }
@@ -122,17 +122,22 @@ void
 eel_gtk_container_child_add (GtkContainer *container,
 			     GtkWidget *child)
 {
+	GtkWidget *widget;
+
 	g_return_if_fail (GTK_IS_CONTAINER (container));
 	g_return_if_fail (GTK_IS_WIDGET (child));
-	
-	gtk_widget_set_parent (child, GTK_WIDGET (container));
 
-	if (GTK_WIDGET_REALIZED (container)) {
+	widget = GTK_WIDGET (container);
+	
+	gtk_widget_set_parent (child, widget);
+
+	if (gtk_widget_get_realized (widget)) {
 		gtk_widget_realize (child);
 	}
 	
-	if (GTK_WIDGET_VISIBLE (container) && GTK_WIDGET_VISIBLE (child)) {
-		if (GTK_WIDGET_MAPPED (container)) {
+	if (gtk_widget_get_mapped (widget)
+	    && gtk_widget_get_visible (child)) {
+		if (gtk_widget_get_mapped (widget)) {
 			gtk_widget_map (child);
 		}
 		
@@ -158,9 +163,9 @@ eel_gtk_container_child_remove (GtkContainer *container,
 
 	g_return_if_fail (GTK_IS_CONTAINER (container));
 	g_return_if_fail (GTK_IS_WIDGET (child));
-	g_return_if_fail (child->parent == GTK_WIDGET (container));
+	g_return_if_fail (gtk_widget_get_parent (child) == GTK_WIDGET (container));
 	
-	child_was_visible = GTK_WIDGET_VISIBLE (child);
+	child_was_visible = gtk_widget_get_visible (child);
 	
 	gtk_widget_unparent (child);
 
@@ -194,7 +199,7 @@ eel_gtk_container_child_size_allocate (GtkContainer *container,
 	}
 
 	g_return_if_fail (GTK_IS_WIDGET (child));
-	g_return_if_fail (child->parent == GTK_WIDGET (container));
+	g_return_if_fail (gtk_widget_get_parent (child) == GTK_WIDGET (container));
 
  	if (eel_irect_is_empty (&child_geometry)) {
 		return;

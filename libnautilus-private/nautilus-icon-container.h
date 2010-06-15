@@ -285,6 +285,8 @@ void              nautilus_icon_container_freeze_icon_positions         (Nautilu
 int               nautilus_icon_container_get_max_layout_lines           (NautilusIconContainer  *container);
 int               nautilus_icon_container_get_max_layout_lines_for_pango (NautilusIconContainer  *container);
 
+void              nautilus_icon_container_set_highlighted_for_clipboard (NautilusIconContainer  *container,
+									 GList                  *clipboard_icon_data);
 
 /* operations on all icons */
 void              nautilus_icon_container_unselect_all                  (NautilusIconContainer  *view);
@@ -351,12 +353,12 @@ void              nautilus_icon_container_widget_to_file_operation_position (Nau
 									     GdkPoint              *position);
 
 
-#define CANVAS_WIDTH(container) ((GTK_WIDGET (container)->allocation.width \
+#define CANVAS_WIDTH(container,allocation) ((allocation.width	  \
 				- container->details->left_margin \
 				- container->details->right_margin) \
 				/  EEL_CANVAS (container)->pixels_per_unit)
 
-#define CANVAS_HEIGHT(container) ((GTK_WIDGET (container)->allocation.height \
+#define CANVAS_HEIGHT(container,allocation) ((allocation.height \
 			 - container->details->top_margin \
 			 - container->details->bottom_margin) \
 			 / EEL_CANVAS (container)->pixels_per_unit)

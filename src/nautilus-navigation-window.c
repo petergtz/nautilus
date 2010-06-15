@@ -449,7 +449,7 @@ nautilus_navigation_window_set_up_sidebar (NautilusNavigationWindow *window)
 
 	gtk_paned_pack1 (GTK_PANED (window->details->content_paned),
 			 GTK_WIDGET (window->sidebar),
-			 FALSE, TRUE);
+			 FALSE, FALSE);
 
 	setup_side_pane_width (window);
 	g_signal_connect (window->sidebar, 
@@ -727,12 +727,19 @@ real_sync_title (NautilusWindow *window,
 			 sync_title, (window, slot));
 
 	if (slot == window->details->active_pane->active_slot) {
-		full_title = g_strdup_printf (_("%s - File Browser"), slot->title);
+		/* if spatial mode is default, we keep "File Browser" in the window title
+		 * to recognize browser windows. Otherwise, we default to the directory name.
+		 */
+		if (!eel_preferences_get_boolean (NAUTILUS_PREFERENCES_ALWAYS_USE_BROWSER)) {
+			full_title = g_strdup_printf (_("%s - File Browser"), slot->title);
+			window_title = eel_str_middle_truncate (full_title, MAX_TITLE_LENGTH);
+			g_free (full_title);
+		} else {
+			window_title = eel_str_middle_truncate (slot->title, MAX_TITLE_LENGTH);
+		}
 
-		window_title = eel_str_middle_truncate (full_title, MAX_TITLE_LENGTH);
 		gtk_window_set_title (GTK_WINDOW (window), window_title);
 		g_free (window_title);
-		g_free (full_title);
 	}
 
 	pane = NAUTILUS_NAVIGATION_WINDOW_PANE (slot->pane);
@@ -744,7 +751,9 @@ static NautilusIconInfo *
 real_get_icon (NautilusWindow *window,
 	       NautilusWindowSlot *slot)
 {
-	return nautilus_icon_info_lookup_from_name ("system-file-manager", 48);
+	return nautilus_file_get_icon (slot->viewed_file, 48,
+					NAUTILUS_FILE_ICON_FLAGS_IGNORE_VISITING |
+					NAUTILUS_FILE_ICON_FLAGS_USE_MOUNT_ICON);
 }
 
 static void
@@ -1092,9 +1101,9 @@ nautilus_navigation_window_save_geometry (NautilusNavigationWindow *window)
 
 	g_assert (NAUTILUS_IS_WINDOW (window));
 
-	if (GTK_WIDGET(window)->window) {
+	if (gtk_widget_get_window (GTK_WIDGET (window))) {
 		geometry_string = eel_gtk_window_get_geometry_string (GTK_WINDOW (window));
-		is_maximized = gdk_window_get_state (GTK_WIDGET (window)->window)
+		is_maximized = gdk_window_get_state (gtk_widget_get_window (GTK_WIDGET (window)))
 				& GDK_WINDOW_STATE_MAXIMIZED;
 		
 		if (eel_preferences_key_is_writable (NAUTILUS_PREFERENCES_NAVIGATION_WINDOW_SAVED_GEOMETRY) &&

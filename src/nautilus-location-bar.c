@@ -126,7 +126,7 @@ drag_data_received_callback (GtkWidget *widget,
 	g_assert (data != NULL);
 	g_assert (callback_data == NULL);
 
-	names = g_uri_list_extract_uris (data->data);
+	names = g_uri_list_extract_uris (gtk_selection_data_get_data (data));
 
 	if (names == NULL || *names == NULL) {
 		g_warning ("No D&D URI's");
@@ -213,7 +213,7 @@ drag_data_get_callback (GtkWidget *widget,
 	case NAUTILUS_DND_URI_LIST:
 	case NAUTILUS_DND_TEXT_PLAIN:
 		gtk_selection_data_set (selection_data,
-					selection_data->target,
+					gtk_selection_data_get_target (selection_data),
 					8, (guchar *) entry_text,
 					eel_strlen (entry_text));
 		break;
@@ -234,6 +234,7 @@ style_set_handler (GtkWidget *widget, GtkStyle *previous_style)
 {
 	PangoLayout *layout;
 	int width, width2;
+	int xpad;
 
 	layout = gtk_label_get_layout (GTK_LABEL(widget));
 
@@ -246,7 +247,10 @@ style_set_handler (GtkWidget *widget, GtkStyle *previous_style)
 	pango_layout_get_pixel_size (layout, &width2, NULL);
 	width = MAX (width, width2);
 
-	width += 2 * GTK_MISC (widget)->xpad;
+	gtk_misc_get_padding (GTK_MISC (widget),
+			      &xpad, NULL);
+
+	width += 2 * xpad;
 
 	gtk_widget_set_size_request (widget, width, -1);
 
@@ -266,10 +270,10 @@ label_button_pressed_callback (GtkWidget             *widget,
 		return FALSE;
 	}
 
-	window = nautilus_location_bar_get_window (widget->parent);
+	window = nautilus_location_bar_get_window (gtk_widget_get_parent (widget));
 	slot = NAUTILUS_WINDOW (window)->details->active_pane->active_slot;
 	view = slot->content_view;
-	label = GTK_BIN (widget)->child;
+	label = gtk_bin_get_child (GTK_BIN (widget));
 	/* only pop-up if the URI in the entry matches the displayed location */
 	if (view == NULL ||
 	    strcmp (gtk_label_get_text (GTK_LABEL (label)), LOCATION_LABEL)) {
@@ -279,28 +283,6 @@ label_button_pressed_callback (GtkWidget             *widget,
 	nautilus_view_pop_up_location_context_menu (view, event, NULL);
 
 	return FALSE;
-}
-
-static int
-get_editable_number_of_chars (GtkEditable *editable)
-{
-	char *text;
-	int length;
-
-	text = gtk_editable_get_chars (editable, 0, -1);
-	length = g_utf8_strlen (text, -1);
-	g_free (text);
-	return length;
-}
-
-static void
-set_position_and_selection_to_end (GtkEditable *editable)
-{
-	int end;
-
-	end = get_editable_number_of_chars (editable);
-	gtk_editable_select_region (editable, end, end);
-	gtk_editable_set_position (editable, end);
 }
 
 static void
@@ -428,7 +410,7 @@ nautilus_location_bar_init (NautilusLocationBar *bar)
 	entry = nautilus_location_entry_new ();
 	
 	g_signal_connect_object (entry, "activate",
-				 G_CALLBACK (editable_activate_callback), bar, 0);
+				 G_CALLBACK (editable_activate_callback), bar, G_CONNECT_AFTER);
 	g_signal_connect_object (entry, "changed",
 				 G_CALLBACK (editable_changed_callback), bar, 0);
 
@@ -505,9 +487,8 @@ nautilus_location_bar_set_location (NautilusNavigationBar *navigation_bar,
 		file = g_file_new_for_uri (location);
 		formatted_location = g_file_get_parse_name (file);
 		g_object_unref (file);
-		nautilus_entry_set_text (NAUTILUS_ENTRY (bar->details->entry),
-					 formatted_location);
-		set_position_and_selection_to_end (GTK_EDITABLE (bar->details->entry));
+		nautilus_location_entry_update_current_location (NAUTILUS_LOCATION_ENTRY (bar->details->entry),
+								 formatted_location);
 		g_free (formatted_location);
 	}
 

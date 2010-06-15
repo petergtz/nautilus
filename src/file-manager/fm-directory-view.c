@@ -281,10 +281,6 @@ static void     trash_or_delete_files                          (GtkWindow       
 								const GList          *files,
 								gboolean              delete_if_all_already_in_trash,
 								FMDirectoryView      *view);
-static void     restore_from_trash                             (GList                *files,
-								FMDirectoryView      *view);
-static GHashTable * get_original_directories                   (GList *files,
-								GList **unhandled_files);
 static void     load_directory                                 (FMDirectoryView      *view,
 								NautilusDirectory    *directory);
 static void     fm_directory_view_merge_menus                  (FMDirectoryView      *view);
@@ -599,7 +595,6 @@ fm_directory_view_get_nautilus_window_slot (FMDirectoryView  *view)
 
 	return view->details->slot;
 }
-
 
 /* Returns the GtkWindow that this directory view occupies, or NULL
  * if at the moment this directory view is not in a GtkWindow or the
@@ -1035,7 +1030,8 @@ action_restore_from_trash_callback (GtkAction *action,
 	view = FM_DIRECTORY_VIEW (callback_data);
 
 	selection = fm_directory_view_get_selection_for_file_transfer (view);
-	restore_from_trash (selection, view);
+	nautilus_restore_files_from_trash (selection,
+					   fm_directory_view_get_containing_window (view));
 
 	nautilus_file_list_free (selection);
 
@@ -1171,10 +1167,12 @@ static void
 select_pattern (FMDirectoryView *view)
 {
 	GtkWidget *dialog;
-	GtkWidget *box;
 	GtkWidget *label;
+	GtkWidget *example;
+	GtkWidget *table;
 	GtkWidget *entry;
 	GList *ret;
+	char *example_pattern;
 
 	ret = NULL;
 	dialog = gtk_dialog_new_with_buttons (_("Select Items Matching"),
@@ -1191,18 +1189,42 @@ select_pattern (FMDirectoryView *view)
 					 GTK_RESPONSE_OK);
 	gtk_dialog_set_has_separator (GTK_DIALOG (dialog), FALSE);
 	gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
-	gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->vbox), 2);
+	gtk_box_set_spacing (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), 2);
 
-	box = gtk_hbox_new (FALSE, 12);
-	gtk_container_set_border_width (GTK_CONTAINER (box), 5);
 	label = gtk_label_new_with_mnemonic (_("_Pattern:"));
+	example = gtk_label_new (NULL);
+	example_pattern = g_strdup_printf ("<b>%s</b><i>%s</i>", 
+					   _("Examples: "),
+					   "*.png, file\?\?.txt, pict*.\?\?\?");
+	gtk_label_set_markup (GTK_LABEL (example), example_pattern);
+	g_free (example_pattern);
+	gtk_misc_set_alignment (GTK_MISC (example), 0.0, 0.5);
 	entry = gtk_entry_new ();
 	gtk_entry_set_activates_default (GTK_ENTRY (entry), TRUE);
-	gtk_box_pack_start (GTK_BOX (box), label, TRUE, TRUE, 0);
-	gtk_box_pack_start (GTK_BOX (box), entry, TRUE, TRUE, 0);
+
+	table = gtk_table_new (2, 2, FALSE);
+	
+	gtk_table_attach (GTK_TABLE (table), label,
+			  0, 1,
+			  0, 1,
+			  GTK_FILL, GTK_FILL,
+			  5, 5);
+
+	gtk_table_attach (GTK_TABLE (table), entry,
+			  1, 2,
+			  0, 1,
+			  GTK_EXPAND | GTK_FILL, GTK_FILL,
+			  5, 5);
+
+	gtk_table_attach (GTK_TABLE (table), example,
+			  1, 2,
+			  1, 2,
+			  GTK_FILL, GTK_FILL,
+			  5, 0);
+
 	gtk_label_set_mnemonic_widget (GTK_LABEL (label), entry);
-	gtk_widget_show_all (box);
-	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), box);
+	gtk_widget_show_all (table);
+	gtk_container_add (GTK_CONTAINER (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), table);
 	g_object_set_data (G_OBJECT (dialog), "entry", entry);
 	g_signal_connect (dialog, "response",
 			  G_CALLBACK (pattern_select_response_cb),
@@ -1303,14 +1325,14 @@ action_save_search_as_callback (GtkAction *action,
 		gtk_dialog_set_default_response (GTK_DIALOG (dialog),
 						 GTK_RESPONSE_OK);
 		gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
-		gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->vbox), 2);
+		gtk_box_set_spacing (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), 2);
 		gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 
 		table = gtk_table_new (2, 2, FALSE);
 		gtk_container_set_border_width (GTK_CONTAINER (table), 5);
 		gtk_table_set_row_spacings (GTK_TABLE (table), 6);
 		gtk_table_set_col_spacings (GTK_TABLE (table), 12);
-		gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), table, TRUE, TRUE, 0);
+		gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), table, TRUE, TRUE, 0);
 		gtk_widget_show (table);
 		
 		label = gtk_label_new_with_mnemonic (_("Search _name:"));
@@ -1766,7 +1788,7 @@ slot_inactive (NautilusWindowSlot *slot,
 	       FMDirectoryView *view)
 {
 	g_assert (view->details->active ||
-		  GTK_WIDGET (view)->parent == NULL);
+		  gtk_widget_get_parent (GTK_WIDGET (view)) == NULL);
 	view->details->active = FALSE;
 
 	fm_directory_view_unmerge_menus (view);
@@ -4347,11 +4369,11 @@ add_application_to_open_with_menu (FMDirectoryView *view,
 
 	launch_parameters = application_launch_parameters_new 
 		(application, files, view);
-	escaped_app = eel_str_double_underscores (g_app_info_get_name (application));
+	escaped_app = eel_str_double_underscores (g_app_info_get_display_name (application));
 	if (submenu)
 		label = g_strdup_printf ("%s", escaped_app);
 	else
-		label = g_strdup_printf (_("Open with %s"), escaped_app);
+		label = g_strdup_printf (_("Open With %s"), escaped_app);
 
 	tip = g_strdup_printf (ngettext ("Use \"%s\" to open the selected item",
 					 "Use \"%s\" to open the selected items",
@@ -5730,114 +5752,6 @@ create_popup_menu (FMDirectoryView *view, const char *popup_path)
 
 	return GTK_MENU (menu);
 }
-
-typedef struct {
-	char **file_uris;
-        guint n_file_uris;
-	gboolean cut;
-} ClipboardInfo;
-
-static char *
-convert_file_list_to_string (ClipboardInfo *info,
-			     gboolean format_for_text,
-                             gsize *len)
-{
-	GString *uris;
-	char *uri, *tmp;
-	GFile *f;
-        guint i;
-
-	if (format_for_text) {
-		uris = g_string_new (NULL);
-	} else {
-		uris = g_string_new (info->cut ? "cut" : "copy");
-	}
-
-        for (i = 0; i < info->n_file_uris; ++i) {
-		uri = info->file_uris[i];
-		
-		if (format_for_text) {
-			f = g_file_new_for_uri (uri);
-			tmp = g_file_get_parse_name (f);
-			g_object_unref (f);
-			
-			if (tmp != NULL) {
-				g_string_append (uris, tmp);
-				g_free (tmp);
-			} else {
-				g_string_append (uris, uri);
-			}
-
-			/* skip newline for last element */
-			if (i + 1 < info->n_file_uris) {
-				g_string_append_c (uris, '\n');
-			}
-		} else {
-			g_string_append_c (uris, '\n');
-			g_string_append (uris, uri);
-		}
-	}
-
-        *len = uris->len;
-	return g_string_free (uris, FALSE);
-}
-
-static void
-get_clipboard_callback (GtkClipboard     *clipboard,
-			GtkSelectionData *selection_data,
-			guint             info,
-			gpointer          user_data)
-{
-	ClipboardInfo *clipboard_info = user_data;
-
-        if (gtk_targets_include_uri (&selection_data->target, 1)) {
-                gtk_selection_data_set_uris (selection_data, clipboard_info->file_uris);
-        } else if (gtk_targets_include_text (&selection_data->target, 1)) {
-                char *str;
-                gsize len;
-
-                str = convert_file_list_to_string (clipboard_info, TRUE, &len);
-                gtk_selection_data_set_text (selection_data, str, len);
-                g_free (str);
-        } else if (selection_data->target == copied_files_atom) {
-                char *str;
-                gsize len;
-
-                str = convert_file_list_to_string (clipboard_info, FALSE, &len);
-                gtk_selection_data_set (selection_data, copied_files_atom, 8, str, len);
-                g_free (str);
-        }
-}
-
-static void
-clear_clipboard_callback (GtkClipboard *clipboard,
-			  gpointer      user_data)
-{
-	ClipboardInfo *info = user_data;
-
-        g_strfreev (info->file_uris);
-	g_slice_free (ClipboardInfo, info);
-}
-
-static ClipboardInfo *
-convert_file_list_to_uris (GList *files,
-                           gboolean cut)
-{
-        ClipboardInfo *info;
-        guint i;
-
-	info = g_slice_new (ClipboardInfo);
-        info->cut = cut;
-        info->n_file_uris = g_list_length (files);
-        info->file_uris = g_new (char *, info->n_file_uris + 1);
-
-        for (i = 0; files != NULL; files = files->next, ++i)
-                info->file_uris[i] = nautilus_file_get_uri (files->data);
-
-        info->file_uris[info->n_file_uris] = NULL;
-
-        return info;
-}
 	
 static void
 copy_or_cut_files (FMDirectoryView *view,
@@ -5846,12 +5760,13 @@ copy_or_cut_files (FMDirectoryView *view,
 {
 	int count;
 	char *status_string, *name;
-	ClipboardInfo *info;
+	NautilusClipboardInfo info;
         GtkTargetList *target_list;
         GtkTargetEntry *targets;
         int n_targets;
 
-	info = convert_file_list_to_uris (clipboard_contents, cut);
+	info.files = clipboard_contents;
+	info.cut = cut;
 
         target_list = gtk_target_list_new (NULL, 0);
         gtk_target_list_add (target_list, copied_files_atom, 0, 0);
@@ -5863,11 +5778,11 @@ copy_or_cut_files (FMDirectoryView *view,
 
 	gtk_clipboard_set_with_data (nautilus_clipboard_get (GTK_WIDGET (view)),
 				     targets, n_targets,
-				     get_clipboard_callback, clear_clipboard_callback,
-				     info);
+				     nautilus_get_clipboard_callback, nautilus_clear_clipboard_callback,
+				     NULL);
         gtk_target_table_free (targets, n_targets);
 
-	nautilus_clipboard_monitor_emit_changed ();
+	nautilus_clipboard_monitor_set_clipboard_info (nautilus_clipboard_monitor_get (), &info);
 
 	count = g_list_length (clipboard_contents);
 	if (count == 1) {
@@ -6860,11 +6775,11 @@ action_connect_to_server_link_callback (GtkAction *action,
 		g_object_set_data_full (G_OBJECT (dialog), "link-icon", g_strdup (icon_name), g_free);
 		
 		gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
-		gtk_box_set_spacing (GTK_BOX (GTK_DIALOG (dialog)->vbox), 2);
+		gtk_box_set_spacing (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))), 2);
 
 		box = gtk_hbox_new (FALSE, 12);
 		gtk_widget_show (box);
-		gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox),
+		gtk_box_pack_start (GTK_BOX (gtk_dialog_get_content_area (GTK_DIALOG (dialog))),
 				    box, TRUE, TRUE, 0);
 		
 		label = gtk_label_new_with_mnemonic (_("Link _name:"));
@@ -7051,75 +6966,6 @@ action_location_delete_callback (GtkAction *action,
 	eel_g_object_list_free (files);
 }
 
-static GList *
-locations_from_file_list (GList *file_list)
-{
-	NautilusFile *file;
-	GList *l, *ret;
-
-	ret = NULL;
-
-	for (l = file_list; l != NULL; l = l->next) {
-		file = NAUTILUS_FILE (l->data);
-		ret = g_list_prepend (ret, nautilus_file_get_location (file));
-	}
-
-	return g_list_reverse (ret);
-}
-
-static void
-restore_from_trash (GList *files,
-		    FMDirectoryView *view)
-{
-	NautilusFile *file, *original_dir;
-	GHashTable *original_dirs_hash;
-	GList *original_dirs, *unhandled_files;
-	GFile *original_dir_location;
-	GList *locations, *l;
-	char *message, *file_name;
-
-	g_assert (FM_IS_DIRECTORY_VIEW (view));
-
-	original_dirs_hash = get_original_directories (files, &unhandled_files);
-
-	for (l = unhandled_files; l != NULL; l = l->next) {
-		file = NAUTILUS_FILE (l->data);
-		file_name = nautilus_file_get_display_name (file);
-		message = g_strdup_printf (_("Could not determine original location of \"%s\" "), file_name);
-		g_free (file_name);
-
-		eel_show_warning_dialog (message,
-					 _("The item cannot be restored from trash"),
-					 fm_directory_view_get_containing_window (view));
-		g_free (message);
-	}
-
-	if (original_dirs_hash != NULL) {
-		original_dirs = g_hash_table_get_keys (original_dirs_hash);
-		for (l = original_dirs; l != NULL; l = l->next) {
-			original_dir = NAUTILUS_FILE (l->data);
-			original_dir_location = nautilus_file_get_location (original_dir);
-
-			files = g_hash_table_lookup (original_dirs_hash, original_dir);
-			locations = locations_from_file_list (files);
-
-			nautilus_file_operations_move
-				(locations, NULL, 
-				 original_dir_location,
-				 (GtkWindow *) view->details->window,
-				 NULL, NULL);
-
-			eel_g_object_list_free (locations);
-			g_object_unref (original_dir_location);
-		}
-
-		g_list_free (original_dirs);
-		g_hash_table_destroy (original_dirs_hash);
-	}
-
-	nautilus_file_list_unref (unhandled_files);
-}
-
 static void
 action_location_restore_from_trash_callback (GtkAction *action,
 					     gpointer callback_data)
@@ -7134,7 +6980,8 @@ action_location_restore_from_trash_callback (GtkAction *action,
 	l.prev = NULL;
 	l.next = NULL;
 	l.data = file;
-	restore_from_trash (&l, view);
+	nautilus_restore_files_from_trash (&l,
+					   fm_directory_view_get_containing_window (view));
 }
 
 static void
@@ -7231,7 +7078,7 @@ static const GtkActionEntry directory_view_entries[] = {
   /* tooltip */                  N_("Choose another application with which to open the selected item"),
                                  G_CALLBACK (action_other_application_callback) },
   /* name, stock id */         { "OtherApplication2", NULL,
-  /* label, accelerator */       N_("Open with Other _Application..."), NULL,
+  /* label, accelerator */       N_("Open With Other _Application..."), NULL,
   /* tooltip */                  N_("Choose another application with which to open the selected item"),
                                  G_CALLBACK (action_other_application_callback) },
   /* name, stock id */         { "Open Scripts Folder", NULL,
@@ -7510,34 +7357,32 @@ pre_activate (FMDirectoryView *view,
 	      GtkActionGroup *action_group)
 {
 	GdkEvent *event;
-	GtkWidget *proxy, *shell;
-	gboolean unset_pos;
+	GtkWidget *proxy;
+	gboolean activated_from_popup;
 
 	/* check whether action was activated through a popup menu.
 	 * If not, unset the last stored context menu popup position */
-	unset_pos = TRUE;
+	activated_from_popup = FALSE;
 
 	event = gtk_get_current_event ();
 	proxy = gtk_get_event_widget (event);
 
-	if (proxy != NULL && GTK_IS_MENU_ITEM (proxy)) {
-		shell = proxy->parent;
+	if (proxy != NULL) {
+		GtkWidget *toplevel;
+		GdkWindowTypeHint hint;
 
-		unset_pos = FALSE;
+		toplevel = gtk_widget_get_toplevel (proxy);
 
-		do {
-			if (!GTK_IS_MENU (shell)) {
-				/* popup menus are GtkMenu-only menu shell hierarchies */
-				unset_pos = TRUE;
-				break;
+		if (GTK_IS_WINDOW (toplevel)) {
+			hint = gtk_window_get_type_hint (GTK_WINDOW (toplevel));
+
+			if (hint == GDK_WINDOW_TYPE_HINT_POPUP_MENU) {
+				activated_from_popup = TRUE;
 			}
-
-			shell = GTK_MENU_SHELL (shell)->parent_menu_shell;
-		} while (GTK_IS_MENU_SHELL (shell)
-			 && GTK_MENU_SHELL (shell)->parent_menu_shell != NULL);
+		}
 	}
 
-	if (unset_pos) {
+	if (!activated_from_popup) {
 		update_context_menu_position_from_event (view, NULL);
 	}
 }
@@ -7782,10 +7627,6 @@ file_should_show_foreach (NautilusFile        *file,
 		*show_eject = TRUE;
 	}
 
-	if (nautilus_file_can_unmount (file)) {
-		*show_unmount = TRUE;
-	}
-
 	if (nautilus_file_can_mount (file)) {
 		*show_mount = TRUE;
 
@@ -7803,6 +7644,12 @@ file_should_show_foreach (NautilusFile        *file,
 
 	if (nautilus_file_can_stop (file)) {
 		*show_stop = TRUE;
+	}
+
+	/* Dot not show both Unmount and Eject/Safe Removal; too confusing to
+	 * have too many menu entries */
+	if (nautilus_file_can_unmount (file) && !*show_eject && !*show_stop) {
+		*show_unmount = TRUE;
 	}
 
 	if (nautilus_file_can_poll_for_media (file) && !nautilus_file_is_media_check_automatic (file)) {
@@ -7852,10 +7699,6 @@ file_should_show_self (NautilusFile        *file,
 		*show_eject = TRUE;
 	}
 
-	if (nautilus_file_can_unmount (file)) {
-		*show_unmount = TRUE;
-	}
-
 	if (nautilus_file_can_mount (file)) {
 		*show_mount = TRUE;
 	}
@@ -7874,65 +7717,18 @@ file_should_show_self (NautilusFile        *file,
 		*show_stop = TRUE;
 	}
 
+	/* Dot not show both Unmount and Eject/Safe Removal; too confusing to
+	 * have too many menu entries */
+	if (nautilus_file_can_unmount (file) && !*show_eject && !*show_stop) {
+		*show_unmount = TRUE;
+	}
+
 	if (nautilus_file_can_poll_for_media (file) && !nautilus_file_is_media_check_automatic (file)) {
 		*show_poll = TRUE;
 	}
 
 	*start_stop_type = nautilus_file_get_start_stop_type (file);
 
-}
-
-static GHashTable *
-get_original_directories (GList *files,
-			  GList **unhandled_files)
-{
-	GHashTable *directories;
-	NautilusFile *file, *original_file, *original_dir;
-	GList *l, *m;
-
-	directories = NULL;
-
-	if (unhandled_files != NULL) {
-		*unhandled_files = NULL;
-	}
-
-	for (l = files; l != NULL; l = l->next) {
-		file = NAUTILUS_FILE (l->data);
-		original_file = nautilus_file_get_trash_original_file (file);
-
-		original_dir = NULL;
-		if (original_file != NULL) {
-			original_dir = nautilus_file_get_parent (original_file);
-		}
-
-		if (original_dir != NULL) {
-			if (directories == NULL) {
-				directories = g_hash_table_new_full (g_direct_hash, g_direct_equal,
-								     (GDestroyNotify) nautilus_file_unref,
-								     (GDestroyNotify) nautilus_file_list_unref);
-			}
-			nautilus_file_ref (original_dir);
-			m = g_hash_table_lookup (directories, original_dir);
-			if (m != NULL) {
-				g_hash_table_steal (directories, original_dir);
-				nautilus_file_unref (original_dir);
-			}
-			m = g_list_append (m, nautilus_file_ref (file));
-			g_hash_table_insert (directories, original_dir, m);
-		} else if (unhandled_files != NULL) {
-			*unhandled_files = g_list_append (*unhandled_files, nautilus_file_ref (file));
-		}
-
-		if (original_file != NULL) {
-			nautilus_file_unref (original_file);
-		}
-
-		if (original_dir != NULL) {
-			nautilus_file_unref (original_dir);
-		}
-	}
-
-	return directories;
 }
 
 static gboolean
@@ -7992,7 +7788,7 @@ update_restore_from_trash_action (GtkAction *action,
 		if (g_list_length (files) == 1) {
 			original_file = nautilus_file_get_trash_original_file (files->data);
 		} else {
-			original_dirs_hash = get_original_directories (files, NULL);
+			original_dirs_hash = nautilus_trashed_files_get_original_directories (files, NULL);
 			if (original_dirs_hash != NULL) {
 				original_dirs = g_hash_table_get_keys (original_dirs_hash);
 				if (g_list_length (original_dirs) == 1) {
@@ -8744,8 +8540,8 @@ real_update_menus (FMDirectoryView *view)
 	if (app != NULL) {
 		char *escaped_app;
 
-		escaped_app = eel_str_double_underscores (g_app_info_get_name (app));
-		label_with_underscore = g_strdup_printf (_("_Open with %s"),
+		escaped_app = eel_str_double_underscores (g_app_info_get_display_name (app));
+		label_with_underscore = g_strdup_printf (_("_Open With %s"),
 							 escaped_app);
 
 		app_icon = g_app_info_get_icon (app);
