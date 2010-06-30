@@ -91,6 +91,8 @@
 #define NAUTILUS_MENU_PATH_SHORT_LIST_PLACEHOLDER  	"/MenuBar/View/View Choices/Short List"
 #define NAUTILUS_MENU_PATH_AFTER_SHORT_LIST_SEPARATOR   "/MenuBar/View/View Choices/After Short List"
 
+#define NAUTILUS_WINDOW_DBUS_NAME_LEN	64
+
 enum {
 	ARG_0,
 	ARG_APP
@@ -147,19 +149,21 @@ static const struct {
 static void
 enter_restore_mode_event(DBusGProxy *object, gpointer user_data)
 {
-	DBusGConnection *bus;
-	gchar *dbus_window_as_string;
-	DBusGProxy *cozy_control_center;
-	GError *error = NULL;
-	gint result;
 	g_print("Received a signal from Cozy Restore Control Center\n");
 	if (gtk_window_has_toplevel_focus(GTK_WINDOW(user_data)))
 	{
+		DBusGConnection *bus;
+		gchar dbus_window_as_string[NAUTILUS_WINDOW_DBUS_NAME_LEN];
+		DBusGProxy *cozy_control_center;
+		GError *error = NULL;
+		gint result;
+
 		g_print("Registering myself, because I'm the toplevel window with the focus.");
-		bus = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+		bus = dbus_g_bus_get (DBUS_BUS_SESSION, NULL);
 		cozy_control_center = dbus_g_proxy_new_for_name(bus, "org.freedesktop.Cozy", "/org/freedesktop/Cozy/RestoreControlCenter",
 								"org.freedesktop.Cozy.RestoreControlCenter");
-		dbus_window_as_string = g_strdup_printf("/NautilusWindow/%p", GTK_WINDOW(user_data));
+		g_snprintf(dbus_window_as_string, NAUTILUS_WINDOW_DBUS_NAME_LEN, 
+				"/NautilusWindow/%p", GTK_WINDOW(user_data));
 		result = dbus_g_proxy_call(cozy_control_center, "register_me", &error,
 				G_TYPE_STRING, dbus_window_as_string,
 				G_TYPE_STRING, "org.gnome.NautilusWindow",
@@ -170,7 +174,9 @@ enter_restore_mode_event(DBusGProxy *object, gpointer user_data)
 		if (!result)
 		{
 			g_printerr ("Error: Could not register myself at Cozy Control Center due to:\n%s\n", error->message);
+			g_error_free(error);
 		}
+		g_object_unref(cozy_control_center);
 	}
 }
 
@@ -182,7 +188,7 @@ nautilus_window_init (NautilusWindow *window)
 	GtkWidget *menu;
 	GtkWidget *statusbar;
 
-	gchar *dbus_window_as_string;
+	gchar dbus_window_as_string[NAUTILUS_WINDOW_DBUS_NAME_LEN];
 	DBusGConnection *bus;
 	GError *error = NULL;
 // Cozy specific:
@@ -242,7 +248,7 @@ nautilus_window_init (NautilusWindow *window)
 
 	bus = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
 	dbus_g_object_type_install_info(NAUTILUS_TYPE_WINDOW, &dbus_glib_nautilus_window_object_info);
-	dbus_window_as_string = g_strdup_printf("/NautilusWindow/%p", window);
+	g_snprintf(dbus_window_as_string, NAUTILUS_TYPE_WINDOW, "/NautilusWindow/%p", window);
 	dbus_g_connection_register_g_object (bus, dbus_window_as_string, G_OBJECT (window));
 // cozy specific:
 	cozy_control_center = dbus_g_proxy_new_for_name(bus, "org.freedesktop.Cozy", "/org/freedesktop/Cozy/RestoreControlCenter",
@@ -2118,6 +2124,7 @@ nautilus_window_dbus_go_to (NautilusWindow *window, const char *location, GError
 	GFile *file_location;
 	file_location = g_file_new_for_uri(location);
 	nautilus_window_go_to(window, file_location);
+	g_free(file_location);
 	return TRUE;
 }
 
