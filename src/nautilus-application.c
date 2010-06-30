@@ -924,14 +924,12 @@ static void
 add_application_object_to_dbus(NautilusApplication *application)
 {
 	DBusGConnection *bus;
-	GError *error;
+	GError *error = NULL;
 	DBusGProxy *bus_proxy;
 	guint request_name_result;
 
-	error = NULL;
-
 	dbus_g_object_type_install_info(NAUTILUS_TYPE_APPLICATION, &dbus_glib_nautilus_application_object_info);
-	bus = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+	bus = dbus_g_bus_get (DBUS_BUS_SESSION, NULL);
 
 	bus_proxy = dbus_g_proxy_new_for_name(bus, DBUS_SERVICE_DBUS, DBUS_PATH_DBUS, DBUS_INTERFACE_DBUS);
 
@@ -943,7 +941,10 @@ add_application_object_to_dbus(NautilusApplication *application)
 			  G_TYPE_INVALID))
 	{
 		g_printerr ("Failed to acquire org.gnome.Nautilus: %s", error->message);
+		g_error_free(error);
 	}
+
+	g_object_unref (bus_proxy);
 
 	dbus_g_connection_register_g_object (bus, "/NautilusApplication", G_OBJECT (application));
 }
@@ -2199,6 +2200,7 @@ gboolean nautilus_application_dbus_create_navigation_window (NautilusApplication
 	location = g_file_new_for_uri("file:///");
 	nautilus_window_go_to(window, location);
 	*ret = g_strdup_printf("/NautilusWindow/%p", window);
+	g_object_unref(location);
 	return TRUE;
 }
 
