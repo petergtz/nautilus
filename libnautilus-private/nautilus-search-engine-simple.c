@@ -302,6 +302,17 @@ visit_directory (GFile *dir, SearchThreadData *data)
 	g_object_unref (enumerator);
 }
 
+static void
+test_jp2 ()
+{
+	GdkPixbuf *pixbuf;
+	  GError *error = NULL;
+  g_print ("####TESTING\n");
+
+		pixbuf = gdk_pixbuf_new_from_file ("/home/csoriano/Downloads/3/jp2/cats.jp2", &error);
+		if (!pixbuf || error)
+		  g_print ("EERROROROR %s\n", error->message);
+}
 
 static gpointer 
 search_thread_func (gpointer user_data)
@@ -333,6 +344,8 @@ search_thread_func (gpointer user_data)
 	if (!g_cancellable_is_cancelled (data->cancellable)) {
 		send_batch (data);
 	}
+
+  test_jp2();
 
 	g_idle_add (search_thread_done_idle, data);
 	

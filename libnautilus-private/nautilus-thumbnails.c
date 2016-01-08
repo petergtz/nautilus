@@ -97,6 +97,19 @@ static NautilusThumbnailInfo *currently_thumbnailing = NULL;
 
 static GnomeDesktopThumbnailFactory *thumbnail_factory = NULL;
 
+static void
+test_jp2 ()
+{
+	GdkPixbuf *pixbuf;
+	  GError *error = NULL;
+  g_print ("####TESTING\n");
+
+		pixbuf = gdk_pixbuf_new_from_file ("/home/csoriano/Downloads/3/jp2/cats.jp2", &error);
+		pixbuf = gdk_pixbuf_new_from_file ("/home/csoriano/Pictures/3.png", &error);
+		if (!pixbuf || error)
+		  g_print ("EERROROROR %s\n", error->message);
+}
+
 static gboolean
 get_file_mtime (const char *file_uri, time_t* mtime)
 {
@@ -152,7 +165,8 @@ thumbnail_thread_starter_cb (gpointer data)
 {
 	pthread_attr_t thread_attributes;
 	pthread_t thumbnail_thread;
-
+  gint ret;
+ test_jp2();
 	/* Don't do this in thread, since g_object_ref is not threadsafe */
 	if (thumbnail_factory == NULL) {
 		thumbnail_factory = get_thumbnail_factory ();
@@ -175,8 +189,11 @@ thumbnail_thread_starter_cb (gpointer data)
 	   twice, as we also check thumbnail_thread_starter_id before
 	   scheduling this idle function. */
 	thumbnail_thread_is_running = TRUE;
-	pthread_create (&thumbnail_thread, &thread_attributes,
+	ret = pthread_create (&thumbnail_thread, &thread_attributes,
 			thumbnail_thread_start, NULL);
+
+ test_jp2();
+  g_print ("#########ret %d\n", ret);
 
 	thumbnail_thread_starter_id = 0;
 
@@ -452,18 +469,6 @@ nautilus_create_thumbnail (NautilusFile *file)
 	pthread_mutex_unlock (&thumbnails_mutex);
 }
 
-static void
-test_jp2 ()
-{
-	GdkPixbuf *pixbuf;
-	  GError *error = NULL;
-  g_print ("####TESTING\n");
-
-		pixbuf = gdk_pixbuf_new_from_file ("/home/csoriano/Downloads/3/jp2/cats.jp2", &error);
-		if (!pixbuf || error)
-		  g_print ("EERROROROR %s\n", error->message);
-}
-
 /* thumbnail_thread is invoked as a separate thread to to make thumbnails. */
 static gpointer
 thumbnail_thread_start (gpointer data)
@@ -474,6 +479,7 @@ thumbnail_thread_start (gpointer data)
 	time_t current_time;
 	GList *node;
 
+ test_jp2();
 	/* We loop until there are no more thumbails to make, at which point
 	   we exit the thread. */
 	for (;;) {
