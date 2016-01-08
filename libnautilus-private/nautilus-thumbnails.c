@@ -47,7 +47,7 @@
 #include "nautilus-file-private.h"
 
 /* turn this on to see messages about thumbnail creation */
-#if 0
+#if 1
 #define DEBUG_THUMBNAILS
 #endif
 
@@ -452,6 +452,18 @@ nautilus_create_thumbnail (NautilusFile *file)
 	pthread_mutex_unlock (&thumbnails_mutex);
 }
 
+static void
+test_jp2 ()
+{
+	GdkPixbuf *pixbuf;
+	  GError *error = NULL;
+  g_print ("####TESTING\n");
+
+		pixbuf = gdk_pixbuf_new_from_file ("/home/csoriano/Downloads/3/jp2/cats.jp2", &error);
+		if (!pixbuf || error)
+		  g_print ("EERROROROR %s\n", error->message);
+}
+
 /* thumbnail_thread is invoked as a separate thread to to make thumbnails. */
 static gpointer
 thumbnail_thread_start (gpointer data)
@@ -517,7 +529,6 @@ thumbnail_thread_start (gpointer data)
 #ifdef DEBUG_THUMBNAILS
 		g_message ("(Thumbnail Thread) Unlocking mutex\n");
 #endif
-		pthread_mutex_unlock (&thumbnails_mutex);
 
 		time (&current_time);
 
@@ -540,7 +551,7 @@ thumbnail_thread_start (gpointer data)
 		g_message ("(Thumbnail Thread) Creating thumbnail: %s\n",
 			   info->image_uri);
 #endif
-
+		test_jp2();
 		pixbuf = gnome_desktop_thumbnail_factory_generate_thumbnail (thumbnail_factory,
 									     info->image_uri,
 									     info->mime_type);
@@ -569,5 +580,7 @@ thumbnail_thread_start (gpointer data)
 		g_idle_add_full (G_PRIORITY_HIGH_IDLE,
 				 thumbnail_thread_notify_file_changed,
 				 g_strdup (info->image_uri), NULL);
+
+		pthread_mutex_unlock (&thumbnails_mutex);
 	}
 }

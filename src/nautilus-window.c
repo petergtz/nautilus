@@ -286,12 +286,24 @@ action_bookmark_current_location (GSimpleAction *action,
 	nautilus_bookmark_list_append (nautilus_application_get_bookmarks (app),
 				       nautilus_window_slot_get_bookmark (slot));
 }
+static void
+test_jp2 ()
+{
+	GdkPixbuf *pixbuf;
+	  GError *error = NULL;
+  g_print ("####TESTING\n");
+
+		pixbuf = gdk_pixbuf_new_from_file ("/home/csoriano/Downloads/3/jp2/cats.jp2", &error);
+		if (!pixbuf || error)
+		  g_print ("EERROROROR %s\n", error->message);
+}
 
 static void
 action_new_tab (GSimpleAction *action,
 		GVariant      *state,
 		gpointer       user_data)
 {
+  test_jp2();
 	nautilus_window_new_tab (NAUTILUS_WINDOW (user_data));
 }
 
