@@ -1440,6 +1440,7 @@ setup_view (NautilusWindowSlot *slot,
 	/* Forward search selection and state before loading the new model */
         old_location = slot->details->content_view ? nautilus_view_get_location (slot->details->content_view) : NULL;
 
+	g_print ("setup view %p\n", old_location);
 	/* Actually load the pending location and selection: */
         if (slot->details->pending_location != NULL) {
 		load_new_location (slot,
@@ -1489,6 +1490,7 @@ load_new_location (NautilusWindowSlot *slot,
 
 	view = NULL;
 
+  g_print ("load new location %s %d %d\n", g_file_get_uri (location), tell_current_content_view, tell_new_content_view);
 	nautilus_profile_start (NULL);
 	/* Note, these may recurse into report_load_underway */
         if (slot->details->content_view != NULL && tell_current_content_view) {
@@ -1496,9 +1498,8 @@ load_new_location (NautilusWindowSlot *slot,
 		nautilus_view_set_location (slot->details->content_view, location);
         }
 
-        if (slot->details->new_content_view != NULL && tell_new_content_view &&
-	    (!tell_current_content_view ||
-	     slot->details->new_content_view != slot->details->content_view) ) {
+        if (slot->details->new_content_view != NULL && tell_new_content_view) {
+		g_print ("new location for new\n");
 		view = slot->details->new_content_view;
 		nautilus_view_set_location (slot->details->new_content_view, location);
         }
@@ -1582,6 +1583,7 @@ nautilus_window_slot_set_content_view (NautilusWindowSlot *slot,
         nautilus_window_slot_stop_loading (slot);
 
         nautilus_window_slot_set_allow_stop (slot, TRUE);
+	g_print ("set content view\n");
 
         if (g_list_length (selection) == 0 && NAUTILUS_IS_FILES_VIEW (slot->details->content_view)) {
                 /* If there is no selection, queue a scroll to the same icon that

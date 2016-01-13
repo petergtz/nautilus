@@ -3143,6 +3143,7 @@ nautilus_files_view_set_location (NautilusView *view,
 
         nautilus_profile_start (NULL);
         directory = nautilus_directory_get (location);
+	g_print ("new location\n");
         load_directory (NAUTILUS_FILES_VIEW (view), directory);
         /* In case we want to load a previous search, sync the query */
         if (NAUTILUS_IS_SEARCH_DIRECTORY (directory)) {
@@ -3176,6 +3177,7 @@ done_loading (NautilusFilesView *view,
         GList *selection;
         gboolean do_reveal = FALSE;
 
+  g_print ("done loading %d\n", view->details->loading);
         if (!view->details->loading) {
                 return;
         }
@@ -7106,6 +7108,7 @@ load_directory (NautilusFilesView *view,
         view->details->location = nautilus_directory_get_location (directory);
 
         g_object_notify (G_OBJECT (view), "location");
+        g_object_notify (G_OBJECT (view), "is-loading");
         g_object_notify (G_OBJECT (view), "is-searching");
 
         /* FIXME bugzilla.gnome.org 45062: In theory, we also need to monitor metadata here (as
